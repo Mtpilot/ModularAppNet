@@ -1,4 +1,5 @@
 ﻿using System.Data.Common;
+using System.Globalization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using ModularMonolith.Host;
@@ -24,6 +25,10 @@ public class CustomWebApplicationFactory : WebApplicationFactory<IApiMarker>, IA
 
     public async Task InitializeAsync()
     {
+	    var culture = new CultureInfo("en-US");
+	    CultureInfo.DefaultThreadCurrentCulture = culture;
+	    CultureInfo.DefaultThreadCurrentUICulture = culture;
+
 	    await _dbContainer.StartAsync();
 
 	    _dbConnection = new NpgsqlConnection(_dbContainer.GetConnectionString());

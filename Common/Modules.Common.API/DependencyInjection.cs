@@ -55,6 +55,8 @@ public static class DependencyInjection
             opt.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
 
+        services.AddScoped<Modules.Common.API.Abstractions.Links.ILinkService, Modules.Common.API.Services.LinkService>();
+
         return services;
     }
 

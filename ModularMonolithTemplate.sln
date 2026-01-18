@@ -1,5 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.2.11408.102 d18.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{A140E573-7FC3-46D5-B1B9-3EF537C0B82B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Stocks", "Stocks", "{C915522F-9AA8-45AC-9C9C-5AA70421623E}"
@@ -63,6 +66,14 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modules.Shipments.Tests.Integration", "Shipments\Modules.Shipments.Tests.Integration\Modules.Shipments.Tests.Integration.csproj", "{0E5D22E7-84D4-4BBC-A6E8-A1C0D37947A1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modules.Common.Result.Tests.Unit", "Common\Modules.Common.Result.Tests.Unit\Modules.Common.Result.Tests.Unit.csproj", "{AD7F74B0-9AE4-459A-B004-983A15B8E440}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{F0D623C8-20D4-4E75-84E6-BBD957BC959B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modules.Workflows.Domain", "Workflows\Modules.Workflows.Domain\Modules.Workflows.Domain.csproj", "{BEADCD3C-730B-4EDD-9838-7F312F811FF4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AppMetaData", "AppMetaData", "{3FFFA140-87A8-47EA-8BD7-B5905DBE0A90}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modules.Workflows.Features", "Workflows\Modules.Workflows.Features\Modules.Workflows.Features.csproj", "{1049B08E-A594-45E7-BD90-3DF33BFE08B7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -162,6 +173,17 @@ Global
 		{AD7F74B0-9AE4-459A-B004-983A15B8E440}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD7F74B0-9AE4-459A-B004-983A15B8E440}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD7F74B0-9AE4-459A-B004-983A15B8E440}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BEADCD3C-730B-4EDD-9838-7F312F811FF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEADCD3C-730B-4EDD-9838-7F312F811FF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEADCD3C-730B-4EDD-9838-7F312F811FF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEADCD3C-730B-4EDD-9838-7F312F811FF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1049B08E-A594-45E7-BD90-3DF33BFE08B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1049B08E-A594-45E7-BD90-3DF33BFE08B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1049B08E-A594-45E7-BD90-3DF33BFE08B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1049B08E-A594-45E7-BD90-3DF33BFE08B7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C915522F-9AA8-45AC-9C9C-5AA70421623E} = {A140E573-7FC3-46D5-B1B9-3EF537C0B82B}
@@ -193,5 +215,12 @@ Global
 		{9A1E22E8-0021-40AB-A53A-51595EEC5EC0} = {C4521812-A496-4792-86B9-FABAD4A6634E}
 		{0E5D22E7-84D4-4BBC-A6E8-A1C0D37947A1} = {4EF76D6A-3B20-40C3-80F5-55CA02BA07D8}
 		{AD7F74B0-9AE4-459A-B004-983A15B8E440} = {340CCE8D-F1ED-4282-96FC-B40A1D7FDB4D}
+		{F0D623C8-20D4-4E75-84E6-BBD957BC959B} = {A140E573-7FC3-46D5-B1B9-3EF537C0B82B}
+		{BEADCD3C-730B-4EDD-9838-7F312F811FF4} = {F0D623C8-20D4-4E75-84E6-BBD957BC959B}
+		{3FFFA140-87A8-47EA-8BD7-B5905DBE0A90} = {A140E573-7FC3-46D5-B1B9-3EF537C0B82B}
+		{1049B08E-A594-45E7-BD90-3DF33BFE08B7} = {F0D623C8-20D4-4E75-84E6-BBD957BC959B}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8725359E-50CC-46C4-ABFE-D693155DC824}
 	EndGlobalSection
 EndGlobal

@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
@@ -14,8 +14,7 @@
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
-        </PackageReference>
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+        </PackageReference>        
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
         <PackageReference Include="Serilog.AspNetCore" />
         <PackageReference Include="Serilog.Sinks.Console" />
@@ -28,6 +27,7 @@
       <ProjectReference Include="..\Shipments\Modules.Shipments.Features\Modules.Shipments.Features.csproj" />
       <ProjectReference Include="..\Stocks\Modules.Stocks.Features\Modules.Stocks.Features.csproj" />
       <ProjectReference Include="..\Users\Modules.Users.Features\Modules.Users.Features.csproj" />
+      <ProjectReference Include="..\Workflows\Modules.Workflows.Features\Modules.Workflows.Features.csproj" />
     </ItemGroup>
 
     <ItemGroup>

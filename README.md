@@ -126,6 +126,16 @@ The project includes comprehensive tests:
 - **Testcontainers**: Provides Docker containers for integration testing with PostgreSQL
 - **NetArchTest.Rules**: Enforces architectural rules and boundaries
 
+### Integration Tests With Testcontainers
+
+The Shipments integration tests spin up a PostgreSQL container at runtime using Testcontainers.
+Docker Desktop (or another Docker engine) must be running before executing tests.
+
+What happens during test startup:
+- The test host starts a PostgreSQL container and injects its connection string into the API host.
+- Tests use real HTTP calls against the in-memory test server.
+- After each test class, the database is reset using Respawn to keep tests isolated.
+
 ## Seeding & Migrations
 
 The application includes development seeding to populate test data:

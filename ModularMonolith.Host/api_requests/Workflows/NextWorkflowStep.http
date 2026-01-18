@@ -1,0 +1,12 @@
+### Advance workflow to next step
+PATCH {{host}}/api/workflows/123/next
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "type": "Scan",
+  "data": {
+    "lineId": "ABC-1",
+    "qty": 1
+  }
+}
