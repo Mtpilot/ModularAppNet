@@ -18,9 +18,11 @@ public static class Result
 
 public readonly partial record struct Result<TValue> : IResult<TValue>
 {
-    private readonly TValue? _value = default;
+#pragma warning disable IDE0032 // Use auto property
+	private readonly TValue? _value = default;
+#pragma warning restore IDE0032 // Use auto property
 
-    private Result(TValue value)
+	private Result(TValue value)
     {
         if (value is null)
         {

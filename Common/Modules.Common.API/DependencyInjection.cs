@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using Modules.Common.API.ErrorHandling;
+using Modules.Common.API.Swagger;
 using Serilog;
 
 // ReSharper disable once CheckNamespace
@@ -20,6 +21,10 @@ public static class DependencyInjection
             .AddSwaggerGen(options =>
             {
 	            options.SwaggerDoc("v1", new OpenApiInfo { Title = "Demo API", Version = "v1" });
+	            
+	            // Add schema filter to convert JsonElement to object type in Swagger
+	            options.SchemaFilter<JsonElementSchemaFilter>();
+	            
 	            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
 	            {
 		            In = ParameterLocation.Header,

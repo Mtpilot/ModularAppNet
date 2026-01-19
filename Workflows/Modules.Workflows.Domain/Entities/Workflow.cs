@@ -9,6 +9,8 @@ public class Workflow<TData>
 {
 	public required string Code { get; set; }
 
+	public required string TypeCode { get; set; }
+
 	public required string Name { get; set; }
 	public required string Description { get; set; }
 

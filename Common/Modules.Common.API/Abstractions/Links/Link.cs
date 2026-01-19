@@ -1,7 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace Modules.Common.API.Abstractions.Links;
 
-namespace Modules.Common.API.Abstractions.Links;
-
-public record Link(string Href, string Rel, string Method);
+public record Link(string Href, string Rel, HttpMethod Method);

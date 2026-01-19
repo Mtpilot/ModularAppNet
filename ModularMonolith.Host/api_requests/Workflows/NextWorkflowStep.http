@@ -7,6 +7,22 @@ Authorization: Bearer {{token}}
   "type": "Scan",
   "data": {
     "lineId": "ABC-1",
-    "qty": 1
+    "qty": 1,
+    "items": [
+      {
+        "productId": "PROD-001",
+        "quantity": 5,
+        "tags": ["urgent", "fragile"]
+      },
+      {
+        "productId": "PROD-002",
+        "quantity": 3,
+        "tags": ["standard"]
+      }
+    ],
+    "metadata": {
+      "source": "warehouse",
+      "priority": "high"
+    }
   }
 }
