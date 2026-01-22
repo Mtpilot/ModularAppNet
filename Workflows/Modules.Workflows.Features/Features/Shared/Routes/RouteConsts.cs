@@ -1,4 +1,4 @@
-﻿namespace Modules.Workflows.Features.Features.Shared.Routes;
+namespace Modules.Workflows.Features.Features.Shared.Routes;
 
 
 internal static class RouteConsts
@@ -12,4 +12,10 @@ internal static class RouteConsts
 	internal const string GetWorkflow = $"{BaseRoute}/{{code}}";
 
 	internal const string NextStep = $"{BaseRoute}/{{code}}/next/{{stepType}}";
+
+	internal const string CreateWorkflow = BaseRoute;
+
+	internal const string CancelWorkflow = $"{BaseRoute}/{{code}}/cancel";
+
+	internal const string CompleteWorkflow = $"{BaseRoute}/{{code}}/complete";
 }

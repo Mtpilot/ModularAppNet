@@ -19,4 +19,16 @@ public static class WorkflowErrors
 		Error.NotFound(
 			$"{ErrorPrefix}.{nameof(NextStepNotFound)}",
 			$"No next step found for workflow '{code}' from step '{stepType}'");
+
+	public static Error AlreadyExists(string code) =>
+		Error.Conflict($"{ErrorPrefix}.{nameof(AlreadyExists)}", $"Workflow with code '{code}' already exists");
+
+	public static Error CannotCancel(string code, string reason) =>
+		Error.Validation($"{ErrorPrefix}.{nameof(CannotCancel)}", $"Cannot cancel workflow '{code}': {reason}");
+
+	public static Error CannotComplete(string code, string reason) =>
+		Error.Validation($"{ErrorPrefix}.{nameof(CannotComplete)}", $"Cannot complete workflow '{code}': {reason}");
+
+	public static Error NotOnFinalStep(string code) =>
+		Error.Validation($"{ErrorPrefix}.{nameof(NotOnFinalStep)}", $"Workflow '{code}' is not on the final step");
 }

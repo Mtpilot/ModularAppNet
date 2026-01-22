@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
@@ -68,7 +68,31 @@ public class Workflow<TData>
 		}
 		return previousStep;
 	}
+
+	public bool IsFinalStep()
+	{
+		var currentStep = CurrentStep();
+		if (currentStep is null)
+		{
+			return false;
+		}
+
+		var nextStep = GetNextStep(currentStep.Order);
+		return nextStep is null;
+	}
 	#endregion Steps
+
+	#region Workflow Management
+	public void Cancel()
+	{
+		IsActive = false;
+	}
+
+	public void Complete()
+	{
+		IsActive = false;
+	}
+	#endregion Workflow Management
 
 
 	public override string ToString()
