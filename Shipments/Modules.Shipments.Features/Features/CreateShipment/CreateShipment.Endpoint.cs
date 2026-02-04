@@ -8,7 +8,7 @@ using Modules.Shipments.Features.Features.Shared.Requests;
 using Modules.Shipments.Features.Features.Shared.Routes;
 using Address = Modules.Shipments.Domain.ValueObjects.Address;
 
-namespace Modules.Shipments.Features.Features.CreateShipment;
+namespace Modules.Shipments.Features.Features.CreateShipment; //SESZH: неймспейс фичи тут дублируется, только в Tracing Они не дублируются
 
 public sealed record CreateShipmentRequest(
     string OrderId,

@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\Modules.Common.API\Modules.Common.API.csproj" />
+    <ProjectReference Include="..\..\Common\Modules.Common.Application\Modules.Common.Application.csproj" />
+    <ProjectReference Include="..\Modules.MaintenanceOperations.Infrastructure\Modules.MaintenanceOperations.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules.MaintenanceOperations.PublicApi\Modules.MaintenanceOperations.PublicApi.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Features\CreateOperation\Events\" />
+  </ItemGroup>
+
+</Project>

@@ -1,6 +1,6 @@
 ﻿namespace Modules.Shipments.Domain.Policies;
 
-public static class ShipmentPolicyConsts
+public static class ShipmentPolicyConsts //SESZH: файл называется Constants, а класс - Consts, confuses.
 {
     public const string ReadPolicy = "shipments:read";
     public const string CreatePolicy = "shipments:create";

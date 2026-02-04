@@ -21,7 +21,10 @@ builder.Services
     .AddUsersModule(builder.Configuration)
     .AddShipmentsModule(builder.Configuration)
     .AddCarriersModule(builder.Configuration)
-    .AddStocksModule(builder.Configuration);
+    .AddStocksModule(builder.Configuration)
+	.AddMaintenanceModule(builder.Configuration)
+	.AddMaintenanceOperationsModule(builder.Configuration)
+	;
 
 // Seed entities in DEVELOPMENT mode
 if (builder.Environment.IsDevelopment())
