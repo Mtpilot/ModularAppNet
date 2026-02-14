@@ -1,50 +1,87 @@
 ﻿using System.Text.Json;
 using Modules.Common.API.Abstractions.Links;
 
-
 namespace Modules.Workflows.Features.Features.Shared.Responses;
 
-
-public abstract record WorkflowBaseInfo (string Code, string TypeCode, string Name, string Description)
+/// <summary>
+/// Базовая информация о workflow - общая для всех типов ответов
+/// </summary>
+public abstract record WorkflowBaseInfo(string Code, string TypeCode, string Name, string Description)
 {
 	public required WorkflowStepDataSchema DataSchema { get; set; }
 	public required JsonElement Data { get; set; }
 }
 
-public sealed record WorkflowShortInfoResponse (string Code, string TypeCode, string Name, string Description) : WorkflowBaseInfo(Code, TypeCode, Name, Description)
+/// <summary>
+/// Краткий список workflow (для GET /workflows)
+/// </summary>
+public sealed record WorkflowShortInfoResponse(
+	string Code, 
+	string TypeCode, 
+	string Name, 
+	string Description) 
+	: WorkflowBaseInfo(Code, TypeCode, Name, Description)
 {
 	public required string CurrentStepType { get; set; }
 	public required string CurrentStepName { get; set; }
-
 	public required List<Link> Links { get; set; }
 }
 
-
-public sealed record WorkflowResponse (string Code, string TypeCode, string Name, string Description) : WorkflowBaseInfo(Code, TypeCode, Name, Description)
+/// <summary>
+/// Полная информация о workflow с текущим шагом (для GET /workflows/{code} и переходов)
+/// </summary>
+public sealed record WorkflowResponse(
+	string Code, 
+	string TypeCode, 
+	string Name, 
+	string Description) 
+	: WorkflowBaseInfo(Code, TypeCode, Name, Description)
 {
 	public required WorkflowCurrentStep CurrentStep { get; set; }
-
-	public required List<WorkflowStepShortResponse> WorkflowSteps { get; set; }
+	public required List<WorkflowStepResponse> WorkflowSteps { get; set; }
 }
 
+/// <summary>
+/// Информация о шаге в списке (просто справочная информация)
+/// </summary>
+public sealed record WorkflowStepResponse(
+	string Type, 
+	string Name, 
+	int Order,
+	string Description);
 
-public sealed record WorkflowStepShortResponse (string Type, string Name, int Order); //Сканировать, Проверить, Принять (Scan, Verify, Accept)
-
-
-public sealed record WorkflowCurrentStep(string Type, string Name, string Description)
+/// <summary>
+/// Информация о текущем активном шаге с доступными действиями
+/// </summary>
+public sealed record WorkflowCurrentStep( //Сканировать, Проверить, Принять (Scan, Verify, Accept)
+	string Type, 
+	string Name, 
+	string Description)
 {
 	public required WorkflowStepDataSchema DataSchema { get; set; }
 	public required JsonElement Data { get; set; }
-	public required Actions Actions { get; set; }
+	public required WorkflowActions Actions { get; set; }
 }
 
-
-public sealed record Actions
+/// <summary>
+/// Доступные действия на текущем шаге
+/// </summary>
+public sealed record WorkflowActions
 {
-	public required List<Link> Links { get; set; }
+	/// <summary>
+	/// Доступные действия для текущего шага (например, "Increment Qty", "Add Line")
+	/// </summary>
+	public required List<Link> StepActions { get; set; }
+	
+	/// <summary>
+	/// Ссылка на переход к следующему шагу (если доступно)
+	/// </summary>
 	public Link? NextStep { get; set; }
 }
 
+/// <summary>
+/// JSON Schema информация для валидации данных
+/// </summary>
 public sealed record WorkflowStepDataSchema
 {
 	public required string Version { get; set; }

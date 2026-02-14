@@ -19,4 +19,9 @@ public static class WorkflowErrors
 		Error.NotFound(
 			$"{ErrorPrefix}.{nameof(NextStepNotFound)}",
 			$"No next step found for workflow '{code}' from step '{stepType}'");
+
+	public static Error PreviousStepNotFound(string code, string stepType) =>
+		Error.NotFound(
+			$"{ErrorPrefix}.{nameof(PreviousStepNotFound)}",
+			$"No previous step found for workflow '{code}' from step '{stepType}'");
 }

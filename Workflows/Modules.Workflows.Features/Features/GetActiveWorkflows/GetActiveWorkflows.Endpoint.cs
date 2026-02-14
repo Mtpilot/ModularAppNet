@@ -22,11 +22,11 @@ public class GetActiveWorkflowsEndpoint : IApiEndpoint
 	}
 
 	private static async Task<IResult> Handle(
-		[FromRoute]string workflowType,
+		[FromRoute]string workflowTypeCode,
 		IGetActiveWorkflowsHandler handler,
 		CancellationToken cancellationToken)
 	{
-		var response = await handler.HandleAsync(workflowType, cancellationToken);
+		var response = await handler.HandleAsync(workflowTypeCode, cancellationToken);
 		if (response.IsError)
 		{
 			return response.Errors.ToProblem();
