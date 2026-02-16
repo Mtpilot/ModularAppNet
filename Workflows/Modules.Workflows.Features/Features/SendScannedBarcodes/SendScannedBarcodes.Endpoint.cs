@@ -13,7 +13,9 @@ using Modules.Workflows.Features.Features.Shared.Routes;
 
 namespace Modules.Workflows.Features.Features.SendScannedBarcodes;
 
+#pragma warning disable MA0049 // Type name should not match containing namespace
 public class SendScannedBarcodes : IApiEndpoint
+#pragma warning restore MA0049 // Type name should not match containing namespace
 {
 	public void MapEndpoint(WebApplication app)
 	{

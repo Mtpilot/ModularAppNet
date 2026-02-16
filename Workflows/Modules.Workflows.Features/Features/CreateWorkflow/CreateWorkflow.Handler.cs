@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Modules.Common.API.Abstractions.Links;
 using Modules.Common.Domain.Handlers;
@@ -9,6 +5,11 @@ using Modules.Common.Domain.Results;
 using Modules.Workflows.Domain.Entities;
 using Modules.Workflows.Domain.Errors;
 using Modules.Workflows.Features.Features.Shared.Responses;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using HttpMethod = Modules.Common.API.Abstractions.Links.HttpMethod;
 
 namespace Modules.Workflows.Features.Features.CreateWorkflow;
@@ -51,10 +52,13 @@ internal sealed class CreateWorkflowHandler(
 
 	private static Workflow<Dictionary<string, object>> BuildWorkflow(string code, CreateWorkflowRequest request)
 	{
-		var firstStep = GetFirstStepForType(request.TypeCode);
+		var id =  Guid.NewGuid();
+        var firstStep = GetFirstStepForType(id, request.TypeCode);
 		
 		return new Workflow<Dictionary<string, object>>
-		{
+		{	
+			Id= id,
+			WorkflowDataItems = new List<WorkflowDataItem>(),
 			Code = code,
 			TypeCode = request.TypeCode,
 			Name = request.Name,
@@ -67,18 +71,18 @@ internal sealed class CreateWorkflowHandler(
 				Description = "Workflow data collection",
 				Collection = new List<Dictionary<string, object>>()
 			},
-			Steps = GetStepsForType(request.TypeCode)
+			Steps = GetStepsForType(id, request.TypeCode)
 		};
 	}
 
-	private static WorkflowStep GetFirstStepForType(string typeCode)
+	private static WorkflowStep GetFirstStepForType(Guid id, string typeCode)
 	{
 		// Sample implementation - in real app, this would load from workflow type configuration
-		var steps = GetStepsForType(typeCode);
+		var steps = GetStepsForType(id, typeCode);
 		return steps.OrderBy(s => s.Order).First();
 	}
 
-	private static List<WorkflowStep> GetStepsForType(string typeCode)
+	private static List<WorkflowStep> GetStepsForType(Guid workflowId, string typeCode)
 	{
 		// Sample implementation - in real app, this would load from workflow type configuration based on typeCode
 		_ = typeCode; // Will be used in real implementation
@@ -86,6 +90,8 @@ internal sealed class CreateWorkflowHandler(
 		{
 			new WorkflowStep
 			{
+				Id = Guid.NewGuid(),
+				WorkflowId = workflowId,
 				Type = "Scan",
 				Name = "Шаг сканирования",
 				Description = "Сканирование товара",
@@ -94,6 +100,8 @@ internal sealed class CreateWorkflowHandler(
 			},
 			new WorkflowStep
 			{
+				Id = Guid.NewGuid(),
+				WorkflowId = workflowId,
 				Type = "Verify",
 				Name = "Шаг проверки",
 				Description = "Проверка количества",
@@ -102,6 +110,8 @@ internal sealed class CreateWorkflowHandler(
 			},
 			new WorkflowStep
 			{
+				Id = Guid.NewGuid(),
+				WorkflowId= workflowId,
 				Type = "Accept",
 				Name = "Шаг приемки",
 				Description = "Подтверждение приемки",
@@ -129,11 +139,12 @@ internal sealed class CreateWorkflowHandler(
 				DataType = workflow.TypeCode,
 				SchemaJson = "{ 'InvoiceId': 'string', 'Сounterparty': 'string', 'Contract': 'string' }",
 			},
+
 			CurrentStep = new WorkflowCurrentStep(currentStep.Type, currentStep.Name, currentStep.Description)
 			{
-				Actions = new Actions
-				{
-					Links = new List<Link>
+				Actions = new WorkflowActions
+                {
+                    StepActions = new List<Link>
 					{
 						new Link("/api/item", "Increment Qty", HttpMethod.POST),
 						new Link("/api/", "Add Line", HttpMethod.PUT)
@@ -150,7 +161,7 @@ internal sealed class CreateWorkflowHandler(
 			},
 			WorkflowSteps = workflow.Steps
 				.OrderBy(s => s.Order)
-				.Select(s => new WorkflowStepShortResponse(s.Type, s.Name, s.Order))
+				.Select(s => new WorkflowStepResponse(s.Type, s.Name, s.Order, s.Description))
 				.ToList()
 		};
 	}

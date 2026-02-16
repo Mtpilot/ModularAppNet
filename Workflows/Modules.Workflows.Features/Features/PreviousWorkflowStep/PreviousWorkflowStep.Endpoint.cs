@@ -15,7 +15,9 @@ using Modules.Common.API.Extensions;
 
 namespace Modules.Workflows.Features.Features.PreviousWorkflowStep;
 
+#pragma warning disable MA0049 // Type name should not match containing namespace
 public sealed class PreviousWorkflowStep : IApiEndpoint
+#pragma warning restore MA0049 // Type name should not match containing namespace
 {
 	public void MapEndpoint(WebApplication app)
 	{

@@ -51,10 +51,14 @@ internal sealed class CompleteWorkflowHandler(
 
 	private static Workflow<Dictionary<string, object>> BuildSampleWorkflow()
 	{
+
+		var id = Guid.NewGuid();
 		// Sample implementation - in real app, this would load from storage
 		const string workflowTypeCode = "ReceiveGoods";
 		return new Workflow<Dictionary<string, object>>
 		{
+			Id = id,
+			WorkflowDataItems = new List<WorkflowDataItem>(),
 			Code = "123",
 			TypeCode = workflowTypeCode,
 			Name = "Приемка по накладной",
@@ -66,7 +70,9 @@ internal sealed class CompleteWorkflowHandler(
 			{
 				new WorkflowStep
 				{
-					Type = "Scan",
+                    Id = Guid.NewGuid(),
+                    WorkflowId= id,
+                    Type = "Scan",
 					Name = "Шаг сканирования",
 					Description = "Сканирование товара",
 					Order = 1,
@@ -74,7 +80,9 @@ internal sealed class CompleteWorkflowHandler(
 				},
 				new WorkflowStep
 				{
-					Type = "Verify",
+                    Id = Guid.NewGuid(),
+                    WorkflowId= id,
+                    Type = "Verify",
 					Name = "Шаг проверки",
 					Description = "Проверка количества",
 					Order = 2,
@@ -82,7 +90,9 @@ internal sealed class CompleteWorkflowHandler(
 				},
 				new WorkflowStep
 				{
-					Type = "Accept",
+                    Id = Guid.NewGuid(),
+                    WorkflowId= id,
+                    Type = "Accept",
 					Name = "Шаг приемки",
 					Description = "Подтверждение приемки",
 					Order = 3,

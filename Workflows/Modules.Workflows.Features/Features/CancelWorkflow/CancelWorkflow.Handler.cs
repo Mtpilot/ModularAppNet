@@ -47,9 +47,13 @@ internal sealed class CancelWorkflowHandler(
 	{
 		// Sample implementation - in real app, this would load from storage
 		const string workflowTypeCode = "ReceiveGoods";
-		return new Workflow<Dictionary<string, object>>
+
+        var id = Guid.NewGuid();
+        return new Workflow<Dictionary<string, object>>
 		{
-			Code = "123",
+            Id = id,
+            WorkflowDataItems = new List<WorkflowDataItem>(),
+            Code = "123",
 			TypeCode = workflowTypeCode,
 			Name = "Приемка по накладной",
 			Description = "Приемка по каждой строчки накладной",
@@ -60,7 +64,9 @@ internal sealed class CancelWorkflowHandler(
 			{
 				new WorkflowStep
 				{
-					Type = "Scan",
+                    Id = Guid.NewGuid(),
+                    WorkflowId= id,
+                    Type = "Scan",
 					Name = "Шаг сканирования",
 					Description = "Сканирование товара",
 					Order = 1,
@@ -68,7 +74,9 @@ internal sealed class CancelWorkflowHandler(
 				},
 				new WorkflowStep
 				{
-					Type = "Verify",
+                    Id = Guid.NewGuid(),
+                    WorkflowId= id,
+                    Type = "Verify",
 					Name = "Шаг проверки",
 					Description = "Проверка количества",
 					Order = 2,
@@ -76,7 +84,9 @@ internal sealed class CancelWorkflowHandler(
 				},
 				new WorkflowStep
 				{
-					Type = "Accept",
+                    Id = Guid.NewGuid(),
+                    WorkflowId= id,
+                    Type = "Accept",
 					Name = "Шаг приемки",
 					Description = "Подтверждение приемки",
 					Order = 3,
