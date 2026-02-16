@@ -1,12 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
-using System.Linq;
+using System.Text.Json;
+
+
+using Modules.Workflows.Domain.Serializers;
+
 
 namespace Modules.Workflows.Domain.Entities;
 
-public class Workflow<TData>	
+public class Workflow<TData>
 {
+	public required Guid Id { get; set; }
 	public required string Code { get; set; }
 
 	public required string TypeCode { get; set; }
@@ -20,7 +26,19 @@ public class Workflow<TData>
 	public required List<WorkflowStep> Steps { get; set; }
 
 	//public required List<WorkflowAction> Actions { get; set; }
-	public required IWorkflowDataCollection<TData> Data { get; set; }
+
+	//SESZH: убрал в таком виде, добавляю в виде списка Guid, посмотрим, что будет с поиском по разным таблицам. UPD: пока не актуально
+	public IWorkflowDataCollection<TData> Data
+	{
+		get => string.IsNullOrEmpty(DataJson)
+			? null!
+			: JsonSerializer.Deserialize<WorkflowDataItemsCollection<TData>>(DataJson, DataItemSerializer.DataItemSeializerOptions)!;
+		set => DataJson = value == null ? "{}" : JsonSerializer.Serialize(value, DataItemSerializer.DataItemSeializerOptions);
+	}
+	public string DataJson { get; set; } = string.Empty;
+	public required List<WorkflowDataItem> WorkflowDataItems { get; set; }
+
+	//public required List<Guid> DataGuids {  get; set; }
 
 	#region Steps
 	public string GetCacheKey() => $"workflow:{Code}";
@@ -110,24 +128,6 @@ public class Workflow<TData>
 }
 
 
-public class WorkflowStep //Сканировать, Проверить, Принять
-{
-	public required string Type { get; set; } //Scan, Verify, Accept
-	public required string Name { get; set; }
-	public required int Order { get; set; }
-	public required string Description { get; set; }
-
-	public required List<WorkflowStepAction> Actions { get; set; }
-}
-
-
-public class WorkflowStepAction
-{
-	public required string Type { get; set; }
-	public required string Name { get; set; }
-	public required string Description { get; set; }
-}
-
 
 //public class WorkflowAction
 //{
@@ -144,4 +144,11 @@ public interface IWorkflowDataCollection<TEntity> //TEntity - e.g., Invoce(Speci
 	string Description { get; set; }
 
 	ICollection<TEntity> Collection { get; set; } 
+}
+
+public record WorkflowDataItemsCollection<T> : IWorkflowDataCollection<T>
+{
+	public required string Name { get; set; }
+	public required string Description { get; set; }
+	public ICollection<T> Collection { get; set; } = Array.Empty<T>();
 }
