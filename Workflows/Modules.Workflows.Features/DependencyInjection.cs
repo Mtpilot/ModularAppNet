@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Modules.Common.API.Abstractions;
 using Modules.Common.Application.Extensions;
+using Modules.Workflows.Infrastructure.Database;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
@@ -12,7 +13,10 @@ public static class WorkflowsModuleRegistration
     public static IServiceCollection AddWorkflowsModule(this IServiceCollection services, IConfiguration _)
     {
         return services
-            .AddWorkflowsModuleApi();
+            .AddWorkflowsModuleApi()
+			//.AddWorkflowsInfrastructure(_)
+			.AddWorkflowsMockInfrastructure()
+			;
     }
     
     private static IServiceCollection AddWorkflowsModuleApi(this IServiceCollection services)

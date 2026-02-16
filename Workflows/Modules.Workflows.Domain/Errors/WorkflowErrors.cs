@@ -31,4 +31,8 @@ public static class WorkflowErrors
 
 	public static Error NotOnFinalStep(string code) =>
 		Error.Validation($"{ErrorPrefix}.{nameof(NotOnFinalStep)}", $"Workflow '{code}' is not on the final step");
+	public static Error PreviousStepNotFound(string code, string stepType) =>
+		Error.NotFound(
+			$"{ErrorPrefix}.{nameof(PreviousStepNotFound)}",
+			$"No previous step found for workflow '{code}' from step '{stepType}'");
 }
