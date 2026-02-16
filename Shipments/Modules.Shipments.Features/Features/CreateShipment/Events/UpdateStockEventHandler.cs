@@ -14,28 +14,28 @@ public sealed class UpdateStockEventHandler(
     ILogger<UpdateStockEventHandler> logger)
     : IEventHandler<ShipmentCreatedEvent>
 {
-    public async Task HandleAsync(ShipmentCreatedEvent @event, CancellationToken cancellationToken)
+    public async Task HandleAsync(ShipmentCreatedEvent eventSource, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Updating stock for order {OrderId}", @event.Shipment.OrderId);
+        logger.LogInformation("Updating stock for order {OrderId}", eventSource.Shipment.OrderId);
 
         try
         {
-            var updateRequest = CreateDecreaseStockRequest(@event.Shipment);
+            var updateRequest = CreateDecreaseStockRequest(eventSource.Shipment);
             var response = await stockApi.DecreaseStockAsync(updateRequest, cancellationToken);
 
             if (!response.IsSuccess)
             {
                 logger.LogError("Failed to update stock for order {OrderId}: {@Errors}",
-                    @event.Shipment.OrderId, response.Errors);
+                    eventSource.Shipment.OrderId, response.Errors);
 
                 throw new Exception($"Failed to update stock: {response.Errors}");
             }
 
-            logger.LogInformation("Successfully updated stock for order {OrderId}", @event.Shipment.OrderId);
+            logger.LogInformation("Successfully updated stock for order {OrderId}", eventSource.Shipment.OrderId);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to update stock for order {OrderId}", @event.Shipment.OrderId);
+            logger.LogError(ex, "Failed to update stock for order {OrderId}", eventSource.Shipment.OrderId);
             throw;
         }
     }

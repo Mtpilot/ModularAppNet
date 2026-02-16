@@ -78,18 +78,18 @@ public class EventPublisher(IServiceProvider serviceProvider, ILogger<EventPubli
 
     private async Task<Exception?> ExecuteHandlerAsync<TEvent>(
         IEventHandler<TEvent> handler,
-        TEvent @event,
+        TEvent eventSource,
         CancellationToken cancellationToken) where TEvent : IEvent
     {
         try
         {
-            await handler.HandleAsync(@event, cancellationToken);
+            await handler.HandleAsync(eventSource, cancellationToken);
             return null;
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error handling event {EventType} with handler {HandlerType}",
-                @event.GetType().Name, handler.GetType().Name);
+                eventSource.GetType().Name, handler.GetType().Name);
             return ex;
         }
     }
