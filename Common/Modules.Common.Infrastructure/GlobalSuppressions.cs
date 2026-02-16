@@ -5,4 +5,4 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Performance", "CA1873:Avoid potentially expensive logging", Justification = "<Pending>", Scope = "member", Target = "~M:Modules.Common.Infrastructure.Policies.AuthorizationConfigureOptions.Configure(Microsoft.AspNetCore.Authorization.AuthorizationOptions)")]
+//[assembly: SuppressMessage("Performance", "CA1873:Avoid potentially expensive logging", Justification = "<Pending>", Scope = "member", Target = "~M:Modules.Common.Infrastructure.Policies.AuthorizationConfigureOptions.Configure(Microsoft.AspNetCore.Authorization.AuthorizationOptions)")]

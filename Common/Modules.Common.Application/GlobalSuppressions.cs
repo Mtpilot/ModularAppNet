@@ -5,4 +5,4 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Performance", "CA1873:Avoid potentially expensive logging", Justification = "<Pending>", Scope = "member", Target = "~M:Modules.Common.Application.EventPublisher.PublishAsync``1(``0,System.Threading.CancellationToken)~System.Threading.Tasks.Task")]
+//[assembly: SuppressMessage("Performance", "CA1873:Avoid potentially expensive logging", Justification = "<Pending>", Scope = "member", Target = "~M:Modules.Common.Application.EventPublisher.PublishAsync``1(``0,System.Threading.CancellationToken)~System.Threading.Tasks.Task")]
