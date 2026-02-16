@@ -1,0 +1,15 @@
+### Create Workflow
+POST {{host}}/api/workflows
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "typeCode": "ReceiveGoods",
+  "name": "Приемка по накладной",
+  "description": "Приемка по каждой строчки накладной",
+  "data": {
+    "invoiceId": "INV-2024-001",
+    "counterparty": "ООО Поставщик",
+    "contract": "Договор №123"
+  }
+}

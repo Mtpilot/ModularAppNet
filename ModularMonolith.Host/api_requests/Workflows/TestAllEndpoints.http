@@ -1,0 +1,30 @@
+### Test All New Workflow Management Endpoints
+### This file tests all three new endpoints
+
+### 1. Create Workflow
+POST {{host}}/api/workflows
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "typeCode": "ReceiveGoods",
+  "name": "Приемка по накладной",
+  "description": "Приемка по каждой строчки накладной",
+  "data": {
+    "invoiceId": "INV-2024-001",
+    "counterparty": "ООО Поставщик",
+    "contract": "Договор №123"
+  }
+}
+
+### 2. Get Created Workflow (use code from response above)
+GET {{host}}/api/workflows/{{workflowCode}}
+Authorization: Bearer {{token}}
+
+### 3. Cancel Workflow
+POST {{host}}/api/workflows/{{workflowCode}}/cancel
+Authorization: Bearer {{token}}
+
+### 4. Complete Workflow (create new one first, then complete)
+POST {{host}}/api/workflows/{{workflowCode}}/complete
+Authorization: Bearer {{token}}

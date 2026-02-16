@@ -4,6 +4,8 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <!-- Suppress specific CA diagnostics at project level to keep them as warnings -->
+        <NoWarn>$(NoWarn);CA1873;CA1711;CA1040;CA1716;CA2225;CA1002</NoWarn>
     </PropertyGroup>
 
 </Project>

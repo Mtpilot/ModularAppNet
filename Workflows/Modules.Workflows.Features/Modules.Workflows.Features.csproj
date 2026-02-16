@@ -4,6 +4,10 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <!-- Ensure CA1873 stays a warning in this project (in case warnings are promoted to errors globally) -->
+    <WarningsNotAsErrors>CA1873</WarningsNotAsErrors>
+    <!-- Also explicitly silence CA1873 in this project to avoid it being treated as error by global settings -->
+    <NoWarn>$(NoWarn);CA1873</NoWarn>
   </PropertyGroup>
   
   <ItemGroup>

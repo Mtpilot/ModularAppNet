@@ -11,5 +11,5 @@ public interface IEventHandler;
 /// <typeparam name="TEvent">Type of event handled by this handler</typeparam>
 public interface IEventHandler<in TEvent> : IEventHandler where TEvent : IEvent
 {
-    Task HandleAsync(TEvent @event, CancellationToken cancellationToken);
+    Task HandleAsync(TEvent eventSource, CancellationToken cancellationToken);
 }

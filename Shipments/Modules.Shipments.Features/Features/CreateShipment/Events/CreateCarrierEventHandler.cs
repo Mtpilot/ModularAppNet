@@ -14,28 +14,28 @@ public sealed class CreateCarrierEventHandler(
     ILogger<CreateCarrierEventHandler> logger)
     : IEventHandler<ShipmentCreatedEvent>
 {
-    public async Task HandleAsync(ShipmentCreatedEvent @event, CancellationToken cancellationToken)
+    public async Task HandleAsync(ShipmentCreatedEvent eventSource, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Creating carrier shipment for order {OrderId}", @event.Shipment.OrderId);
+        logger.LogInformation("Creating carrier shipment for order {OrderId}", eventSource.Shipment.OrderId);
 
         try
         {
-            var carrierRequest = CreateCarrierRequest(@event.Shipment);
+            var carrierRequest = CreateCarrierRequest(eventSource.Shipment);
             var response = await carrierApi.CreateShipmentAsync(carrierRequest, cancellationToken);
 
             if (!response.IsSuccess)
             {
                 logger.LogError("Failed to create carrier shipment for order {OrderId}: {@Errors}", 
-                    @event.Shipment.OrderId, response.Errors);
+                    eventSource.Shipment.OrderId, response.Errors);
 
                 throw new Exception($"Failed to create carrier shipment: {response.Errors}");
             }
 
-            logger.LogInformation("Successfully created carrier shipment for order {OrderId}", @event.Shipment.OrderId);
+            logger.LogInformation("Successfully created carrier shipment for order {OrderId}", eventSource.Shipment.OrderId);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to create carrier shipment for order {OrderId}", @event.Shipment.OrderId);
+            logger.LogError(ex, "Failed to create carrier shipment for order {OrderId}", eventSource.Shipment.OrderId);
             throw;
         }
     }

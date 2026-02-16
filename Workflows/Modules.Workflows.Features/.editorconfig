@@ -1,0 +1,5 @@
+root = true
+
+[*.cs]
+# Treat CA1873 as warning for this project
+dotnet_diagnostic.CA1873.severity = warning

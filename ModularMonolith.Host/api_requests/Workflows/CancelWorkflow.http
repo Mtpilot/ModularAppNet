@@ -1,0 +1,3 @@
+### Cancel Workflow
+POST {{host}}/api/workflows/123/cancel
+Authorization: Bearer {{token}}

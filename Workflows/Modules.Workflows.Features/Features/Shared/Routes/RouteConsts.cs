@@ -1,4 +1,4 @@
-﻿namespace Modules.Workflows.Features.Features.Shared.Routes;
+namespace Modules.Workflows.Features.Features.Shared.Routes;
 
 
 internal static class RouteConsts
@@ -11,6 +11,11 @@ internal static class RouteConsts
 
 	internal const string GetWorkflow = $"{BaseRoute}/{{code}}";
 
+	internal const string CreateWorkflow = BaseRoute;
+
+	internal const string CancelWorkflow = $"{BaseRoute}/{{code}}/cancel";
+
+	internal const string CompleteWorkflow = $"{BaseRoute}/{{code}}/complete";
 	internal const string NextStep = $"{BaseRoute}/{{code}}/next/";//SESZH: я подумал-подумал и не понял, зачем нам тип шага, когда мы идем к следующему в конкретном воркфлоу, если внутри этого самого воркфлоу есть инфа и о нынешнем и о следующем и о всех вообще{{stepType}}";
 	internal const string PreviousStep = $"{BaseRoute}/{{code}}/back/";//{{stepType}}";
 
