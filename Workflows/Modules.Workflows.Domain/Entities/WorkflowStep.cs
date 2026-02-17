@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+//using System.Text.Json;
 
 namespace Modules.Workflows.Domain.Entities;
 
@@ -14,4 +15,5 @@ public class WorkflowStep //Сканировать, Проверить, Прин
 	public required string Description { get; set; }
 
 	public required List<WorkflowStepAction> Actions { get; set; }
+	//public abstract JsonElement GenerateStepData();
 }

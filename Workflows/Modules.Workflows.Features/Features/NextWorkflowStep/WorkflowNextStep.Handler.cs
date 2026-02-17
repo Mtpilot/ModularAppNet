@@ -13,7 +13,7 @@ using HttpMethod = Modules.Common.API.Abstractions.Links.HttpMethod;
 
 namespace Modules.Workflows.Features.Features.NextWorkflowStep;
 
-internal sealed record WorkflowNextStepCommand(string Code, JsonElement Data);
+internal sealed record WorkflowNextStepCommand(string Code);
 
 internal interface IWorkflowNextStepHandler : IHandler
 {
@@ -52,75 +52,18 @@ internal sealed class WorkflowNextStepHandler(
 		{
 			return WorkflowErrors.NextStepNotFound(request.Code, "SESZH: аналогично");
 		}
+		//workflow.CurrentStepType = nextStep.Type; //SESZH: ОЧЕНЬ странная механика.
 
-		//if (!nextStep.Type.Equals(request.StepType, StringComparison.OrdinalIgnoreCase))
-		//{
-		//	return WorkflowErrors.StepMissMatch(request.Code, nextStep.Type, request.StepType);
-		//}
+		workflow.SetStepNumber(nextStep.Order); //SESZH: чуть менее странная механика.
 
-		workflow.CurrentStepType = nextStep.Type; //SESZH: ОЧЕНЬ странная механика.
-
-		//var nextAvailableStep = workflow.GetNextStep(nextStep.Order);
-		//const string workflowTypeCode = "ReceiveGoods";
-		var response = workflow.ToResponse(request.Data, new WorkflowStepDataSchema
-		{
+		var response = workflow.ToResponse(workflow.GenerateCheckoutReport(), new WorkflowStepDataSchema
+		{         
 			Version = "1.0",
 			DataType = "ReceiveGoods",
 			SchemaJson = "{ 'InvoiceId': 'string', 'Сounterparty': 'string', 'Contract': 'string' }",
 		},
 		linkService);
 		await context.SaveChangesAsync(cancellationToken);
-		//(workflowTypeCode, linkService, nextStep, nextAvailableStep, request.Data);
-		//var response = new WorkflowResponse(workflow.Code, workflowTypeCode, workflow.Name, workflow.Description)
-		//{
-		//	Data = JsonDocument.Parse("{ \"InvoiceId\": \"string\", \"Сounterparty\": \"string\", \"Contract\": \"string\" }").RootElement,
-		//	DataSchema = new WorkflowStepDataSchema
-		//	{
-		//		Version = "1.0",
-		//		DataType = "ReceiveGoods",
-		//		SchemaJson = "{ 'InvoiceId': 'string', 'Сounterparty': 'string', 'Contract': 'string' }",
-		//	},
-		//CurrentStep = nextAvailableStep.ToCurrentStepResponse(workflowTypeCode, nextStep, )
-		/*new WorkflowCurrentStep(nextStep.Type, nextStep.Name, "Step Description")
-		{
-			Actions = new Actions
-			{
-				Links = nextStep.Actions
-					.Select(action => linkService.Generate(
-						action.Endpoint,
-						action.RouteParams ?? new Dictionary<string, object> { { "code", workflow.Code } },
-						action.Name,
-						action.HttpMethod.ToHttpMethod()
-					))
-					.ToList(),
-				NextStep = nextAvailableStep != null 
-					? linkService.Generate(
-						"WorkflowNextStep",
-						new { code = workflow.Code, stepType = nextAvailableStep.Type },
-						"Move to Next Step",
-						HttpMethod.PATCH
-					)
-					: null
-			},
-			DataSchema = new WorkflowStepDataSchema
-			{
-				Version = "1.0",
-				DataType = "Invoice",
-				SchemaJson = "{ 'type': 'object', 'properties': { 'invoiceNumber': { 'type': 'string' }, 'items': { 'type': 'array', 'items': { 'type': 'object', 'properties': { 'itemCode': { 'type': 'string' }, 'quantity': { 'type': 'integer' } }, 'required': ['itemCode', 'quantity'] } } }, 'required': ['invoiceNumber', 'items'] }",
-			},
-			// Example: Use data from request or create sample data
-			Data = request.Data.ValueKind != JsonValueKind.Null && request.Data.ValueKind != JsonValueKind.Undefined 
-				? request.Data.Clone() 
-				: CreateSampleData()
-		},*/
-
-		//WorkflowSteps = new List<WorkflowStepShortResponse>
-		//{
-		//	new WorkflowStepShortResponse("Scan", "Шаг сканирования", 1),
-		//	new WorkflowStepShortResponse("Verify", "Шаг проверки", 2),
-		//	new WorkflowStepShortResponse("Complete", "Шаг завершения", 3)
-		//}
-		//};
 
 		return response;
 	}

@@ -32,18 +32,17 @@ public sealed class PreviousWorkflowStep : IApiEndpoint
 
 	private static async Task<IResult> Handle(
 		string code,
-		[FromBody] WorkflowPreviousStepBodyRequest request,
 		IValidator<WorkflowPreviousStepBodyRequest> validator,
 		IWorkflowPreviousStepHandler handler,
 		CancellationToken cancellationToken)
 	{
-		var validationResult = await validator.ValidateAsync(request, cancellationToken);
-		if (!validationResult.IsValid)
-		{
-			return Results.ValidationProblem(validationResult.ToDictionary());
-		}
+		//var validationResult = await validator.ValidateAsync(request, cancellationToken);
+		//if (!validationResult.IsValid)
+		//{
+		//	return Results.ValidationProblem(validationResult.ToDictionary());
+		//}
 
-		var command = new WorkflowPreviousStepCommand(code, request.Data);
+		var command = new WorkflowPreviousStepCommand(code);
 		var response = await handler.HandleAsync(command, cancellationToken);
 		if (response.IsError)
 		{

@@ -21,7 +21,7 @@ public class Workflow<TData>
 	public required string Description { get; set; }
 
 	public required bool IsActive { get; set; }
-
+	public required int CurrentStepNumber { get; set; }
 	public required string CurrentStepType { get; set; }
 	public required List<WorkflowStep> Steps { get; set; }
 
@@ -43,13 +43,18 @@ public class Workflow<TData>
 	#region Steps
 	public string GetCacheKey() => $"workflow:{Code}";
 
-	public WorkflowStep CurrentStep() => GetStepByType(CurrentStepType) ?? throw new InvalidOperationException($"Current step type '{CurrentStepType}' not found in workflow '{Code}'.");
+	//public WorkflowStep CurrentStep() => GetStepByType(CurrentStepType) ?? throw new InvalidOperationException($"Current step type '{CurrentStepType}' not found in workflow '{Code}'.");
+	public WorkflowStep CurrentStep() => GetStepByOrder(CurrentStepNumber) ?? throw new InvalidOperationException($"Current step with order '{CurrentStepNumber}' not found in workflow '{Code}'.");
 	public WorkflowStep? GetStepByType(string type) => Steps.FirstOrDefault(step => step.Type.Equals(type, StringComparison.OrdinalIgnoreCase));
-
+	public WorkflowStep? GetStepByOrder(int order) =>
+		Steps.FirstOrDefault(step => step.Order == order);
 
 	public WorkflowStep? GetFirstStep()
 	{
 		WorkflowStep? firstStep = null;
+		//SESZH
+		firstStep = Steps.MinBy(x=> x.Order);
+
 		foreach (var step in Steps)
 		{
 			if (firstStep == null || step.Order < firstStep.Order)
@@ -63,6 +68,9 @@ public class Workflow<TData>
 	public WorkflowStep? GetNextStep(int currentOrder)
 	{
 		WorkflowStep? nextStep = null;
+		//SESZH: linq мне показался очевидным, интересно, почему не так?
+		//nextStep = Steps.Where(x=> x.Order> currentOrder).MinBy(x=> x.Order);
+
 		foreach (var step in Steps)
 		{
 			if (step.Order > currentOrder && (nextStep == null || step.Order < nextStep.Order))
@@ -77,6 +85,9 @@ public class Workflow<TData>
 	public WorkflowStep? GetPreviousStep(int currentOrder)
 	{
 		WorkflowStep? previousStep = null;
+		//SESZH: linq мне показался очевидным, интересно, почему не так?
+		//previousStep = Steps.Where(x => x.Order < currentOrder).MaxBy(x => x.Order);
+
 		foreach (var step in Steps)
 		{
 			if (step.Order < currentOrder && (previousStep == null || step.Order > previousStep.Order))
@@ -86,7 +97,14 @@ public class Workflow<TData>
 		}
 		return previousStep;
 	}
-
+	public void SetStepNumber(int number) //SESZH: возможно, сделать просто навигацию вперед-назад? Тогда уже этому методу нужно будет заниматься валидацией перехода
+	{
+		if (CurrentStepNumber == 1 && number > CurrentStepNumber) //SESZH: подумать над переходами и состоянием IsActive
+		{
+			IsActive = true;
+		}
+		CurrentStepNumber = number;
+	}
 	public bool IsFinalStep()
 	{
 		var currentStep = CurrentStep();
@@ -112,6 +130,17 @@ public class Workflow<TData>
 	}
 	#endregion Workflow Management
 
+	public JsonElement GenerateCheckoutReport() //SESZH: пока нужно как-то отправлять инфу о том, сколько заменено, сколько изменено, думал, через шаги, через шаги не получилось пока.
+	{
+		return JsonSerializer.SerializeToElement(new
+		{
+			name = Name,
+			items = Data?.Collection.Count,
+			itemsTaken = "Calculating in development", //SESZH: еще подумать, в каком виде отдавать, но пока все упирается в хранение и изменение Data
+			itemsLost = "Calculating in development",
+			extraItems = "Calculating in development",
+		});
+	}
 
 	public override string ToString()
 	{

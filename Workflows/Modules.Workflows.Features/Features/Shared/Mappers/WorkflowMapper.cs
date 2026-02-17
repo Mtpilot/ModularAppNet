@@ -83,24 +83,6 @@ internal static class WorkflowMapper
 		JsonElement data,
 		ILinkService linkService)
 	{
-#pragma warning disable
-		var link = nextStep != null
-					? linkService.Generate(
-						"WorkflowNextStep",
-						new { code = workflowCode },
-						"Move to Next Step",
-						HttpMethod.PATCH)
-					: null;
-		var data1 = data;
-		var stepactions = step.Actions
-					.Select(action => linkService.Generate(
-						action.Endpoint,
-						new {code = workflowCode},
-						//action.RouteParams ?? new Dictionary<string, object> { { "code", workflowCode } },
-						action.Name,
-						action.HttpMethod.ToHttpMethod()))
-					.ToList();
-
 		return new WorkflowCurrentStep(step.Type, step.Name, step.Description)
 		{
 			DataSchema = dataSchema,
@@ -125,7 +107,6 @@ internal static class WorkflowMapper
 			}
 		};
 	}
-#pragma warning restore
 	/// <summary>
 	/// Маппим строку HTTP метода в enum
 	/// </summary>

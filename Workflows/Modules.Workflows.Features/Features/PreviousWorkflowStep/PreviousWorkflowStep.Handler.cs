@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Modules.Workflows.Features.Features.PreviousWorkflowStep;
 
-internal sealed record WorkflowPreviousStepCommand(string Code, JsonElement Data);
+internal sealed record WorkflowPreviousStepCommand(string Code);
 
 internal interface IWorkflowPreviousStepHandler : IHandler
 {
@@ -54,9 +54,10 @@ internal sealed class WorkflowPreviousStepHandler(
 			return WorkflowErrors.PreviousStepNotFound(request.Code, "SESZH: аналогично");
 		}
 
-		workflow.CurrentStepType = previousStep.Type; //SESZH: все еще ОЧЕНЬ странная механика.
+		//workflow.CurrentStepType = previousStep.Type; //SESZH: все еще ОЧЕНЬ странная механика.
+		workflow.SetStepNumber(previousStep.Order);
 
-		var response = workflow.ToResponse(request.Data, new WorkflowStepDataSchema
+		var response = workflow.ToResponse(workflow.GenerateCheckoutReport(), new WorkflowStepDataSchema
 		{
 			Version = "1.0",
 			DataType = "ReceiveGoods",

@@ -5,6 +5,8 @@ using Modules.Common.Domain.Results;
 using Modules.Workflows.Domain.Entities;
 using Modules.Workflows.Domain.Errors;
 using Modules.Workflows.Features.Features.Shared.Responses;
+using Modules.Workflows.Features.Features.Shared.Mappers;
+using Modules.Workflows.MockInfrastructure.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +22,7 @@ internal interface ICreateWorkflowHandler : IHandler
 }
 
 internal sealed class CreateWorkflowHandler(
+	WorkflowsDbContext context,
 	ILogger<CreateWorkflowHandler> logger,
 	ILinkService linkService) : ICreateWorkflowHandler
 {
@@ -35,12 +38,21 @@ internal sealed class CreateWorkflowHandler(
 		
 		// Build workflow with first step
 		var workflow = BuildWorkflow(workflowCode, request);
-		
-		// TODO: Save workflow to storage (database, cache, etc.)
-		
-		logger.LogInformation("Created workflow with code '{Code}'", workflowCode);
 
-		var response = MapToResponse(workflow, linkService);
+		await context.Workflows.AddAsync(workflow, cancellationToken); //SESZH: немного влез в создание
+        await context.SaveChangesAsync(cancellationToken);
+
+
+        // TODO: Save workflow to storage (database, cache, etc.)
+
+        logger.LogInformation("Created workflow with code '{Code}'", workflowCode);
+
+		var response = workflow.ToResponse(JsonDocument.Parse("{ \"InvoiceId\": \"string\", \"Сounterparty\": \"string\", \"Contract\": \"string\" }").RootElement, new WorkflowStepDataSchema
+        {
+            Version = "1.0",
+            DataType = workflow.TypeCode,
+            SchemaJson = "{ 'InvoiceId': 'string', 'Сounterparty': 'string', 'Contract': 'string' }",
+        }, linkService);
 		return response;
 	}
 
@@ -50,12 +62,12 @@ internal sealed class CreateWorkflowHandler(
 		return Guid.NewGuid().ToString("N")[..8].ToUpperInvariant();
 	}
 
-	private static Workflow<Dictionary<string, object>> BuildWorkflow(string code, CreateWorkflowRequest request)
+	private static Workflow<IDataItem> BuildWorkflow(string code, CreateWorkflowRequest request)
 	{
 		var id =  Guid.NewGuid();
         var firstStep = GetFirstStepForType(id, request.TypeCode);
 		
-		return new Workflow<Dictionary<string, object>>
+		return new Workflow<IDataItem>
 		{	
 			Id= id,
 			WorkflowDataItems = new List<WorkflowDataItem>(),
@@ -65,11 +77,12 @@ internal sealed class CreateWorkflowHandler(
 			Description = request.Description,
 			IsActive = true,
 			CurrentStepType = firstStep.Type,
-			Data = new WorkflowDataCollection
+            CurrentStepNumber = 1,
+            Data = new WorkflowDataItemsCollection<IDataItem>
 			{
 				Name = "Workflow Data",
 				Description = "Workflow data collection",
-				Collection = new List<Dictionary<string, object>>()
+				Collection = new List<IDataItem>()
 			},
 			Steps = GetStepsForType(id, request.TypeCode)
 		};
@@ -121,55 +134,55 @@ internal sealed class CreateWorkflowHandler(
 		};
 	}
 
-	private static WorkflowResponse MapToResponse(Workflow<Dictionary<string, object>> workflow, ILinkService linkService)
-	{
-		var currentStep = workflow.CurrentStep();
-		var nextStep = workflow.GetNextStep(currentStep.Order);
-		
-		var nextStepLink = nextStep != null
-			? linkService.Generate("WorkflowNextStep", new { code = workflow.Code, stepType = nextStep.Type }, "Move to Next Step", HttpMethod.PATCH)
-			: null;
-
-		return new WorkflowResponse(workflow.Code, workflow.TypeCode, workflow.Name, workflow.Description)
-		{
-			Data = JsonDocument.Parse("{ \"InvoiceId\": \"string\", \"Сounterparty\": \"string\", \"Contract\": \"string\" }").RootElement,
-			DataSchema = new WorkflowStepDataSchema
-			{
-				Version = "1.0",
-				DataType = workflow.TypeCode,
-				SchemaJson = "{ 'InvoiceId': 'string', 'Сounterparty': 'string', 'Contract': 'string' }",
-			},
-
-			CurrentStep = new WorkflowCurrentStep(currentStep.Type, currentStep.Name, currentStep.Description)
-			{
-				Actions = new WorkflowActions
-                {
-                    StepActions = new List<Link>
-					{
-						new Link("/api/item", "Increment Qty", HttpMethod.POST),
-						new Link("/api/", "Add Line", HttpMethod.PUT)
-					},
-					NextStep = nextStepLink
-				},
-				DataSchema = new WorkflowStepDataSchema
-				{
-					Version = "1.0",
-					DataType = "Invoice",
-					SchemaJson = "{ 'type': 'object', 'properties': { 'invoiceNumber': { 'type': 'string' }, 'items': { 'type': 'array', 'items': { 'type': 'object', 'properties': { 'itemCode': { 'type': 'string' }, 'quantity': { 'type': 'integer' } }, 'required': ['itemCode', 'quantity'] } } }, 'required': ['invoiceNumber', 'items'] }",
-				},
-				Data = JsonDocument.Parse("{}").RootElement
-			},
-			WorkflowSteps = workflow.Steps
-				.OrderBy(s => s.Order)
-				.Select(s => new WorkflowStepResponse(s.Type, s.Name, s.Order, s.Description))
-				.ToList()
-		};
-	}
-
-	private sealed class WorkflowDataCollection : IWorkflowDataCollection<Dictionary<string, object>>
-	{
-		public string Name { get; set; } = "Data";
-		public string Description { get; set; } = "Workflow data";
-		public ICollection<Dictionary<string, object>> Collection { get; set; } = new List<Dictionary<string, object>>();
-	}
+	//private static WorkflowResponse MapToResponse(Workflow<Dictionary<string, object>> workflow, ILinkService linkService)
+	//{
+	//	var currentStep = workflow.CurrentStep();
+	//	var nextStep = workflow.GetNextStep(currentStep.Order);
+	//	
+	//	var nextStepLink = nextStep != null
+	//		? linkService.Generate("WorkflowNextStep", new { code = workflow.Code, stepType = nextStep.Type }, "Move to Next Step", HttpMethod.PATCH)
+	//		: null;
+	//
+	//	return new WorkflowResponse(workflow.Code, workflow.TypeCode, workflow.Name, workflow.Description)
+	//	{
+	//		Data = JsonDocument.Parse("{ \"InvoiceId\": \"string\", \"Сounterparty\": \"string\", \"Contract\": \"string\" }").RootElement,
+	//		DataSchema = new WorkflowStepDataSchema
+	//		{
+	//			Version = "1.0",
+	//			DataType = workflow.TypeCode,
+	//			SchemaJson = "{ 'InvoiceId': 'string', 'Сounterparty': 'string', 'Contract': 'string' }",
+	//		},
+	//
+	//		CurrentStep = new WorkflowCurrentStep(currentStep.Type, currentStep.Name, currentStep.Description)
+	//		{
+	//			Actions = new WorkflowActions
+    //            {
+    //                StepActions = new List<Link>
+	//				{
+	//					new Link("/api/item", "Increment Qty", HttpMethod.POST),
+	//					new Link("/api/", "Add Line", HttpMethod.PUT)
+	//				},
+	//				NextStep = nextStepLink
+	//			},
+	//			DataSchema = new WorkflowStepDataSchema
+	//			{
+	//				Version = "1.0",
+	//				DataType = "Invoice",
+	//				SchemaJson = "{ 'type': 'object', 'properties': { 'invoiceNumber': { 'type': 'string' }, 'items': { 'type': 'array', 'items': { 'type': 'object', 'properties': { 'itemCode': { 'type': 'string' }, 'quantity': { 'type': 'integer' } }, 'required': ['itemCode', 'quantity'] } } }, 'required': ['invoiceNumber', 'items'] }",
+	//			},
+	//			Data = JsonDocument.Parse("{}").RootElement
+	//		},
+	//		WorkflowSteps = workflow.Steps
+	//			.OrderBy(s => s.Order)
+	//			.Select(s => new WorkflowStepResponse(s.Type, s.Name, s.Order, s.Description))
+	//			.ToList()
+	//	};
+	//}
+	//
+	//private sealed class WorkflowDataCollection : IWorkflowDataCollection<Dictionary<string, object>>
+	//{
+	//	public string Name { get; set; } = "Data";
+	//	public string Description { get; set; } = "Workflow data";
+	//	public ICollection<Dictionary<string, object>> Collection { get; set; } = new List<Dictionary<string, object>>();
+	//}
 }
