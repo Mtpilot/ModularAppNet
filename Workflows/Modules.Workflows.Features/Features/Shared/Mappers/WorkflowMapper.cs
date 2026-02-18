@@ -17,6 +17,7 @@ internal static class WorkflowMapper
 		WorkflowStepDataSchema dataSchema,
 		ILinkService linkService)
 	{
+		//TODO: Mapper не подходящий класс для вычисления логики перехода на следующий шаг. Но пока можно оставить
 		var currentStep = workflow.CurrentStep();
 		var nextAvailableStep = workflow.GetNextStep(currentStep.Order);
 
@@ -35,7 +36,7 @@ internal static class WorkflowMapper
 				data,
 				linkService),
 			WorkflowSteps = workflow.Steps
-				.Select(s => new WorkflowStepResponse(s.Type, s.Name, s.Order, s.Description))
+				.Select(s => new WorkflowStepShortInfoResponse("StepCode-1", s.Type, s.Name, s.Order,  s.Description))
 				.ToList()
 		};
 	}
@@ -75,7 +76,7 @@ internal static class WorkflowMapper
 	/// <summary>
 	/// Domain WorkflowStep → API CurrentStep с действиями
 	/// </summary>
-	internal static WorkflowCurrentStep ToCurrentStepResponse(
+	internal static WorkflowStepResponse ToCurrentStepResponse(
 		this WorkflowStep step,
 		string workflowCode,
 		WorkflowStep? nextStep,
@@ -83,7 +84,7 @@ internal static class WorkflowMapper
 		JsonElement data,
 		ILinkService linkService)
 	{
-		return new WorkflowCurrentStep(step.Type, step.Name, step.Description)
+		return new WorkflowStepResponse("StepCode-1", step.Type, step.Name, 3 ,step.Description)
 		{
 			DataSchema = dataSchema,
 			Data = data,

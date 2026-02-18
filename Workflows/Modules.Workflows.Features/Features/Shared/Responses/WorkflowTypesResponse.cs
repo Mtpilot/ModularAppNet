@@ -4,4 +4,9 @@ using System.Text;
 
 namespace Modules.Workflows.Features.Features.Shared.Responses;
 
-public sealed record WorkflowTypesResponse(string Code, string Name);
+
+//TODO: должен возвращаться WorkflowType, а не Code конкретного Workflow
+public sealed record WorkflowTypesResponse(string WorkflowTypeCode, string Name);
+
+
+

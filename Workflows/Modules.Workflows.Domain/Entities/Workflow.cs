@@ -28,6 +28,9 @@ public class Workflow<TData>
 	//public required List<WorkflowAction> Actions { get; set; }
 
 	//SESZH: убрал в таком виде, добавляю в виде списка Guid, посмотрим, что будет с поиском по разным таблицам. UPD: пока не актуально
+
+	//TODO: Как связаны Data и WorkflowDataItems, в частном случае приемки тут должне быть массив содержащий один элемент - это спецификация с полями шапки спецификации
+	
 	public IWorkflowDataCollection<TData> Data
 	{
 		get => string.IsNullOrEmpty(DataJson)
@@ -168,9 +171,9 @@ public class Workflow<TData>
 
 public interface IWorkflowDataCollection<TEntity> //TEntity - e.g., Invoce(Specification)
 {
-	string Name { get; set; } //e.g., "Спецификация"
+	string Name { get; set; } //e.g., "Спецификации"
 
-	string Description { get; set; }
+	string Description { get; set; } // Содержит коллекцию документов (в частном случае спецификации)
 
 	ICollection<TEntity> Collection { get; set; } 
 }

@@ -16,11 +16,11 @@ public abstract record WorkflowBaseInfo(string Code, string TypeCode, string Nam
 /// Краткий список workflow (для GET /workflows)
 /// </summary>
 public sealed record WorkflowShortInfoResponse(
-	string Code, 
-	string TypeCode, 
+	string WorkflowCode, 
+	string WorkflowTypeCode, 
 	string Name, 
 	string Description) 
-	: WorkflowBaseInfo(Code, TypeCode, Name, Description)
+	: WorkflowBaseInfo(WorkflowCode, WorkflowTypeCode, Name, Description)
 {
 	public required string CurrentStepType { get; set; }
 	public required string CurrentStepName { get; set; }
@@ -31,21 +31,22 @@ public sealed record WorkflowShortInfoResponse(
 /// Полная информация о workflow с текущим шагом (для GET /workflows/{code} и переходов)
 /// </summary>
 public sealed record WorkflowResponse(
-	string Code, 
-	string TypeCode, 
+	string WorkflowCode, 
+	string WorkflowTypeCode, 
 	string Name, 
 	string Description) 
-	: WorkflowBaseInfo(Code, TypeCode, Name, Description)
+	: WorkflowBaseInfo(WorkflowCode, WorkflowTypeCode, Name, Description)
 {
-	public required WorkflowCurrentStep CurrentStep { get; set; }
-	public required List<WorkflowStepResponse> WorkflowSteps { get; set; }
+	public required WorkflowStepResponse CurrentStep { get; init; }
+	public required IList<WorkflowStepShortInfoResponse> WorkflowSteps { get; init; }
 }
 
 /// <summary>
 /// Информация о шаге в списке (просто справочная информация)
 /// </summary>
-public sealed record WorkflowStepResponse(
-	string Type, 
+public record WorkflowStepShortInfoResponse(
+    string WorkflowStepCode,
+    string WorkflowStepType, 
 	string Name, 
 	int Order,
 	string Description);
@@ -53,10 +54,12 @@ public sealed record WorkflowStepResponse(
 /// <summary>
 /// Информация о текущем активном шаге с доступными действиями
 /// </summary>
-public sealed record WorkflowCurrentStep( //Сканировать, Проверить, Принять (Scan, Verify, Accept)
-	string Type, 
-	string Name, 
-	string Description)
+public sealed record WorkflowStepResponse( //Сканировать, Проверить, Принять (Scan, Verify, Accept)
+	string WorkflowStepCode,
+	string WorkflowStepType, 
+	string Name,
+    int Order,
+    string Description): WorkflowStepShortInfoResponse(WorkflowStepCode, WorkflowStepType, Name, Order, Description)
 {
 	public required WorkflowStepDataSchema DataSchema { get; set; }
 	public required JsonElement Data { get; set; }
@@ -71,7 +74,7 @@ public sealed record WorkflowActions
 	/// <summary>
 	/// Доступные действия для текущего шага (например, "Increment Qty", "Add Line")
 	/// </summary>
-	public required List<Link> StepActions { get; set; }
+	public required IList<Link> StepActions { get; init; }
 	
 	/// <summary>
 	/// Ссылка на переход к следующему шагу (если доступно)
