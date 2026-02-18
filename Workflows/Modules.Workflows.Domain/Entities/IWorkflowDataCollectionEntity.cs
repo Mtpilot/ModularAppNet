@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Modules.Workflows.Domain.Entities;
 
-public record WorkflowType(string Code, string Name)
+public interface IWorkflowDataCollectionEntity
 {
-    public required Guid Id {get; set;}
+	string EntityCode { get; set; }
 }

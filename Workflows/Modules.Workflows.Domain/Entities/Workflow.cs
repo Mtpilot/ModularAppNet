@@ -10,12 +10,12 @@ using Modules.Workflows.Domain.Serializers;
 
 namespace Modules.Workflows.Domain.Entities;
 
-public class Workflow<TData>
-{
+public class Workflow<TEntity>
+{ 
 	public required Guid Id { get; set; }
 	public required string Code { get; set; }
 
-	public required string TypeCode { get; set; }
+	//public required string TypeCode { get; set; }
 
 	public required string Name { get; set; }
 	public required string Description { get; set; }
@@ -23,6 +23,7 @@ public class Workflow<TData>
 	public required bool IsActive { get; set; }
 	public required int CurrentStepNumber { get; set; }
 	public required string CurrentStepType { get; set; }
+	public required WorkflowType Type {get; set;}
 	public required List<WorkflowStep> Steps { get; set; }
 
 	//public required List<WorkflowAction> Actions { get; set; }
@@ -31,15 +32,14 @@ public class Workflow<TData>
 
 	//TODO: Как связаны Data и WorkflowDataItems, в частном случае приемки тут должне быть массив содержащий один элемент - это спецификация с полями шапки спецификации
 	
-	public IWorkflowDataCollection<TData> Data
-	{
-		get => string.IsNullOrEmpty(DataJson)
-			? null!
-			: JsonSerializer.Deserialize<WorkflowDataItemsCollection<TData>>(DataJson, DataItemSerializer.DataItemSeializerOptions)!;
-		set => DataJson = value == null ? "{}" : JsonSerializer.Serialize(value, DataItemSerializer.DataItemSeializerOptions);
-	}
-	public string DataJson { get; set; } = string.Empty;
-	public required List<WorkflowDataItem> WorkflowDataItems { get; set; }
+	//public IWorkflowDataCollection<TData> Data
+	//{
+	//	get => string.IsNullOrEmpty(DataJson)
+	//		? null!
+	//		: JsonSerializer.Deserialize<WorkflowDataItemsCollection<TData>>(DataJson, DataItemSerializer.DataItemSeializerOptions)!;
+	//	set => DataJson = value == null ? "{}" : JsonSerializer.Serialize(value, DataItemSerializer.DataItemSeializerOptions);
+	//}
+	//public string DataJson { get; set; } = string.Empty;
 
 	//public required List<Guid> DataGuids {  get; set; }
 
@@ -134,11 +134,11 @@ public class Workflow<TData>
 	#endregion Workflow Management
 
 	public JsonElement GenerateCheckoutReport() //SESZH: пока нужно как-то отправлять инфу о том, сколько заменено, сколько изменено, думал, через шаги, через шаги не получилось пока.
-	{
+	{//SESZH: этот метод уйдет, расчет будет внутри шага
 		return JsonSerializer.SerializeToElement(new
 		{
 			name = Name,
-			items = Data?.Collection.Count,
+			items = 0,//Data?.Collection.Count,
 			itemsTaken = "Calculating in development", //SESZH: еще подумать, в каком виде отдавать, но пока все упирается в хранение и изменение Data
 			itemsLost = "Calculating in development",
 			extraItems = "Calculating in development",
@@ -169,16 +169,9 @@ public class Workflow<TData>
 //}
 
 
-public interface IWorkflowDataCollection<TEntity> //TEntity - e.g., Invoce(Specification)
-{
-	string Name { get; set; } //e.g., "Спецификации"
 
-	string Description { get; set; } // Содержит коллекцию документов (в частном случае спецификации)
 
-	ICollection<TEntity> Collection { get; set; } 
-}
-
-public record WorkflowDataItemsCollection<T> : IWorkflowDataCollection<T>
+public record WorkflowDataItemsCollection<T> : IWorkflowDataCollection<T> //SESZH: пусть пока будет старая версия один тип у всех
 {
 	public required string Name { get; set; }
 	public required string Description { get; set; }

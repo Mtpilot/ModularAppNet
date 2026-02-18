@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.AspNetCore.Builder;
@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Modules.Common.API.Abstractions;
 using Modules.Common.API.Extensions;
-using Modules.Workflows.Features.Features.GetActiveWorkflows;
 using Modules.Workflows.Features.Features.Shared.Requests;
 using Modules.Workflows.Features.Features.Shared.Responses;
 using Modules.Workflows.Features.Features.Shared.Routes;
@@ -28,12 +27,12 @@ public class SendScannedBarcodes : IApiEndpoint
 	}
 
 	private static async Task<IResult> Handle(
-		[FromRoute] string code,
+		[FromRoute] string workflowCode,
 		[FromBody] List<ScannedBarcodePayload> scannedBarcodes,
 		ISendScannedBarcodesHandler handler,
 		CancellationToken cancellationToken)
 	{
-		var response = await handler.HandleAsync(code, scannedBarcodes, cancellationToken);
+		var response = await handler.HandleAsync(workflowCode, scannedBarcodes, cancellationToken);
 		if (response.IsError)
 		{
 			return response.Errors.ToProblem();

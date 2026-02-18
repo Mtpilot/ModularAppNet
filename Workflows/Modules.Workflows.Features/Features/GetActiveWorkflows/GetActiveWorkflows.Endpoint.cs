@@ -13,7 +13,7 @@ public class GetActiveWorkflowsEndpoint : IApiEndpoint
 {
 	public void MapEndpoint(WebApplication app)
 	{
-		app.MapGet(RouteConsts.GetActive, Handle)
+		app.MapGet(RouteConsts.GetActiveWorkflows, Handle)
 			.WithName("GetActiveWorkflows")
 			.WithTags("Workflow group")
 			.WithSummary("Get all active workflow")

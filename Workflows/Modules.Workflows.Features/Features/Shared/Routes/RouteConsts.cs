@@ -7,17 +7,18 @@ internal static class RouteConsts
 
 	internal const string GetWorkflowTypes = $"{BaseRoute}/types";
 
-	internal const string GetActive = $"{BaseRoute}/{{workflowTypeCode}}/active";
+	internal const string GetWorkflows = $"{BaseRoute}/types/{{workflowTypeCode}}";
+	internal const string GetActiveWorkflows = $"{BaseRoute}/types/{{workflowTypeCode}}/active";
 
-	internal const string GetWorkflow = $"{BaseRoute}/{{code}}";
+	internal const string GetWorkflow = $"{BaseRoute}/{{workflowCode}}";
 
 	internal const string CreateWorkflow = BaseRoute;
 
-	internal const string CancelWorkflow = $"{BaseRoute}/{{code}}/cancel";
+	internal const string CancelWorkflow = $"{BaseRoute}/{{workflowCode}}/cancel";
 
-	internal const string CompleteWorkflow = $"{BaseRoute}/{{code}}/complete";
-	internal const string NextStep = $"{BaseRoute}/{{code}}/next/";//SESZH: я подумал-подумал и не понял, зачем нам тип шага, когда мы идем к следующему в конкретном воркфлоу, если внутри этого самого воркфлоу есть инфа и о нынешнем и о следующем и о всех вообще{{stepType}}";
-	internal const string PreviousStep = $"{BaseRoute}/{{code}}/back/";//{{stepType}}";
+	internal const string CompleteWorkflow = $"{BaseRoute}/{{workflowCode}}/complete";
+	internal const string NextStep = $"{BaseRoute}/{{workflowCode}}/next/";//SESZH: я подумал-подумал и не понял, зачем нам тип шага, когда мы идем к следующему в конкретном воркфлоу, если внутри этого самого воркфлоу есть инфа и о нынешнем и о следующем и о всех вообще{{stepType}}";
+	internal const string PreviousStep = $"{BaseRoute}/{{workflowCode}}/back/";//{{stepType}}";
 
-	internal const string SendScannedBarcodes= $"{BaseRoute}/{{code}}/data/sendbarcodes";
+	internal const string SendScannedBarcodes= $"{BaseRoute}/{{workflowCode}}/data/sendbarcodes";
 }

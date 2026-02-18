@@ -12,46 +12,46 @@ namespace Modules.Workflows.Features.Features.CompleteWorkflow;
 
 internal interface ICompleteWorkflowHandler : IHandler
 {
-	Task<Result<Success>> HandleAsync(string code, CancellationToken cancellationToken);
+	Task<Result<Success>> HandleAsync(string workflowCode, CancellationToken cancellationToken);
 }
 
 internal sealed class CompleteWorkflowHandler(
 	WorkflowsDbContext context,
 	ILogger<CompleteWorkflowHandler> logger) : ICompleteWorkflowHandler
 {
-	public async Task<Result<Success>> HandleAsync(string code, CancellationToken cancellationToken)
+	public async Task<Result<Success>> HandleAsync(string workflowCode, CancellationToken cancellationToken)
 	{
-		logger.LogInformation("Completing workflow with code '{Code}'", code);
+		logger.LogInformation("Completing workflow with code '{Code}'", workflowCode);
 
 		// TODO: Load workflow from storage (database, cache, etc.)
 
 		var workflow = await context.Workflows.Include(wf => wf.Steps)
             .ThenInclude(st => st.Actions)
-            .FirstOrDefaultAsync(x => x.Code == code, cancellationToken);
+            .FirstOrDefaultAsync(x => x.Code == workflowCode, cancellationToken);
 
-        if (!workflow.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
+        if (!workflow.Code.Equals(workflowCode, StringComparison.OrdinalIgnoreCase))
 		{
-			logger.LogDebug("Workflow with code {Code} not found", code);
-			return WorkflowErrors.NotFound(code);
+			logger.LogDebug("Workflow with code {Code} not found", workflowCode);
+			return WorkflowErrors.NotFound(workflowCode);
 		}
 
 		if (!workflow.IsActive)
 		{
-			logger.LogInformation("Workflow with code {Code} is not active", code);
-			return WorkflowErrors.CannotComplete(code, "Workflow is not active");
+			logger.LogInformation("Workflow with code {Code} is not active", workflowCode);
+			return WorkflowErrors.CannotComplete(workflowCode, "Workflow is not active");
 		}
 
 		if (!workflow.IsFinalStep())
 		{
-			logger.LogInformation("Workflow with code {Code} is not on final step", code);
-			return WorkflowErrors.NotOnFinalStep(code);
+			logger.LogInformation("Workflow with code {Code} is not on final step", workflowCode);
+			return WorkflowErrors.NotOnFinalStep(workflowCode);
 		}
 
 		workflow.Complete();
 
 		// TODO: Save workflow to storage
 		
-		logger.LogInformation("Workflow with code {Code} was completed", code);
+		logger.LogInformation("Workflow with code {Code} was completed", workflowCode);
 		return Result.Success;
 	}
 

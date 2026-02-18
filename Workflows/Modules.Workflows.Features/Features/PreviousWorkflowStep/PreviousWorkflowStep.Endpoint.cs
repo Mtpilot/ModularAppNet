@@ -31,7 +31,7 @@ public sealed class PreviousWorkflowStep : IApiEndpoint
 	}
 
 	private static async Task<IResult> Handle(
-		string code,
+		string workflowCode,
 		IValidator<WorkflowPreviousStepBodyRequest> validator,
 		IWorkflowPreviousStepHandler handler,
 		CancellationToken cancellationToken)
@@ -42,7 +42,7 @@ public sealed class PreviousWorkflowStep : IApiEndpoint
 		//	return Results.ValidationProblem(validationResult.ToDictionary());
 		//}
 
-		var command = new WorkflowPreviousStepCommand(code);
+		var command = new WorkflowPreviousStepCommand(workflowCode);
 		var response = await handler.HandleAsync(command, cancellationToken);
 		if (response.IsError)
 		{

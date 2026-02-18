@@ -11,6 +11,7 @@ namespace Modules.Workflows.Features.Features.CreateWorkflow;
 
 public sealed record CreateWorkflowRequest(
 	string TypeCode,
+	string TypeName,
 	string Name,
 	string Description,
 	System.Text.Json.JsonElement Data);

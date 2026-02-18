@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
@@ -16,7 +16,7 @@ namespace Modules.Workflows.Features.Features.GetWorkflow;
 
 internal interface IGetWorkflowHandler : IHandler
 {
-	Task<Result<WorkflowResponse>> HandleAsync(string code, CancellationToken cancellationToken);
+	Task<Result<WorkflowResponse>> HandleAsync(string workflowCode, CancellationToken cancellationToken);
 }
 
 
@@ -25,7 +25,7 @@ internal sealed class GetWorkflowHandler(
 	WorkflowsDbContext context,
 	ILinkService linkService) : IGetWorkflowHandler
 {
-	public async Task<Result<WorkflowResponse>> HandleAsync(string code, CancellationToken cancellationToken)
+	public async Task<Result<WorkflowResponse>> HandleAsync(string workflowCode, CancellationToken cancellationToken)
 	{
 		logger.LogInformation("Getting active workflows");
 
@@ -35,10 +35,10 @@ internal sealed class GetWorkflowHandler(
 		//const string type = "Verify";
 		//var nextStepLink = linkService.Generate("WorkflowNextStep", new { code = workflowCode, type }, "Move to Next Step", HttpMethod.PATCH);
 		var workflow = await context.Workflows
+			.Include(w=> w.Type)
 	.Include(w => w.Steps)
 		.ThenInclude(s => s.Actions)
-		.Include(w=> w.WorkflowDataItems)
-	.FirstAsync(w => w.Code == code, cancellationToken);
+	.FirstAsync(w => w.Code == workflowCode, cancellationToken);
 
 	//	var links = await context.WorkflowDataLinks
 	//.Where(l => workflow.DataGuids.Contains(l.DataId))
@@ -57,8 +57,9 @@ internal sealed class GetWorkflowHandler(
 //			}
 //		}
 
+		var currentStepData = workflow.CurrentStep().Data;
 		var wf = workflow.ToResponse(
-			JsonDocument.Parse(JsonSerializer.Serialize(workflow.Data, Modules.Workflows.Domain.Serializers.DataItemSerializer.DataItemSeializerOptions)).RootElement,
+			JsonDocument.Parse(JsonSerializer.Serialize(currentStepData)).RootElement,
 			//JsonDocument.Parse("{ \"InvoiceId\": \"string\", \"Сounterparty\": \"string\", \"Contract\": \"string\" }").RootElement,
 			new WorkflowStepDataSchema
 			{

@@ -50,7 +50,7 @@ internal sealed class CreateWorkflowHandler(
 		var response = workflow.ToResponse(JsonDocument.Parse("{ \"InvoiceId\": \"string\", \"Сounterparty\": \"string\", \"Contract\": \"string\" }").RootElement, new WorkflowStepDataSchema
         {
             Version = "1.0",
-            DataType = workflow.TypeCode,
+            DataType = workflow.Type.Code,
             SchemaJson = "{ 'InvoiceId': 'string', 'Сounterparty': 'string', 'Contract': 'string' }",
         }, linkService);
 		return response;
@@ -62,28 +62,27 @@ internal sealed class CreateWorkflowHandler(
 		return Guid.NewGuid().ToString("N")[..8].ToUpperInvariant();
 	}
 
-	private static Workflow<IDataItem> BuildWorkflow(string code, CreateWorkflowRequest request)
+	private static Workflow<IWorkflowDataCollectionEntity> BuildWorkflow(string workflowCode, CreateWorkflowRequest request)
 	{
 		var id =  Guid.NewGuid();
         var firstStep = GetFirstStepForType(id, request.TypeCode);
 		
-		return new Workflow<IDataItem>
+		return new Workflow<IWorkflowDataCollectionEntity>
 		{	
 			Id= id,
-			WorkflowDataItems = new List<WorkflowDataItem>(),
-			Code = code,
-			TypeCode = request.TypeCode,
+			Code = workflowCode,
+			Type = new WorkflowType(request.TypeCode, request.Name) { Id = Guid.NewGuid() },
 			Name = request.Name,
 			Description = request.Description,
 			IsActive = true,
 			CurrentStepType = firstStep.Type,
             CurrentStepNumber = 1,
-            Data = new WorkflowDataItemsCollection<IDataItem>
-			{
-				Name = "Workflow Data",
-				Description = "Workflow data collection",
-				Collection = new List<IDataItem>()
-			},
+            //Data = new WorkflowDataItemsCollection<IDataItem>
+			//{
+			//	Name = "Workflow Data",
+			//	Description = "Workflow data collection",
+			//	Collection = new List<IDataItem>()
+			//},
 			Steps = GetStepsForType(id, request.TypeCode)
 		};
 	}
@@ -105,31 +104,37 @@ internal sealed class CreateWorkflowHandler(
 			{
 				Id = Guid.NewGuid(),
 				WorkflowId = workflowId,
+				StepCode = "Scan-01",
 				Type = "Scan",
 				Name = "Шаг сканирования",
 				Description = "Сканирование товара",
 				Order = 1,
-				Actions = new List<WorkflowStepAction>()
+				Actions = new List<WorkflowStepAction>(),
+				Data = []
 			},
 			new WorkflowStep
 			{
 				Id = Guid.NewGuid(),
 				WorkflowId = workflowId,
+				StepCode = "Verify-02",
 				Type = "Verify",
 				Name = "Шаг проверки",
 				Description = "Проверка количества",
 				Order = 2,
-				Actions = new List<WorkflowStepAction>()
+				Actions = new List<WorkflowStepAction>(),
+				Data = []
 			},
 			new WorkflowStep
 			{
 				Id = Guid.NewGuid(),
 				WorkflowId= workflowId,
+				StepCode = "Accept-03",
 				Type = "Accept",
 				Name = "Шаг приемки",
 				Description = "Подтверждение приемки",
 				Order = 3,
-				Actions = new List<WorkflowStepAction>()
+				Actions = new List<WorkflowStepAction>(),
+				Data = []
 			}
 		};
 	}

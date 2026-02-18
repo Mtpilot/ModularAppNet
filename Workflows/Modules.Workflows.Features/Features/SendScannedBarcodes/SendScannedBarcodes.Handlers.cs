@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
@@ -32,26 +32,34 @@ internal sealed class SendScannedBarcodesHandler(
 		logger.LogInformation("");
 
 		var workflow = await context.Workflows
-			.Include(x=> x.WorkflowDataItems)
-			.FirstOrDefaultAsync(x=> x.Code == workflowCode, cancellationToken);
+			.Include(x => x.Steps)
+			.FirstOrDefaultAsync(x => x.Code == workflowCode, cancellationToken);
 
 		if (workflow is null)
 		{
 			throw new NotSupportedException("Workflow not found"); //SESZH: пока не знаю, в каких случаях может быть неверный код и что с этим делать.
 		}
+		var scanStep = workflow.Steps.FirstOrDefault(s => string.Equals(s.Type, "Scan", StringComparison.OrdinalIgnoreCase));
+		if (scanStep is null)
+		{
+			return 0;
+		}
+		var data = scanStep.Data;
 		var changed = 0;
 		foreach (var payload in body)
 		{
-			var item = workflow?.WorkflowDataItems.FirstOrDefault(d => d.Code == payload.Barcode);
-
-#pragma warning disable IDE0031 // Use null propagation
-			if (item != null)
+			var itemDict = data.FirstOrDefault(d =>
+				d.TryGetValue("ItemCode", out var code) && payload.Barcode.Equals(code?.ToString(), StringComparison.OrdinalIgnoreCase));
+			if (itemDict is null)
 			{
-				item.Quantity = payload.Quantity;
-				changed++;
+				continue;
 			}
-#pragma warning restore IDE0031 // Use null propagation
+			itemDict["Quantity"] = payload.Quantity;
+			changed++;
 		}
+		// Сохраняем изменения обратно в шаг, чтобы DataJson обновился перед SaveChanges
+		if (changed > 0)
+			scanStep.Data = data;
 
 		await context.SaveChangesAsync(cancellationToken);
 		//SESZH: пусть пока это возвращается

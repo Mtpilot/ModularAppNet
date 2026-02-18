@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using Modules.Common.API.Abstractions.Links;
 using Modules.Workflows.Domain.Entities;
 using Modules.Workflows.Features.Features.Shared.Responses;
@@ -12,7 +12,7 @@ internal static class WorkflowMapper
 	/// Domain Workflow → API Response
 	/// </summary>
 	internal static WorkflowResponse ToResponse(
-		this Workflow<IDataItem> workflow,
+		this Workflow<IWorkflowDataCollectionEntity> workflow,
 		JsonElement data,
 		WorkflowStepDataSchema dataSchema,
 		ILinkService linkService)
@@ -23,7 +23,7 @@ internal static class WorkflowMapper
 
 		return new WorkflowResponse(
 			workflow.Code,
-			workflow.TypeCode,
+			workflow.Type.Code,
 			workflow.Name,
 			workflow.Description)
 		{
@@ -36,7 +36,7 @@ internal static class WorkflowMapper
 				data,
 				linkService),
 			WorkflowSteps = workflow.Steps
-				.Select(s => new WorkflowStepShortInfoResponse("StepCode-1", s.Type, s.Name, s.Order,  s.Description))
+				.Select(s => new WorkflowStepShortInfoResponse(s.StepCode, s.Type, s.Name, s.Order,  s.Description))
 				.ToList()
 		};
 	}
@@ -45,7 +45,7 @@ internal static class WorkflowMapper
 	/// Domain WorkflowStep → API Response для краткого списка
 	/// </summary>
 	internal static WorkflowShortInfoResponse ToShortResponse(
-		this Workflow<IDataItem> workflow,
+		this Workflow<IWorkflowDataCollectionEntity> workflow,
 		JsonElement data,
 		WorkflowStepDataSchema dataSchema,
 		ILinkService linkService)
@@ -54,7 +54,7 @@ internal static class WorkflowMapper
 
 		return new WorkflowShortInfoResponse(
 			workflow.Code,
-			workflow.TypeCode,
+			workflow.Type.Code,
 			workflow.Name,
 			workflow.Description)
 		{
@@ -84,7 +84,7 @@ internal static class WorkflowMapper
 		JsonElement data,
 		ILinkService linkService)
 	{
-		return new WorkflowStepResponse("StepCode-1", step.Type, step.Name, 3 ,step.Description)
+		return new WorkflowStepResponse(step.StepCode, step.Type, step.Name, step.Order ,step.Description)
 		{
 			DataSchema = dataSchema,
 			Data = data,
