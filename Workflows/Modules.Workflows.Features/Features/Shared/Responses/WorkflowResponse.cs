@@ -16,25 +16,25 @@ public abstract record WorkflowBaseInfo(string Code, string TypeCode, string Nam
 /// Краткий список workflow (для GET /workflows)
 /// </summary>
 public sealed record WorkflowShortInfoResponse(
-	string WorkflowCode, 
-	string WorkflowTypeCode, 
-	string Name, 
-	string Description) 
+	string WorkflowCode,
+    string WorkflowTypeCode,
+    string Name,
+    string Description)
 	: WorkflowBaseInfo(WorkflowCode, WorkflowTypeCode, Name, Description)
 {
 	public required string CurrentStepType { get; set; }
 	public required string CurrentStepName { get; set; }
-	public required List<Link> Links { get; set; }
+	public required IList<Link> Links { get; init; }
 }
 
 /// <summary>
 /// Полная информация о workflow с текущим шагом (для GET /workflows/{code} и переходов)
 /// </summary>
 public sealed record WorkflowResponse(
-	string WorkflowCode, 
-	string WorkflowTypeCode, 
-	string Name, 
-	string Description) 
+	string WorkflowCode,
+	string WorkflowTypeCode,
+	string Name,
+	string Description)
 	: WorkflowBaseInfo(WorkflowCode, WorkflowTypeCode, Name, Description)
 {
 	public required WorkflowStepResponse CurrentStep { get; init; }
@@ -46,8 +46,8 @@ public sealed record WorkflowResponse(
 /// </summary>
 public record WorkflowStepShortInfoResponse(
     string WorkflowStepCode,
-    string WorkflowStepType, 
-	string Name, 
+    string WorkflowStepType,
+	string Name,
 	int Order,
 	string Description);
 

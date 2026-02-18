@@ -517,6 +517,9 @@ dotnet_diagnostic.MA0132.severity = suggestion
 dotnet_analyzer_diagnostic.category-roslynator.severity = error
 roslynator_analyzers.enabled_by_default = true
 
+# RCS1251: Remove unnecessary braces from record declaration
+dotnet_diagnostic.RCS1251.severity = suggestion
+
 # RCS1036: Remove unnecessary blank line
 dotnet_diagnostic.RCS1036.severity = none
 

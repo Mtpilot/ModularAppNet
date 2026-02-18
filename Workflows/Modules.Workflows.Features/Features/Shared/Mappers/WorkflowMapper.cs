@@ -13,7 +13,7 @@ internal static class WorkflowMapper
 	/// </summary>
 	internal static WorkflowResponse ToResponse(
 		this Workflow<IWorkflowDataCollectionEntity> workflow,
-		JsonElement data,
+		JsonElement data, 
 		WorkflowStepDataSchema dataSchema,
 		ILinkService linkService)
 	{
@@ -28,7 +28,7 @@ internal static class WorkflowMapper
 			workflow.Description)
 		{
 			DataSchema = dataSchema,
-			Data = data,
+			Data = data, //TODO: ты передаешь сюда данные Шага, это видно по Мокам (где ты заполняешь)
 			CurrentStep = currentStep.ToCurrentStepResponse(
 				workflow.Code,
 				nextAvailableStep,
