@@ -27,12 +27,12 @@ public class SendScannedBarcodes : IApiEndpoint
 	}
 
 	private static async Task<IResult> Handle(
-		[FromRoute] string workflowCode,
+		[FromRoute] string stepCode,
 		[FromBody] List<ScannedBarcodePayload> scannedBarcodes,
 		ISendScannedBarcodesHandler handler,
 		CancellationToken cancellationToken)
 	{
-		var response = await handler.HandleAsync(workflowCode, scannedBarcodes, cancellationToken);
+		var response = await handler.HandleAsync(stepCode, scannedBarcodes, cancellationToken);
 		if (response.IsError)
 		{
 			return response.Errors.ToProblem();

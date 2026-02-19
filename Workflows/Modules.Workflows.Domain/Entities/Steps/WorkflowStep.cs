@@ -5,7 +5,7 @@ using Modules.Workflows.Domain.Serializers;
 
 namespace Modules.Workflows.Domain.Entities;
 
-public class WorkflowStep //Сканировать, Проверить, Принять //SESZH: я добавлю типы и генератор содержимого в зависимости от
+public class WorkflowStep //<TEntity> //Сканировать, Проверить, Принять //SESZH: я добавлю типы и генератор содержимого в зависимости от
 {
 	public required Guid Id { get; set; }
 	public required Guid WorkflowId { get; set; }
@@ -16,11 +16,6 @@ public class WorkflowStep //Сканировать, Проверить, Прин
 	public required string Description { get; set; }
 
 	public required List<WorkflowStepAction> Actions { get; set; }
-	public string? DataJson { get; set; }
 	[NotMapped]
-	public List<Dictionary<string, object>> Data
-	{
-		get => DataItemSerializer.Deserialize(DataJson);
-		set => DataJson = DataItemSerializer.Serialize(value);
-	}
+	public IWorkflowDataCollection Data{get; set;}
 }

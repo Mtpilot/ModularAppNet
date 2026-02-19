@@ -62,7 +62,7 @@ public sealed record WorkflowStepResponse( //Сканировать, Прове�
     string Description): WorkflowStepShortInfoResponse(WorkflowStepCode, WorkflowStepType, Name, Order, Description)
 {
 	public required WorkflowStepDataSchema DataSchema { get; set; }
-	public required JsonElement Data { get; set; }
+	public required JsonElement Data { get; set; } //DefaultWorkflowDataCollection<Invoice/TEntity>
 	public required WorkflowActions Actions { get; set; }
 }
 

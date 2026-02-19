@@ -2,11 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Modules.Common.API.Abstractions.Links;
 using Modules.Common.Domain.Handlers;
 using Modules.Common.Domain.Results;
+using Modules.Workflows.Domain.Entities;
+using Modules.Workflows.Domain.Entities.Application;
 using Modules.Workflows.Features.Features.Shared.Mappers;
 using Modules.Workflows.Features.Features.Shared.Responses;
 using Modules.Workflows.MockInfrastructure.Database;
@@ -33,53 +36,87 @@ internal sealed class GetWorkflowHandler(
 		//const string workflowTypeCode = "ReceiveGoods";
 		//const string workflowCode = "123";
 		//const string type = "Verify";
-		//var nextStepLink = linkService.Generate("WorkflowNextStep", new { code = workflowCode, type }, "Move to Next Step", HttpMethod.PATCH);
-		var workflow = await context.Workflows
-			.Include(w=> w.Type)
-	.Include(w => w.Steps)
-		.ThenInclude(s => s.Actions)
-	.FirstAsync(w => w.Code == workflowCode, cancellationToken);
+		//var nextStepLink = linkService.Generate("WorkflowNextStep", new { code = workflowCode, type }, "Move to Next Step", HttpMethod.PATCH)
 
-	//	var links = await context.WorkflowDataLinks
-	//.Where(l => workflow.DataGuids.Contains(l.DataId))
-	//.ToListAsync(cancellationToken);
+        	var workflow = await context.Workflows
+        		.Include(w=> w.Type)
+        .Include(w => w.Steps)
+        	.ThenInclude(s => s.Actions)
+        .FirstAsync(w => w.Code == workflowCode, cancellationToken);
 
-//		var groups = links.GroupBy(l => l.DataType);
-//
-//foreach(var group in groups)
-//		{
-//			switch (group.Key)
-//			{
-//#pragma warning disable
-//				case "Item": workflow.Data.Name = "DataItems";  workflow.Data.Collection = await context.WorkflowDataItems.Where(x => group.Select(y => y.DataId).Contains(x.Id)).Select(item => new Dictionary<string, object>(JsonSerializer.Deserialize<Dictionary<string, object>>(JsonSerializer.Serialize(item)), StringComparer.OrdinalIgnoreCase)).ToListAsync(cancellationToken); break;
-//#pragma warning restore
-//				default: throw new NotSupportedException();
-//			}
-//		}
 
-		var currentStepData = workflow.CurrentStep().Data;
-		var wf = workflow.ToResponse(
-			JsonDocument.Parse(JsonSerializer.Serialize(currentStepData)).RootElement,
-			//JsonDocument.Parse("{ \"InvoiceId\": \"string\", \"Сounterparty\": \"string\", \"Contract\": \"string\" }").RootElement,
-			new WorkflowStepDataSchema
-			{
-				Version = "1.0",
-				DataType = "ReceiveGoods",
-				SchemaJson = "{ 'InvoiceId': 'string', 'Сounterparty': 'string', 'Contract': 'string' }",
-			},
-			linkService);
+       // workflow.Data = new DefaultWorkflowDataCollection<InvoiceHeader>()
+       // {
+       //     Name = "InvoiceHeaders",
+       //     Description = "Collection of invoice headers",
+       //     Collection = new List<InvoiceHeader>()
+       //     { 
+       //         new InvoiceHeader
+       //         {
+       //             InvoiceId = "INV-2024-001",
+       //             Counterparty = "ООО Поставщик",
+       //             Contract = "Договор-2024"
+       //         }
+       //     }
+       // };
+
+
+        //	var links = await context.WorkflowDataLinks
+        //.Where(l => workflow.DataGuids.Contains(l.DataId))
+        //.ToListAsync(cancellationToken);
+
+        //		var groups = links.GroupBy(l => l.DataType);
+        //
+        //foreach(var group in groups)
+        //		{
+        //			switch (group.Key)
+        //			{
+        //#pragma warning disable
+        //				case "Item": workflow.Data.Name = "DataItems";  workflow.Data.Collection = await context.WorkflowDataItems.Where(x => group.Select(y => y.DataId).Contains(x.Id)).Select(item => new Dictionary<string, object>(JsonSerializer.Deserialize<Dictionary<string, object>>(JsonSerializer.Serialize(item)), StringComparer.OrdinalIgnoreCase)).ToListAsync(cancellationToken); break;
+        //#pragma warning restore
+        //				default: throw new NotSupportedException();
+        //			}
+        //		}
+
+        //var currentStepData = workflow.CurrentStep().Data;
+
+        var tmpData = await GetMockInvoiceHeadersFromInMemoryDb(context, workflow.Id, cancellationToken);
+        var wf = workflow.ConvertWorkflowToResponse(linkService, tmpData);
 
 
 
 
 		return wf;
 	}
+    private async Task<DefaultWorkflowDataCollection<InvoiceHeader>> GetMockInvoiceHeadersFromInMemoryDb(WorkflowsDbContext context, Guid workflowId, CancellationToken cancellationToken)
+    {
+        return new DefaultWorkflowDataCollection<InvoiceHeader> { Name = "InvoiceHeaders", Description = "Collection of invoice headers", Collection = await context.InvoiceHeaders.Where(x => x.WorkflowId == workflowId).ToListAsync(cancellationToken) };
+    }
 }
 
-	/// <summary>
-	/// Example of creating JsonElement with sample data for CurrentStep.Data field.
-	/// This demonstrates how to populate Data with arbitrary JSON structures including arrays and nested objects.
-	/// </summary>
+internal static class WorkflowParserHelper
+{
+    public static WorkflowResponse ConvertWorkflowToResponse(this Workflow workflow, ILinkService linkService, DefaultWorkflowDataCollection<InvoiceHeader> tmpData)
+    {
+        // Здесь можно реализовать логику преобразования сущности Workflow в WorkflowResponse
+        // Например, маппинг полей, генерация ссылок и т.д.
+        // Это позволит держать логику парсинга отдельно от обработчика.
+        var response = workflow.ToResponse(
+            new WorkflowStepDataSchema
+            {
+                Version = "1.0",
+                DataType = "ReceiveGoods",
+                SchemaJson = "{ 'InvoiceId': 'string', 'Сounterparty': 'string', 'Contract': 'string' }",
+            },
+            linkService);
+            response.Data = JsonSerializer.SerializeToElement(tmpData);
+        return response;
+    }
+}
+    /// <summary>
+    /// Example of creating JsonElement with sample data for CurrentStep.Data field.
+    /// This demonstrates how to populate Data with arbitrary JSON structures including arrays and nested objects.
+    /// </summary>
 //	private static JsonElement CreateSampleData()
 //	{
 //		var sampleData = new

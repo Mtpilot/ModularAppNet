@@ -33,7 +33,9 @@ internal sealed class WorkflowNextStepHandler(
 	{
 		logger.LogInformation("Advancing workflow {WorkflowCode} from step", request.Code);
 
-		var workflow = await context.Workflows.Include(wf => wf.Steps)
+		var workflow = await context.Workflows
+			.Include(wf=> wf.Type)
+			.Include(wf => wf.Steps)
 			.ThenInclude(st=> st.Actions)
 			.FirstOrDefaultAsync(x => x.Code == request.Code, cancellationToken);
 		if (workflow is null)
@@ -56,13 +58,15 @@ internal sealed class WorkflowNextStepHandler(
 
 		workflow.SetStepNumber(nextStep.Order); //SESZH: чуть менее странная механика.
 
-		var response = workflow.ToResponse(workflow.GenerateCheckoutReport(), new WorkflowStepDataSchema
+		var response = workflow.ToResponse(new WorkflowStepDataSchema
 		{         
 			Version = "1.0",
 			DataType = "ReceiveGoods",
 			SchemaJson = "{ 'InvoiceId': 'string', 'Сounterparty': 'string', 'Contract': 'string' }",
 		},
 		linkService);
+		//var tmpData = await GetMockInvoiceHeadersFromInMemoryDb(context, workflow.Id, cancellationToken);
+		//response.Data = JsonSerializer.SerializeToElement(tmpData);
 		await context.SaveChangesAsync(cancellationToken);
 
 		return response;

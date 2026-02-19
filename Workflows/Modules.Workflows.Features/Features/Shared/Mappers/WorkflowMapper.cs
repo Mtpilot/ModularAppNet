@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Modules.Common.API.Abstractions.Links;
 using Modules.Workflows.Domain.Entities;
+using Modules.Workflows.Domain.Entities.Application;
 using Modules.Workflows.Features.Features.Shared.Responses;
 using HttpMethod = Modules.Common.API.Abstractions.Links.HttpMethod;
 
@@ -12,8 +13,8 @@ internal static class WorkflowMapper
 	/// Domain Workflow → API Response
 	/// </summary>
 	internal static WorkflowResponse ToResponse(
-		this Workflow<IWorkflowDataCollectionEntity> workflow,
-		JsonElement data, 
+		this Workflow workflow,
+		//JsonElement data, //DefaultWorkflowData<InvoiceHeader> 
 		WorkflowStepDataSchema dataSchema,
 		ILinkService linkService)
 	{
@@ -28,12 +29,13 @@ internal static class WorkflowMapper
 			workflow.Description)
 		{
 			DataSchema = dataSchema,
-			Data = data, //TODO: ты передаешь сюда данные Шага, это видно по Мокам (где ты заполняешь)
+			Data = JsonSerializer.Deserialize<JsonElement>("{}")!, //SESZH: Data required, в хэлпере оно ДОЛЖНО заполниться, поэтому пока будет так
+			//Data = data, //TODO: ты передаешь сюда данные Шага, это видно по Мокам (где ты заполняешь)
 			CurrentStep = currentStep.ToCurrentStepResponse(
 				workflow.Code,
 				nextAvailableStep,
 				dataSchema,
-				data,
+				//JsonElement.Parse(currentStep.DataJson),
 				linkService),
 			WorkflowSteps = workflow.Steps
 				.Select(s => new WorkflowStepShortInfoResponse(s.StepCode, s.Type, s.Name, s.Order,  s.Description))
@@ -45,7 +47,7 @@ internal static class WorkflowMapper
 	/// Domain WorkflowStep → API Response для краткого списка
 	/// </summary>
 	internal static WorkflowShortInfoResponse ToShortResponse(
-		this Workflow<IWorkflowDataCollectionEntity> workflow,
+		this Workflow workflow,
 		JsonElement data,
 		WorkflowStepDataSchema dataSchema,
 		ILinkService linkService)
@@ -61,12 +63,13 @@ internal static class WorkflowMapper
 			CurrentStepType = currentStep.Type,
 			CurrentStepName = currentStep.Name,
 			DataSchema = dataSchema,
-			Data = data,
+			Data = JsonSerializer.Deserialize<JsonElement>("{}")!, //SESZH: Data required, в хэлпере оно ДОЛЖНО заполниться, поэтому пока будет так
+			//Data = data,
 			Links = new List<Link>
 			{
 				linkService.Generate(
 					"GetWorkflow",
-					new { code = workflow.Code },
+					new { workflowCode = workflow.Code },
 					"Self",
 					HttpMethod.GET)
 			}
@@ -81,27 +84,27 @@ internal static class WorkflowMapper
 		string workflowCode,
 		WorkflowStep? nextStep,
 		WorkflowStepDataSchema dataSchema,
-		JsonElement data,
+		//JsonElement data,
 		ILinkService linkService)
 	{
 		return new WorkflowStepResponse(step.StepCode, step.Type, step.Name, step.Order ,step.Description)
 		{
 			DataSchema = dataSchema,
-			Data = data,
+			Data = JsonSerializer.Deserialize<JsonElement>("{}")!,
+			//Data = data,
 			Actions = new WorkflowActions
 			{
 				StepActions = step.Actions
 					.Select(action => linkService.Generate(
 						action.Endpoint,
-						new { code = workflowCode },
-						//action.RouteParams ?? new Dictionary<string, object> { { "code", workflowCode } },
+						new { workflowCode = workflowCode, stepCode = step.StepCode },
 						action.Name,
 						action.HttpMethod.ToHttpMethod()))
 					.ToList(),
 				NextStep = nextStep != null
 					? linkService.Generate(
 						"WorkflowNextStep",
-						new { code = workflowCode },
+						new { workflowCode = workflowCode },
 						"Move to Next Step",
 						HttpMethod.PATCH)
 					: null

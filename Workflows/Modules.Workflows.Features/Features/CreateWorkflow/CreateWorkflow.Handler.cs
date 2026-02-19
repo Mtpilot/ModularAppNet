@@ -3,9 +3,10 @@ using Modules.Common.API.Abstractions.Links;
 using Modules.Common.Domain.Handlers;
 using Modules.Common.Domain.Results;
 using Modules.Workflows.Domain.Entities;
+using Modules.Workflows.Domain.Entities.Application;
 using Modules.Workflows.Domain.Errors;
-using Modules.Workflows.Features.Features.Shared.Responses;
 using Modules.Workflows.Features.Features.Shared.Mappers;
+using Modules.Workflows.Features.Features.Shared.Responses;
 using Modules.Workflows.MockInfrastructure.Database;
 using System;
 using System.Collections.Generic;
@@ -47,7 +48,7 @@ internal sealed class CreateWorkflowHandler(
 
         logger.LogInformation("Created workflow with code '{Code}'", workflowCode);
 
-		var response = workflow.ToResponse(JsonDocument.Parse("{ \"InvoiceId\": \"string\", \"Сounterparty\": \"string\", \"Contract\": \"string\" }").RootElement, new WorkflowStepDataSchema
+		var response = workflow.ToResponse(new WorkflowStepDataSchema
         {
             Version = "1.0",
             DataType = workflow.Type.Code,
@@ -62,22 +63,37 @@ internal sealed class CreateWorkflowHandler(
 		return Guid.NewGuid().ToString("N")[..8].ToUpperInvariant();
 	}
 
-	private static Workflow<IWorkflowDataCollectionEntity> BuildWorkflow(string workflowCode, CreateWorkflowRequest request)
+	private static Workflow BuildWorkflow(string workflowCode, CreateWorkflowRequest request)
 	{
 		var id =  Guid.NewGuid();
         var firstStep = GetFirstStepForType(id, request.TypeCode);
 		
-		return new Workflow<IWorkflowDataCollectionEntity>
-		{	
-			Id= id,
+		return new Workflow
+		{
+			Id = id,
 			Code = workflowCode,
 			Type = new WorkflowType(request.TypeCode, request.Name) { Id = Guid.NewGuid() },
 			Name = request.Name,
 			Description = request.Description,
 			IsActive = true,
 			CurrentStepType = firstStep.Type,
-            CurrentStepNumber = 1,
-            //Data = new WorkflowDataItemsCollection<IDataItem>
+			CurrentStepNumber = 1,
+			Data = new DefaultWorkflowDataCollection<InvoiceHeader>
+			{
+				Name = "Новое Воркфлоу",
+				Description = "",
+				Collection = new List<InvoiceHeader>
+				{
+					new InvoiceHeader
+					{
+						WorkflowId = id,
+						Contract = "Новая накладная",
+						Counterparty = "Новый источник",
+						InvoiceId = $"Новый Айдишник: {Guid.NewGuid().ToString()}",
+					}
+				}
+			},
+			//Data = new WorkflowDataItemsCollection<IDataItem>
 			//{
 			//	Name = "Workflow Data",
 			//	Description = "Workflow data collection",
@@ -98,11 +114,14 @@ internal sealed class CreateWorkflowHandler(
 	{
 		// Sample implementation - in real app, this would load from workflow type configuration based on typeCode
 		_ = typeCode; // Will be used in real implementation
+		var step1Id = Guid.NewGuid();
+		var step2Id = Guid.NewGuid();
+		var step3Id = Guid.NewGuid();
 		return new List<WorkflowStep>
 		{
 			new WorkflowStep
 			{
-				Id = Guid.NewGuid(),
+				Id = step1Id,
 				WorkflowId = workflowId,
 				StepCode = "Scan-01",
 				Type = "Scan",
@@ -110,11 +129,38 @@ internal sealed class CreateWorkflowHandler(
 				Description = "Сканирование товара",
 				Order = 1,
 				Actions = new List<WorkflowStepAction>(),
-				Data = []
+				Data = new DefaultWorkflowDataCollection<Invoice>
+				{
+					Name = "Сканированные товары",
+					Description = "Коллекция отсканированных товаров",
+					Collection = new List<Invoice>
+					{
+						new Invoice
+						{
+							WorkflowId = workflowId,
+							StepId = step1Id,
+							Name = "Накладная 1",
+							Contract = "Контракт 1",
+							Counterparty = "Поставщик 1",
+							Date = DateTime.UtcNow,
+							InvoiceId = "ID родительского",
+							Lines = new List<InvoiceLine>
+							{
+								new InvoiceLine
+								{
+									ProductName = "Товар 1",
+									Quantity = 10,
+									Units = "шт",
+									Barcode = "1234567890123"
+                                },
+                            }
+                        }
+					}
+                }
 			},
 			new WorkflowStep
 			{
-				Id = Guid.NewGuid(),
+				Id = step2Id,
 				WorkflowId = workflowId,
 				StepCode = "Verify-02",
 				Type = "Verify",
@@ -122,11 +168,16 @@ internal sealed class CreateWorkflowHandler(
 				Description = "Проверка количества",
 				Order = 2,
 				Actions = new List<WorkflowStepAction>(),
-				Data = []
-			},
+                Data = new DefaultWorkflowDataCollection<Invoice>
+                {
+                    Name = "Сканированные товары",
+                    Description = "Коллекция отсканированных товаров",
+                    Collection = new List<Invoice>(),
+                }
+            },
 			new WorkflowStep
 			{
-				Id = Guid.NewGuid(),
+				Id = step3Id,
 				WorkflowId= workflowId,
 				StepCode = "Accept-03",
 				Type = "Accept",
@@ -134,8 +185,13 @@ internal sealed class CreateWorkflowHandler(
 				Description = "Подтверждение приемки",
 				Order = 3,
 				Actions = new List<WorkflowStepAction>(),
-				Data = []
-			}
+				Data = new DefaultWorkflowDataCollection<Invoice>
+                {
+                    Name = "Сканированные товары",
+                    Description = "Коллекция отсканированных товаров",
+                    Collection = new List<Invoice>(),
+                }
+            }
 		};
 	}
 

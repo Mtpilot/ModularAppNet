@@ -34,7 +34,9 @@ internal sealed class WorkflowPreviousStepHandler(
 	{
 		logger.LogInformation("Advancing workflow {WorkflowCode} from step", request.Code);
 
-		var workflow = await context.Workflows.Include(wf => wf.Steps)
+		var workflow = await context.Workflows
+            .Include(wf => wf.Type)
+			.Include(wf => wf.Steps)
 			.ThenInclude(st => st.Actions)
 			.FirstOrDefaultAsync(x => x.Code == request.Code, cancellationToken);
 		if (workflow is null)
@@ -57,7 +59,7 @@ internal sealed class WorkflowPreviousStepHandler(
 		//workflow.CurrentStepType = previousStep.Type; //SESZH: все еще ОЧЕНЬ странная механика.
 		workflow.SetStepNumber(previousStep.Order);
 
-		var response = workflow.ToResponse(workflow.GenerateCheckoutReport(), new WorkflowStepDataSchema
+		var response = workflow.ToResponse(new WorkflowStepDataSchema
 		{
 			Version = "1.0",
 			DataType = "ReceiveGoods",

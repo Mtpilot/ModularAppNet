@@ -1,15 +1,17 @@
 using Microsoft.EntityFrameworkCore;
 using Modules.Workflows.Domain.Entities;
+using Modules.Workflows.Domain.Entities.Application;
 
 namespace Modules.Workflows.MockInfrastructure.Database;
 
 public class WorkflowsDbContext(DbContextOptions<WorkflowsDbContext> options) : DbContext(options)
 {
-	public DbSet<Workflow<IWorkflowDataCollectionEntity>> Workflows { get; set; }
+	public DbSet<Workflow> Workflows { get; set; } //SESZH: временно добавлю наследника
 	public DbSet<WorkflowStep> WorkflowSteps { get; set; }
 	public DbSet<WorkflowStepAction> WorkflowStepActions { get; set; }
 	public DbSet<DataItemInventory> WorkflowDataItemInventory { get; set; }
 	public DbSet<WorkflowType> WorkflowTypes { get; set; }
+	public DbSet<InvoiceHeader> InvoiceHeaders { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
@@ -38,11 +40,14 @@ public class WorkflowsDbContext(DbContextOptions<WorkflowsDbContext> options) : 
 		//v => JsonSerializer.Deserialize<IWorkflowDataItemsCollection<IDataItem>>(v, JsonOptions)!);
 
 		modelBuilder.Entity<WorkflowStep>()
-			.Property(e => e.DataJson)
-			.HasColumnType("text");
+			.Ignore(e => e.Data)
+			;
 
 		modelBuilder.Entity<WorkflowStepAction>()
 			.Ignore(e => e.RouteParams);
+
+		modelBuilder.Entity<InvoiceHeader>()
+			.HasKey(e => e.WorkflowId);
 
 		modelBuilder.HasDefaultSchema(DbConsts.MockWorkflowsSchemaName);
 

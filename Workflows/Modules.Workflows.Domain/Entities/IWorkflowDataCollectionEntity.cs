@@ -4,7 +4,8 @@ using System.Text;
 
 namespace Modules.Workflows.Domain.Entities;
 
-public interface IWorkflowDataCollectionEntity
-{
-	string EntityCode { get; set; }
-}
+//SESZH: убрать потом
+//public interface IWorkflowDataCollectionEntity
+//{
+//	string EntityCode { get; set; }
+//}

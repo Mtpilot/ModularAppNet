@@ -1,11 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Modules.Workflows.Domain.Entities;
+using Modules.Workflows.Domain.Entities.Application;
 
 namespace Modules.Workflows.Infrastructure.Database;
 
 public class WorkflowsDbContext(DbContextOptions<WorkflowsDbContext> options) : DbContext(options)
 {
-    public DbSet<Workflow<IDataItem>> Workflows { get; set; }
+    public DbSet<Workflow> Workflows { get; set; }
 	public DbSet<WorkflowStep> WorkflowSteps { get; set; }
 	public DbSet<WorkflowStepAction> WorkflowStepActions { get; set; }
 

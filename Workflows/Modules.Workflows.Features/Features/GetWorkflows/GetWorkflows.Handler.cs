@@ -45,7 +45,7 @@ internal sealed class GetWorkflowsHandler(
 				CurrentStepName = currentStep?.Name ?? string.Empty,
 				CurrentStepType = workflow.CurrentStepType,
 				Links = new List<Link> { getWorkflowLink },
-				Data = JsonDocument.Parse("{ \"InvoiceId\": \"string\", \"Сounterparty\": \"string\", \"Contract\": \"string\" }").RootElement,
+				Data = JsonSerializer.Deserialize<JsonElement>("{}")!,//JsonDocument.Parse(workflow.DataJson).RootElement,
 				DataSchema = new WorkflowStepDataSchema
 				{
 					Version = "1.0",

@@ -10,8 +10,8 @@ using Modules.Workflows.Domain.Serializers;
 
 namespace Modules.Workflows.Domain.Entities;
 
-public class Workflow<TEntity>
-{ 
+public class Workflow//<TEntity, TStepEntity>
+{
 	public required Guid Id { get; set; }
 	public required string Code { get; set; }
 
@@ -31,7 +31,9 @@ public class Workflow<TEntity>
 	//SESZH: убрал в таком виде, добавляю в виде списка Guid, посмотрим, что будет с поиском по разным таблицам. UPD: пока не актуально
 
 	//TODO: Как связаны Data и WorkflowDataItems, в частном случае приемки тут должне быть массив содержащий один элемент - это спецификация с полями шапки спецификации
-	
+	[NotMapped]
+	public IWorkflowDataCollection Data { get; set; }
+
 	//public IWorkflowDataCollection<TData> Data
 	//{
 	//	get => string.IsNullOrEmpty(DataJson)
@@ -43,6 +45,20 @@ public class Workflow<TEntity>
 
 	//public required List<Guid> DataGuids {  get; set; }
 
+	/// <summary>
+	/// Строковая копия Data для хранения в БД. Парно сериализуется с <see cref="Data"/> через <see cref="Serializers.WorkflowDataSerializer"/>.
+	/// В Features для parse использовать <see cref="Serializers.WorkflowDataSerializer.Deserialize{TEntity}(string?)"/>.
+	/// </summary>
+	//public string DataJson { get; set; } = "{}";
+
+	/*
+	[NotMapped]
+	public IWorkflowData<TEntity> Data
+	{
+		get => WorkflowDataSerializer.Deserialize<TEntity>(DataJson) ?? new DefaultWorkflowData<TEntity> { Name = "", Description = "", Data = default! };
+		set => DataJson = WorkflowDataSerializer.Serialize(value);
+	}
+	*/
 	#region Steps
 	public string GetCacheKey() => $"workflow:{Code}";
 
