@@ -13,3 +13,5 @@ public class InvoiceHeader
 	public required string Counterparty { get; set; } 
 	public required string Contract { get; set; }
 }
+
+

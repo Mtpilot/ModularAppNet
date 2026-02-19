@@ -6,10 +6,10 @@ namespace Modules.Workflows.Features.Features.Shared.Responses;
 /// <summary>
 /// Базовая информация о workflow - общая для всех типов ответов
 /// </summary>
-public abstract record WorkflowBaseInfo(string Code, string TypeCode, string Name, string Description)
+public abstract record WorkflowBaseInfoResponse(string Code, string TypeCode, string Name, string Description)
 {
 	public required WorkflowStepDataSchema DataSchema { get; set; }
-	public required JsonElement Data { get; set; }
+	public string? Data { get; set; }
 }
 
 /// <summary>
@@ -20,7 +20,7 @@ public sealed record WorkflowShortInfoResponse(
     string WorkflowTypeCode,
     string Name,
     string Description)
-	: WorkflowBaseInfo(WorkflowCode, WorkflowTypeCode, Name, Description)
+	: WorkflowBaseInfoResponse(WorkflowCode, WorkflowTypeCode, Name, Description)
 {
 	public required string CurrentStepType { get; set; }
 	public required string CurrentStepName { get; set; }
@@ -35,7 +35,7 @@ public sealed record WorkflowResponse(
 	string WorkflowTypeCode,
 	string Name,
 	string Description)
-	: WorkflowBaseInfo(WorkflowCode, WorkflowTypeCode, Name, Description)
+	: WorkflowBaseInfoResponse(WorkflowCode, WorkflowTypeCode, Name, Description)
 {
 	public required WorkflowStepResponse CurrentStep { get; init; }
 	public required IList<WorkflowStepShortInfoResponse> WorkflowSteps { get; init; }
@@ -56,7 +56,7 @@ public record WorkflowStepShortInfoResponse(
 /// </summary>
 public sealed record WorkflowStepResponse( //Сканировать, Проверить, Принять (Scan, Verify, Accept)
 	string WorkflowStepCode,
-	string WorkflowStepType, 
+	string WorkflowStepType,
 	string Name,
     int Order,
     string Description): WorkflowStepShortInfoResponse(WorkflowStepCode, WorkflowStepType, Name, Order, Description)

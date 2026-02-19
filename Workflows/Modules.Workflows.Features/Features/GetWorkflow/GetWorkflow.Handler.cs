@@ -12,6 +12,7 @@ using Modules.Workflows.Domain.Entities;
 using Modules.Workflows.Domain.Entities.Application;
 using Modules.Workflows.Features.Features.Shared.Mappers;
 using Modules.Workflows.Features.Features.Shared.Responses;
+using Modules.Workflows.Infrastructure.Helpers;
 using Modules.Workflows.MockInfrastructure.Database;
 using HttpMethod = Modules.Common.API.Abstractions.Links.HttpMethod;
 
@@ -80,7 +81,7 @@ internal sealed class GetWorkflowHandler(
 
         //var currentStepData = workflow.CurrentStep().Data;
 
-        var tmpData = await GetMockInvoiceHeadersFromInMemoryDb(context, workflow.Id, cancellationToken);
+        var tmpData = await MockTmpHelper.GetMockInvoiceHeadersFromInMemoryDb(context, workflow.Id, cancellationToken);
         var wf = workflow.ConvertWorkflowToResponse(linkService, tmpData);
 
 
@@ -88,20 +89,18 @@ internal sealed class GetWorkflowHandler(
 
 		return wf;
 	}
-    private async Task<DefaultWorkflowDataCollection<InvoiceHeader>> GetMockInvoiceHeadersFromInMemoryDb(WorkflowsDbContext context, Guid workflowId, CancellationToken cancellationToken)
-    {
-        return new DefaultWorkflowDataCollection<InvoiceHeader> { Name = "InvoiceHeaders", Description = "Collection of invoice headers", Collection = await context.InvoiceHeaders.Where(x => x.WorkflowId == workflowId).ToListAsync(cancellationToken) };
-    }
+    
 }
 
+
 internal static class WorkflowParserHelper
-{
+{    
     public static WorkflowResponse ConvertWorkflowToResponse(this Workflow workflow, ILinkService linkService, DefaultWorkflowDataCollection<InvoiceHeader> tmpData)
     {
         // Здесь можно реализовать логику преобразования сущности Workflow в WorkflowResponse
         // Например, маппинг полей, генерация ссылок и т.д.
         // Это позволит держать логику парсинга отдельно от обработчика.
-        var response = workflow.ToResponse(
+        var response = workflow.ToPartialResponse(
             new WorkflowStepDataSchema
             {
                 Version = "1.0",
@@ -109,7 +108,8 @@ internal static class WorkflowParserHelper
                 SchemaJson = "{ 'InvoiceId': 'string', 'Сounterparty': 'string', 'Contract': 'string' }",
             },
             linkService);
-            response.Data = JsonSerializer.SerializeToElement(tmpData);
+            response.Data = JsonSerializer.Serialize(tmpData);
+
         return response;
     }
 }

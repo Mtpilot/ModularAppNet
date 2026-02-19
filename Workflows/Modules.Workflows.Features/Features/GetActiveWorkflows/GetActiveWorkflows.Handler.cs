@@ -4,11 +4,13 @@ using Modules.Common.API.Abstractions.Links;
 using Modules.Common.Domain.Handlers;
 using Modules.Common.Domain.Results;
 using Modules.Workflows.Features.Features.Shared.Responses;
+using Modules.Workflows.Infrastructure.Helpers;
 using Modules.Workflows.MockInfrastructure.Database;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using HttpMethod = Modules.Common.API.Abstractions.Links.HttpMethod;
 
 namespace Modules.Workflows.Features.Features.GetActiveWorkflows;
@@ -43,16 +45,19 @@ internal sealed class GetActiveWorkflowsHandler(
         var response = new List<WorkflowShortInfoResponse>();
         foreach (var workflow in workflows)
         {
+            workflow.Data = await MockTmpHelper.GetMockInvoiceHeadersFromInMemoryDb(context, workflow.Id, cancellationToken);
+          
             var getWorkflowLink = linkService.Generate("GetWorkflow", new { workflowCode = workflow.Code }, $"Get {workflowTypeCode} workflow data", HttpMethod.GET);
 
             var currentStep = workflow.CurrentStep();
+            
 
             var wf = new WorkflowShortInfoResponse(workflow.Code, workflowTypeCode, workflow.Name, workflow.Description)
             {
                 CurrentStepName = currentStep?.Name ?? string.Empty,
                 CurrentStepType = workflow.CurrentStepType,
                 Links = new List<Link> { getWorkflowLink },
-                Data = JsonSerializer.Deserialize<JsonElement>("{}")!,//JsonDocument.Parse(workflow.DataJson).RootElement,
+                Data = JsonSerializer.Serialize(workflow.Data),
                 DataSchema = new WorkflowStepDataSchema
                 {
                     Version = "1.0",

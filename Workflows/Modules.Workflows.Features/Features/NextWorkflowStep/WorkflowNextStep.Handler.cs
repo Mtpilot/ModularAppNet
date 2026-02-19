@@ -58,7 +58,7 @@ internal sealed class WorkflowNextStepHandler(
 
 		workflow.SetStepNumber(nextStep.Order); //SESZH: чуть менее странная механика.
 
-		var response = workflow.ToResponse(new WorkflowStepDataSchema
+		var response = workflow.ToPartialResponse(new WorkflowStepDataSchema
 		{         
 			Version = "1.0",
 			DataType = "ReceiveGoods",

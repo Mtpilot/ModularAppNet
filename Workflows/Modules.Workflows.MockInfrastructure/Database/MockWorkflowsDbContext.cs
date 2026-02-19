@@ -11,7 +11,9 @@ public class WorkflowsDbContext(DbContextOptions<WorkflowsDbContext> options) : 
 	public DbSet<WorkflowStepAction> WorkflowStepActions { get; set; }
 	public DbSet<DataItemInventory> WorkflowDataItemInventory { get; set; }
 	public DbSet<WorkflowType> WorkflowTypes { get; set; }
-	public DbSet<InvoiceHeader> InvoiceHeaders { get; set; }
+	public DbSet<InvoiceHeader> InvoiceHeaders { get; set; } //TODO: Нет хранимого типа InvoiceHeader, только Invoice. InvoiceHeader получается проекций из Invoice при чтении из хранилища.
+															// зачитываются Invoice к процессу, делается проекция в InvoiceHeader,вставляет в Data процесса,
+															// а сам Invoice вставляется в CurrentStep (если шаг scan) 
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{

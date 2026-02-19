@@ -59,7 +59,7 @@ internal sealed class WorkflowPreviousStepHandler(
 		//workflow.CurrentStepType = previousStep.Type; //SESZH: все еще ОЧЕНЬ странная механика.
 		workflow.SetStepNumber(previousStep.Order);
 
-		var response = workflow.ToResponse(new WorkflowStepDataSchema
+		var response = workflow.ToPartialResponse(new WorkflowStepDataSchema
 		{
 			Version = "1.0",
 			DataType = "ReceiveGoods",

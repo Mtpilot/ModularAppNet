@@ -48,7 +48,7 @@ internal sealed class CreateWorkflowHandler(
 
         logger.LogInformation("Created workflow with code '{Code}'", workflowCode);
 
-		var response = workflow.ToResponse(new WorkflowStepDataSchema
+		var response = workflow.ToPartialResponse(new WorkflowStepDataSchema
         {
             Version = "1.0",
             DataType = workflow.Type.Code,

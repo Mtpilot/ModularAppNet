@@ -5,6 +5,7 @@ using Modules.Common.Domain.Handlers;
 using Modules.Common.Domain.Results;
 using Modules.Workflows.Domain.Entities;
 using Modules.Workflows.Features.Features.Shared.Responses;
+using Modules.Workflows.Infrastructure.Helpers;
 using Modules.Workflows.MockInfrastructure.Database;
 using System;
 using System.Collections.Generic;
@@ -34,9 +35,14 @@ internal sealed class GetWorkflowsHandler(
 			.Where(x => x.Type.Code == workflowTypeCode).ToListAsync(cancellationToken);
 
 		var response = new List<WorkflowShortInfoResponse>();
-		foreach (var workflow in workflows)
+
+		
+        foreach (var workflow in workflows)
 		{
-			var getWorkflowLink = linkService.Generate("GetWorkflow", new { workflowCode = workflow.Code }, $"Get {workflowTypeCode} workflow data", HttpMethod.GET);
+            var tmpData =  await MockTmpHelper.GetMockInvoiceHeadersFromInMemoryDb(context, workflow.Id, cancellationToken);
+
+			workflow.Data = tmpData;
+            var getWorkflowLink = linkService.Generate("GetWorkflow", new { workflowCode = workflow.Code }, $"Get {workflowTypeCode} workflow data", HttpMethod.GET);
 
 			var currentStep = workflow.CurrentStep();
 
@@ -45,8 +51,8 @@ internal sealed class GetWorkflowsHandler(
 				CurrentStepName = currentStep?.Name ?? string.Empty,
 				CurrentStepType = workflow.CurrentStepType,
 				Links = new List<Link> { getWorkflowLink },
-				Data = JsonSerializer.Deserialize<JsonElement>("{}")!,//JsonDocument.Parse(workflow.DataJson).RootElement,
-				DataSchema = new WorkflowStepDataSchema
+				Data = JsonSerializer.Serialize(tmpData), //TODO: надо серелизовать из workflow.Data (но из отсутвия Generic нужно подумать как лучше его подставлять) 
+                DataSchema = new WorkflowStepDataSchema
 				{
 					Version = "1.0",
 					DataType = "ReceiveGoods",

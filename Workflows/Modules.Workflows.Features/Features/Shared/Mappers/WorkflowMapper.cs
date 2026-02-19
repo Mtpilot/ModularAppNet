@@ -12,12 +12,13 @@ internal static class WorkflowMapper
 	/// <summary>
 	/// Domain Workflow → API Response
 	/// </summary>
-	internal static WorkflowResponse ToResponse(
+	internal static WorkflowResponse ToPartialResponse(
 		this Workflow workflow,
 		//JsonElement data, //DefaultWorkflowData<InvoiceHeader> 
 		WorkflowStepDataSchema dataSchema,
 		ILinkService linkService)
 	{
+
 		//TODO: Mapper не подходящий класс для вычисления логики перехода на следующий шаг. Но пока можно оставить
 		var currentStep = workflow.CurrentStep();
 		var nextAvailableStep = workflow.GetNextStep(currentStep.Order);
@@ -29,8 +30,7 @@ internal static class WorkflowMapper
 			workflow.Description)
 		{
 			DataSchema = dataSchema,
-			Data = JsonSerializer.Deserialize<JsonElement>("{}")!, //SESZH: Data required, в хэлпере оно ДОЛЖНО заполниться, поэтому пока будет так
-			//Data = data, //TODO: ты передаешь сюда данные Шага, это видно по Мокам (где ты заполняешь)
+			Data = null,
 			CurrentStep = currentStep.ToCurrentStepResponse(
 				workflow.Code,
 				nextAvailableStep,
@@ -46,7 +46,7 @@ internal static class WorkflowMapper
 	/// <summary>
 	/// Domain WorkflowStep → API Response для краткого списка
 	/// </summary>
-	internal static WorkflowShortInfoResponse ToShortResponse(
+	internal static WorkflowShortInfoResponse ToShortPartialResponse(
 		this Workflow workflow,
 		JsonElement data,
 		WorkflowStepDataSchema dataSchema,
@@ -63,8 +63,7 @@ internal static class WorkflowMapper
 			CurrentStepType = currentStep.Type,
 			CurrentStepName = currentStep.Name,
 			DataSchema = dataSchema,
-			Data = JsonSerializer.Deserialize<JsonElement>("{}")!, //SESZH: Data required, в хэлпере оно ДОЛЖНО заполниться, поэтому пока будет так
-			//Data = data,
+			Data = null,
 			Links = new List<Link>
 			{
 				linkService.Generate(
