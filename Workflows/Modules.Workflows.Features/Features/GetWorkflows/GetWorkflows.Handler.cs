@@ -49,7 +49,7 @@ internal sealed class GetWorkflowsHandler(
 			var wf = new WorkflowShortInfoResponse(workflow.Code, workflowTypeCode, workflow.Name, workflow.Description)
 			{
 				CurrentStepName = currentStep?.Name ?? string.Empty,
-				CurrentStepType = workflow.CurrentStepType,
+				CurrentStepType = workflow.CurrentStepType.ToString(),
 				Links = new List<Link> { getWorkflowLink },
 				Data = JsonSerializer.Serialize(tmpData), //TODO: надо серелизовать из workflow.Data (но из отсутвия Generic нужно подумать как лучше его подставлять) 
                 DataSchema = new WorkflowStepDataSchema
@@ -60,7 +60,7 @@ internal sealed class GetWorkflowsHandler(
 				},
 			};
 			response.Add(wf);
-		}
+		}	
 
 		return response;
 	}

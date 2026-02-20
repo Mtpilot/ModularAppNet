@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -23,16 +24,18 @@ public class SendScannedBarcodes : IApiEndpoint
 			.WithTags("Workflow group")
 			.WithSummary("Send scanned barcodes with quantities")
 			.WithDescription("Отправить отсканированные штрих-коды с количествами.")
-			.Produces<int>(StatusCodes.Status200OK);
+			.Produces<WorkflowResponse>(StatusCodes.Status200OK)
+			;
 	}
 
 	private static async Task<IResult> Handle(
+		[FromRoute] string workflowCode,
 		[FromRoute] string stepCode,
 		[FromBody] List<ScannedBarcodePayload> scannedBarcodes,
 		ISendScannedBarcodesHandler handler,
 		CancellationToken cancellationToken)
 	{
-		var response = await handler.HandleAsync(stepCode, scannedBarcodes, cancellationToken);
+		var response = await handler.HandleAsync(workflowCode, stepCode, scannedBarcodes, cancellationToken);
 		if (response.IsError)
 		{
 			return response.Errors.ToProblem();

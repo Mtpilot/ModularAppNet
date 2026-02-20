@@ -87,9 +87,10 @@ internal sealed class CreateWorkflowHandler(
 					new InvoiceHeader
 					{
 						WorkflowId = id,
-						Contract = "Новая накладная",
+						ContractNumber = "Новая накладная",
 						Counterparty = "Новый источник",
-						InvoiceId = $"Новый Айдишник: {Guid.NewGuid().ToString()}",
+						InvoiceNumber = $"Новый Айдишник: {Guid.NewGuid().ToString()}",
+						Date = DateTime.UtcNow,
 					}
 				}
 			},
@@ -124,7 +125,7 @@ internal sealed class CreateWorkflowHandler(
 				Id = step1Id,
 				WorkflowId = workflowId,
 				StepCode = "Scan-01",
-				Type = "Scan",
+				Type = WorkflowStepType.Scan,
 				Name = "Шаг сканирования",
 				Description = "Сканирование товара",
 				Order = 1,
@@ -137,18 +138,20 @@ internal sealed class CreateWorkflowHandler(
 					{
 						new Invoice
 						{
+							Date = DateTime.UtcNow,
 							WorkflowId = workflowId,
 							StepId = step1Id,
-							Name = "Накладная 1",
-							Contract = "Контракт 1",
+							//Name = "Накладная 1",
+							ContractNumber = "Контракт 1",
 							Counterparty = "Поставщик 1",
-							Date = DateTime.UtcNow,
-							InvoiceId = "ID родительского",
+							InvoiceNumber = "ID родительского",
 							Lines = new List<InvoiceLine>
 							{
 								new InvoiceLine
 								{
 									ProductName = "Товар 1",
+									ConstructorName = "Конструкторское имя 1",
+									ProductCode = "Код товара 1",
 									Quantity = 10,
 									Units = "шт",
 									Barcode = "1234567890123"
@@ -163,7 +166,7 @@ internal sealed class CreateWorkflowHandler(
 				Id = step2Id,
 				WorkflowId = workflowId,
 				StepCode = "Verify-02",
-				Type = "Verify",
+				Type = WorkflowStepType.Verify,
 				Name = "Шаг проверки",
 				Description = "Проверка количества",
 				Order = 2,
@@ -180,7 +183,7 @@ internal sealed class CreateWorkflowHandler(
 				Id = step3Id,
 				WorkflowId= workflowId,
 				StepCode = "Accept-03",
-				Type = "Accept",
+				Type = WorkflowStepType.Accept,
 				Name = "Шаг приемки",
 				Description = "Подтверждение приемки",
 				Order = 3,

@@ -49,6 +49,8 @@ internal sealed class CompleteWorkflowHandler(
 
 		workflow.Complete();
 
+		await context.SaveChangesAsync(cancellationToken);
+
 		// TODO: Save workflow to storage
 		
 		logger.LogInformation("Workflow with code {Code} was completed", workflowCode);

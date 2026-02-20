@@ -15,6 +15,8 @@ public static class WorkflowErrors
 	public static Error StepMissMatch(string code, string stepType, string requestedStepType) =>
 	Error.Unexpected($"{ErrorPrefix}.{nameof(StepMissMatch)}", $"Can't transfer workflow '{code}' to step '{requestedStepType}'. Expating step is '{stepType}' ");
 
+	public static Error WrongStep(string code, string currentStepType, string endpoint) =>
+		Error.Unexpected($"{ErrorPrefix}.{nameof(WrongStep)}", $"Can't perform '{endpoint}' action on workflow '{code}' on step '{currentStepType}'.");
 	public static Error NextStepNotFound(string code, string stepType) =>
 		Error.NotFound(
 			$"{ErrorPrefix}.{nameof(NextStepNotFound)}",

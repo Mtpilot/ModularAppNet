@@ -10,10 +10,10 @@ using Modules.Common.Domain.Handlers;
 using Modules.Common.Domain.Results;
 using Modules.Workflows.Domain.Entities;
 using Modules.Workflows.Domain.Entities.Application;
-using Modules.Workflows.Features.Features.Shared.Mappers;
 using Modules.Workflows.Features.Features.Shared.Responses;
 using Modules.Workflows.Infrastructure.Helpers;
 using Modules.Workflows.MockInfrastructure.Database;
+using Modules.Workflows.Features.Features.Shared.Helpers;
 using HttpMethod = Modules.Common.API.Abstractions.Links.HttpMethod;
 
 namespace Modules.Workflows.Features.Features.GetWorkflow;
@@ -81,37 +81,32 @@ internal sealed class GetWorkflowHandler(
 
         //var currentStepData = workflow.CurrentStep().Data;
 
-        var tmpData = await MockTmpHelper.GetMockInvoiceHeadersFromInMemoryDb(context, workflow.Id, cancellationToken);
-        var wf = workflow.ConvertWorkflowToResponse(linkService, tmpData);
+        var tmpWorkflowData = await MockTmpHelper.GetMockInvoiceHeadersFromInMemoryDb(context, workflow.Id, cancellationToken); 
+        switch(workflow.CurrentStep().Type) //SESZH: надо срочно доделывать сигнатуры и начинать очистку от этого всего, потом завязну, оно все нарастает
+        { 
+            case WorkflowStepType.Scan:
+                {
+                    var tmpStepData = await MockTmpHelper.GetMockInvoicesFromInMemoryDb(context, workflow.CurrentStep().Id, cancellationToken);
+                    var wf = workflow.ConvertWorkflowToResponse(linkService, tmpWorkflowData, tmpStepData);
+                    return wf;
+                }
+            case WorkflowStepType.Verify:
+                {
+                    var tmpStepData = await MockTmpHelper.GetMockInvoiceCheckoutsFromInMemoryDb(context, workflow.CurrentStep().Id, cancellationToken);
+                    var wf = workflow.ConvertWorkflowToResponse(linkService, tmpWorkflowData, tmpStepData);
+                    return wf;
+                }
+                default:
+                throw new NotSupportedException("Current step type not supported");
+        }
+        
 
 
 
 
-		return wf;
+		
 	}
     
-}
-
-
-internal static class WorkflowParserHelper
-{    
-    public static WorkflowResponse ConvertWorkflowToResponse(this Workflow workflow, ILinkService linkService, DefaultWorkflowDataCollection<InvoiceHeader> tmpData)
-    {
-        // Здесь можно реализовать логику преобразования сущности Workflow в WorkflowResponse
-        // Например, маппинг полей, генерация ссылок и т.д.
-        // Это позволит держать логику парсинга отдельно от обработчика.
-        var response = workflow.ToPartialResponse(
-            new WorkflowStepDataSchema
-            {
-                Version = "1.0",
-                DataType = "ReceiveGoods",
-                SchemaJson = "{ 'InvoiceId': 'string', 'Сounterparty': 'string', 'Contract': 'string' }",
-            },
-            linkService);
-            response.Data = JsonSerializer.Serialize(tmpData);
-
-        return response;
-    }
 }
     /// <summary>
     /// Example of creating JsonElement with sample data for CurrentStep.Data field.

@@ -38,7 +38,7 @@ internal static class WorkflowMapper
 				//JsonElement.Parse(currentStep.DataJson),
 				linkService),
 			WorkflowSteps = workflow.Steps
-				.Select(s => new WorkflowStepShortInfoResponse(s.StepCode, s.Type, s.Name, s.Order,  s.Description))
+				.Select(s => new WorkflowStepShortInfoResponse(s.StepCode, s.Type.ToString(), s.Name, s.Order,  s.Description))
 				.ToList()
 		};
 	}
@@ -60,7 +60,7 @@ internal static class WorkflowMapper
 			workflow.Name,
 			workflow.Description)
 		{
-			CurrentStepType = currentStep.Type,
+			CurrentStepType = currentStep.Type.ToString(),
 			CurrentStepName = currentStep.Name,
 			DataSchema = dataSchema,
 			Data = null,
@@ -86,10 +86,10 @@ internal static class WorkflowMapper
 		//JsonElement data,
 		ILinkService linkService)
 	{
-		return new WorkflowStepResponse(step.StepCode, step.Type, step.Name, step.Order ,step.Description)
+		return new WorkflowStepResponse(step.StepCode, step.Type.ToString(), step.Name, step.Order ,step.Description)
 		{
 			DataSchema = dataSchema,
-			Data = JsonSerializer.Deserialize<JsonElement>("{}")!,
+			Data = "{}",
 			//Data = data,
 			Actions = new WorkflowActions
 			{

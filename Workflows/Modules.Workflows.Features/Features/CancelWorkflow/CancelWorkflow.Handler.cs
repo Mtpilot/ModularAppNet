@@ -42,11 +42,11 @@ internal sealed class CancelWorkflowHandler(
 
 		workflow.Cancel();
 
-		// TODO: Save workflow to storage
-		
+		await context.SaveChangesAsync(cancellationToken);
+
 		logger.LogInformation("Workflow with code {Code} was cancelled", workflowCode);
 		return Result.Success;
-	}
+	}	
 
 	//private static Workflow<Dictionary<string, object>> BuildSampleWorkflow()
 	//{

@@ -40,7 +40,7 @@ internal sealed class GetActiveWorkflowsHandler(
         var workflows = await context.Workflows
             .Include(x => x.Type)
             .Include(x => x.Steps).ThenInclude(s => s.Actions)
-            .Where(x => x.Type.Code == workflowTypeCode && (!x.IsActive)).ToListAsync(cancellationToken);
+            .Where(x => x.Type.Code == workflowTypeCode && x.IsActive).ToListAsync(cancellationToken);
 
         var response = new List<WorkflowShortInfoResponse>();
         foreach (var workflow in workflows)
@@ -55,7 +55,7 @@ internal sealed class GetActiveWorkflowsHandler(
             var wf = new WorkflowShortInfoResponse(workflow.Code, workflowTypeCode, workflow.Name, workflow.Description)
             {
                 CurrentStepName = currentStep?.Name ?? string.Empty,
-                CurrentStepType = workflow.CurrentStepType,
+                CurrentStepType = workflow.CurrentStepType.ToString(),
                 Links = new List<Link> { getWorkflowLink },
                 Data = JsonSerializer.Serialize(workflow.Data),
                 DataSchema = new WorkflowStepDataSchema
@@ -67,8 +67,6 @@ internal sealed class GetActiveWorkflowsHandler(
             };
             response.Add(wf);
         }
-
-        return response;
 
         return response;
 	}

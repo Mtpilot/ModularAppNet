@@ -33,19 +33,47 @@ public static class MockDbSeeder
 		context.Workflows.AddRange(workflows);
 		context.SaveChanges();
 
-		SaveInvoiceHeaders(context, workflows);
+		SaveInvoices(context, workflows);
+		SaveInvoiceCheckouts(context, workflows);
 	}
 
-	private static void SaveInvoiceHeaders(WorkflowsDbContext context, List<Workflow> workflows)
+	private static void SaveInvoices(WorkflowsDbContext context, List<Workflow> workflows)
 	{
 		foreach (var w in workflows)
 		{
-			if (w.Data is IWorkflowDataCollection<InvoiceHeader> headerCollection)
+			if (w.Steps == null)
 			{
-				context.InvoiceHeaders.AddRange(headerCollection.Collection);
+				continue;
+			}
+
+			foreach (var step in w.Steps)
+			{
+				if (step.Data is IWorkflowDataCollection<Invoice> invoiceCollection && invoiceCollection.Collection?.Count > 0)
+				{
+					context.Invoices.AddRange(invoiceCollection.Collection);
+				}
 			}
 		}
 		context.SaveChanges();
+	}
+	private static void SaveInvoiceCheckouts(WorkflowsDbContext context, List<Workflow> workflows)
+	{
+		foreach (var w in workflows)
+		{
+			if (w.Steps == null)
+			{
+				continue;
+			}
+			foreach (var step in w.Steps)
+		{
+			if (step.Data is IWorkflowDataCollection<InvoiceCheckout> invoiceCheckoutCollection && invoiceCheckoutCollection.Collection?.Count > 0)
+		{
+			context.InvoiceCheckouts.AddRange(invoiceCheckoutCollection.Collection);
+		}
+		}
+			context.SaveChanges();
+		
+	}
 	}
 
 	private static readonly string[] InboundNames = ["Приёмка товара", "Приёмка поставки", "Входящая приёмка"];
@@ -56,7 +84,7 @@ public static class MockDbSeeder
 	private static List<Workflow> CreateInboundWorkflows(WorkflowType workflowType)
 	{
 		var list = new List<Workflow>();
-		for (var i = 1; i <= 3; i++)
+		for (var i = 1; i <= 2; i++)
 		{
 			var id = Guid.NewGuid();
 			list.Add(new Workflow
@@ -66,7 +94,7 @@ public static class MockDbSeeder
 				Name = InboundNames[i - 1],
 				Description = "Приёмка и первичная проверка поступившего товара",
 				IsActive = true,
-				CurrentStepType = "Scan",
+				CurrentStepType = WorkflowStepType.Scan,
 				Type = workflowType,
 				CurrentStepNumber = 1,
 				Data = new DefaultWorkflowDataCollection<InvoiceHeader>
@@ -79,8 +107,9 @@ public static class MockDbSeeder
 						{
 							WorkflowId = id,
 							Counterparty = $"Поставщик {i}",
-							Contract = $"INV-{i:D4}",
-							InvoiceId = Guid.NewGuid().ToString(),
+							ContractNumber = $"INV-{i:D4}",
+							InvoiceNumber = Guid.NewGuid().ToString(),
+							Date = DateTime.UtcNow.AddDays(-i),
 						}
 					}
 				},
@@ -89,6 +118,37 @@ public static class MockDbSeeder
 				Steps = SeedInboundSteps(id)
 			});
 		}
+		var stepId = Guid.NewGuid();
+		list.Add(new Workflow
+		{
+			Id = stepId,
+			Code = $"INBOUND-{3:D2}",
+			Name = InboundNames[3 - 1],
+			Description = "Приёмка и первичная проверка поступившего товара",
+			IsActive = false,
+			CurrentStepType = WorkflowStepType.Scan,
+			Type = workflowType,
+			CurrentStepNumber = 1,
+			Data = new DefaultWorkflowDataCollection<InvoiceHeader>
+			{
+				Name = "Приёмка",
+				Description = "",
+				Collection = new List<InvoiceHeader>
+					{
+						new InvoiceHeader
+						{
+							WorkflowId = stepId,
+							Counterparty = $"Поставщик {3}",
+							ContractNumber = $"INV-{3:D4}",
+							InvoiceNumber = Guid.NewGuid().ToString(),
+							Date = DateTime.UtcNow.AddDays(-3),
+						}
+					}
+			},
+			//Data = new WorkflowDataItemsCollection<IDataItem> { Name = "Поступление", Description = "", Collection = SeedInboundItems().Cast<IDataItem>().ToList() },
+			//WorkflowDataItems = SeedWorkflowDataItems(context, id, "inbound"),
+			Steps = SeedInboundSteps(stepId)
+		});
 		return list;
 	}
 
@@ -213,7 +273,7 @@ public static class MockDbSeeder
 				Name = ReturnNames[i - 1],
 				Description = "",
 				IsActive = true,
-				CurrentStepType = "Scan",
+				CurrentStepType = WorkflowStepType.Scan,
 				Type = workflowType,
 				CurrentStepNumber = 1,
 				Steps = SeedReturnSteps(id),
@@ -226,9 +286,10 @@ public static class MockDbSeeder
 						new InvoiceHeader
 						{
 							WorkflowId = id,
-							InvoiceId = Guid.NewGuid().ToString(),
-							Contract = $"INV-{i:D4}",
+							InvoiceNumber = Guid.NewGuid().ToString(),
+							ContractNumber = $"INV-{i:D4}",
 							Counterparty = $"Поставщик {i}",
+							Date = DateTime.UtcNow.AddDays(-i),
 						}
 					}
 				}
@@ -256,9 +317,9 @@ public static class MockDbSeeder
 				Id = s1,
 				WorkflowId = workflowId,
 				StepCode = "Scan-01",
-				Type = "Scan",
+				Type = WorkflowStepType.Scan,
 				Name = "Сканирование",
-				Order = 0,
+				Order = 1,
 				Description = "Сканируем коробки / паллеты / штуки",
 				Actions =
 				[ SendPackage(s1), NextStep(s1), CancelWorkflow(s1), ],
@@ -270,19 +331,21 @@ public static class MockDbSeeder
 					{
 						new Invoice
 						{
+							Date = DateTime.UtcNow.AddDays(-1),
 							WorkflowId = workflowId,
 							StepId = s1,
-							InvoiceId = "SESZH: должен быть, как у родительского воркфлоу",
+							InvoiceNumber = "SESZH: должен быть, как у родительского воркфлоу",
 							Counterparty = "Аналогично",
-							Contract = "Аналогично",
-							Name = "Аналогично",
-							Date = DateTime.UtcNow.AddDays(-1),
+							ContractNumber = "Аналогично",
+							//Name = "Аналогично",
 							Lines = scanData.Select(l => new InvoiceLine
 							{
 								ProductName = l.Name,
 								Quantity = l.Quantity,
 								Units = l.Units,
-								Barcode = l.ItemCode
+								Barcode = l.ItemCode,
+								ConstructorName = l.Name,
+								ProductCode = l.ItemCode
 							}).ToList()
 						}
 					}
@@ -293,16 +356,31 @@ public static class MockDbSeeder
 				Id = s2, 
 				WorkflowId = workflowId, 
 				StepCode = "Verify-02", 
-				Type = "Verify",  
+				Type = WorkflowStepType.Verify,  
 				Name = "Проверка", 
-				Order = 1, 
+				Order = 2, 
 				Description = "Сверка фактического кол-ва с документом", 
 				Actions = [ NextStep(s2), PrevStep(s2), CancelWorkflow(s2)], 
-				Data = new DefaultWorkflowDataCollection<Invoice> 
+				Data = new DefaultWorkflowDataCollection<InvoiceCheckout> 
 				{ 
 					Name = "Проверка",
 					Description = "Сверка фактического кол-ва с документом",
-						Collection = new List<Invoice>(),
+						Collection = new List<InvoiceCheckout>
+						{
+							new InvoiceCheckout
+							{
+								WorkflowId = workflowId,
+								InvoiceNumber = "SESZH: должен быть, как у родительского воркфлоу",
+								Counterparty = "Аналогично",
+								ContractNumber = "Аналогично",
+								Date = DateTime.UtcNow.AddDays(-1),
+								StepId = s2,
+								TotalItems = -1,
+								AcceptedItems = -1,
+								MissingItems = -1,
+								ExtraItems = -1,
+							}
+						},
 				}
 			},
 			new() 
@@ -310,9 +388,9 @@ public static class MockDbSeeder
 				Id = s3, 
 				WorkflowId = workflowId, 
 				StepCode = "Accept-03", 
-				Type = "Accept",  
+				Type = WorkflowStepType.Accept,  
 				Name = "Принятие на склад", 
-				Order = 2, 
+				Order = 3, 
 				Description = "Подтверждение и размещение", 
 				Actions = [ PrevStep(s3), CompleteWorkflow(s3), CancelWorkflow(s3)], 
 				Data = new DefaultWorkflowDataCollection<Invoice> 
@@ -405,7 +483,7 @@ public static class MockDbSeeder
 				Id = s1, 
 				WorkflowId = workflowId, 
 				StepCode = "Scan-01", 
-				Type = "Scan",   
+				Type = WorkflowStepType.Scan,   
 				Name = "Скан возврата", 
 				Description = "",  
 				Order = 1, 
@@ -418,19 +496,21 @@ public static class MockDbSeeder
 					{
 						new Invoice
 						{
+							Date = DateTime.UtcNow.AddDays(-1),
 							WorkflowId = workflowId,
 							StepId = s1,
-							InvoiceId = "SESZH: должен быть, как у родительского воркфлоу",
+							InvoiceNumber = "SESZH: должен быть, как у родительского воркфлоу",
 							Counterparty = "Аналогично",
-							Contract = "Аналогично",
-							Name = "Аналогично",
-							Date = DateTime.UtcNow.AddDays(-1),
+							ContractNumber = "Аналогично",
+							//Name = "Аналогично",
 							Lines = scanData.Select(l => new InvoiceLine
 							{
 								ProductName = l.Name,
 								Quantity = l.Quantity,
 								Units = l.Units,
-								Barcode = l.ItemCode
+								Barcode = l.ItemCode,
+								ConstructorName = l.Name,
+								ProductCode = l.ItemCode
 							}).ToList(),
 						}
 					}
@@ -440,16 +520,31 @@ public static class MockDbSeeder
 				Id = s2,
 				WorkflowId = workflowId,
 				StepCode = "Verify-02",
-				Type = "Verify",
+				Type = WorkflowStepType.Verify,
 				Name = "Проверка качества",
 				Description = "",
 				Order = 2,
 				Actions = [ NextStep(s2), PrevStep(s2) ],
-				Data = new DefaultWorkflowDataCollection<Invoice>
+				Data = new DefaultWorkflowDataCollection<InvoiceCheckout>
 				{
 					Name = "Проверка качества",
 					Description = "",
-					Collection = new List<Invoice>(),
+						Collection = new List<InvoiceCheckout>
+						{
+							new InvoiceCheckout
+							{
+								WorkflowId = workflowId,
+								InvoiceNumber = "SESZH: должен быть, как у родительского воркфлоу",
+								Counterparty = "Аналогично",
+								ContractNumber = "Аналогично",
+								Date = DateTime.UtcNow.AddDays(-1),
+								StepId = s2,
+								TotalItems = -1,
+								AcceptedItems = -1,
+								MissingItems = -1,
+								ExtraItems = -1,
+							}
+						}
 				}
 			},
 			new() 
@@ -457,7 +552,7 @@ public static class MockDbSeeder
 				Id = s3, 
 				WorkflowId = workflowId, 
 				StepCode = "Accept-03", 
-				Type = "Accept", 
+				Type = WorkflowStepType.Accept, 
 				Name = "Приём", 
 				Description = "", 
 				Order = 3, 

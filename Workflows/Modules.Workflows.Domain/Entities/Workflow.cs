@@ -22,7 +22,7 @@ public class Workflow//<TEntity, TStepEntity>
 
 	public required bool IsActive { get; set; }
 	public required int CurrentStepNumber { get; set; }
-	public required string CurrentStepType { get; set; }
+	public required WorkflowStepType CurrentStepType { get; set; }
 	public required WorkflowType Type {get; set;}
 	public required List<WorkflowStep> Steps { get; set; }
 
@@ -64,7 +64,7 @@ public class Workflow//<TEntity, TStepEntity>
 
 	//public WorkflowStep CurrentStep() => GetStepByType(CurrentStepType) ?? throw new InvalidOperationException($"Current step type '{CurrentStepType}' not found in workflow '{Code}'.");
 	public WorkflowStep CurrentStep() => GetStepByOrder(CurrentStepNumber) ?? throw new InvalidOperationException($"Current step with order '{CurrentStepNumber}' not found in workflow '{Code}'.");
-	public WorkflowStep? GetStepByType(string type) => Steps.FirstOrDefault(step => step.Type.Equals(type, StringComparison.OrdinalIgnoreCase));
+	public WorkflowStep? GetStepByType(WorkflowStepType type) => Steps.FirstOrDefault(step => step.Type == type);
 	public WorkflowStep? GetStepByOrder(int order) =>
 		Steps.FirstOrDefault(step => step.Order == order);
 
@@ -148,18 +148,6 @@ public class Workflow//<TEntity, TStepEntity>
 		IsActive = false;
 	}
 	#endregion Workflow Management
-
-	public JsonElement GenerateCheckoutReport() //SESZH: пока нужно как-то отправлять инфу о том, сколько заменено, сколько изменено, думал, через шаги, через шаги не получилось пока.
-	{//SESZH: этот метод уйдет, расчет будет внутри шага
-		return JsonSerializer.SerializeToElement(new
-		{
-			name = Name,
-			items = 0,//Data?.Collection.Count,
-			itemsTaken = "Calculating in development", //SESZH: еще подумать, в каком виде отдавать, но пока все упирается в хранение и изменение Data
-			itemsLost = "Calculating in development",
-			extraItems = "Calculating in development",
-		});
-	}
 
 	public override string ToString()
 	{

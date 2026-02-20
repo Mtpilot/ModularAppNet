@@ -6,12 +6,14 @@ namespace Modules.Workflows.MockInfrastructure.Database;
 
 public class WorkflowsDbContext(DbContextOptions<WorkflowsDbContext> options) : DbContext(options)
 {
-	public DbSet<Workflow> Workflows { get; set; } //SESZH: временно добавлю наследника
+	public DbSet<Workflow> Workflows { get; set; }
 	public DbSet<WorkflowStep> WorkflowSteps { get; set; }
 	public DbSet<WorkflowStepAction> WorkflowStepActions { get; set; }
 	public DbSet<DataItemInventory> WorkflowDataItemInventory { get; set; }
 	public DbSet<WorkflowType> WorkflowTypes { get; set; }
-	public DbSet<InvoiceHeader> InvoiceHeaders { get; set; } //TODO: Нет хранимого типа InvoiceHeader, только Invoice. InvoiceHeader получается проекций из Invoice при чтении из хранилища.
+	public DbSet<Invoice> Invoices { get; set; }
+	public DbSet<InvoiceCheckout> InvoiceCheckouts { get; set; }
+	//public DbSet<InvoiceHeader> InvoiceHeaders { get; set; } //TODO: Нет хранимого типа InvoiceHeader, только Invoice. InvoiceHeader получается проекций из Invoice при чтении из хранилища.
 															// зачитываются Invoice к процессу, делается проекция в InvoiceHeader,вставляет в Data процесса,
 															// а сам Invoice вставляется в CurrentStep (если шаг scan) 
 
@@ -41,14 +43,21 @@ public class WorkflowsDbContext(DbContextOptions<WorkflowsDbContext> options) : 
 		//v => JsonSerializer.Serialize(v, JsonOptions),
 		//v => JsonSerializer.Deserialize<IWorkflowDataItemsCollection<IDataItem>>(v, JsonOptions)!);
 
-		modelBuilder.Entity<WorkflowStep>()
-			.Ignore(e => e.Data)
-			;
 
 		modelBuilder.Entity<WorkflowStepAction>()
 			.Ignore(e => e.RouteParams);
 
-		modelBuilder.Entity<InvoiceHeader>()
+		modelBuilder.Entity<Invoice>()
+			.HasKey(e => e.WorkflowId);
+
+		modelBuilder.Entity<Invoice>()
+			.OwnsMany(e => e.Lines, line =>
+			{
+				line.WithOwner();
+				line.Property<string>("Id").ValueGeneratedOnAdd();
+			});
+
+		modelBuilder.Entity<InvoiceCheckout>()
 			.HasKey(e => e.WorkflowId);
 
 		modelBuilder.HasDefaultSchema(DbConsts.MockWorkflowsSchemaName);

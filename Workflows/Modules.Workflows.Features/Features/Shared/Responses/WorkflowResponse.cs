@@ -24,7 +24,7 @@ public sealed record WorkflowShortInfoResponse(
 {
 	public required string CurrentStepType { get; set; }
 	public required string CurrentStepName { get; set; }
-	public required IList<Link> Links { get; init; }
+    public required IList<Link> Links { get; init; }
 }
 
 /// <summary>
@@ -38,7 +38,7 @@ public sealed record WorkflowResponse(
 	: WorkflowBaseInfoResponse(WorkflowCode, WorkflowTypeCode, Name, Description)
 {
 	public required WorkflowStepResponse CurrentStep { get; init; }
-	public required IList<WorkflowStepShortInfoResponse> WorkflowSteps { get; init; }
+    public required IList<WorkflowStepShortInfoResponse> WorkflowSteps { get; init; }
 }
 
 /// <summary>
@@ -62,7 +62,7 @@ public sealed record WorkflowStepResponse( //Сканировать, Прове�
     string Description): WorkflowStepShortInfoResponse(WorkflowStepCode, WorkflowStepType, Name, Order, Description)
 {
 	public required WorkflowStepDataSchema DataSchema { get; set; }
-	public required JsonElement Data { get; set; } //DefaultWorkflowDataCollection<Invoice/TEntity>
+	public required string Data { get; set; } //DefaultWorkflowDataCollection<Invoice/TEntity>
 	public required WorkflowActions Actions { get; set; }
 }
 
