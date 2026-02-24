@@ -26,43 +26,13 @@ public class Workflow//<TEntity, TStepEntity>
 	public required WorkflowType Type {get; set;}
 	public required List<WorkflowStep> Steps { get; set; }
 
-	//public required List<WorkflowAction> Actions { get; set; }
-
-	//SESZH: убрал в таком виде, добавляю в виде списка Guid, посмотрим, что будет с поиском по разным таблицам. UPD: пока не актуально
 
 	//TODO: Как связаны Data и WorkflowDataItems, в частном случае приемки тут должне быть массив содержащий один элемент - это спецификация с полями шапки спецификации
 	[NotMapped]
 	public IWorkflowDataCollection Data { get; set; }
 
-	//public IWorkflowDataCollection<TData> Data
-	//{
-	//	get => string.IsNullOrEmpty(DataJson)
-	//		? null!
-	//		: JsonSerializer.Deserialize<WorkflowDataItemsCollection<TData>>(DataJson, DataItemSerializer.DataItemSeializerOptions)!;
-	//	set => DataJson = value == null ? "{}" : JsonSerializer.Serialize(value, DataItemSerializer.DataItemSeializerOptions);
-	//}
-	//public string DataJson { get; set; } = string.Empty;
-
-	//public required List<Guid> DataGuids {  get; set; }
-
-	/// <summary>
-	/// Строковая копия Data для хранения в БД. Парно сериализуется с <see cref="Data"/> через <see cref="Serializers.WorkflowDataSerializer"/>.
-	/// В Features для parse использовать <see cref="Serializers.WorkflowDataSerializer.Deserialize{TEntity}(string?)"/>.
-	/// </summary>
-	//public string DataJson { get; set; } = "{}";
-
-	/*
-	[NotMapped]
-	public IWorkflowData<TEntity> Data
-	{
-		get => WorkflowDataSerializer.Deserialize<TEntity>(DataJson) ?? new DefaultWorkflowData<TEntity> { Name = "", Description = "", Data = default! };
-		set => DataJson = WorkflowDataSerializer.Serialize(value);
-	}
-	*/
 	#region Steps
 	public string GetCacheKey() => $"workflow:{Code}";
-
-	//public WorkflowStep CurrentStep() => GetStepByType(CurrentStepType) ?? throw new InvalidOperationException($"Current step type '{CurrentStepType}' not found in workflow '{Code}'.");
 	public WorkflowStep CurrentStep() => GetStepByOrder(CurrentStepNumber) ?? throw new InvalidOperationException($"Current step with order '{CurrentStepNumber}' not found in workflow '{Code}'.");
 	public WorkflowStep? GetStepByType(WorkflowStepType type) => Steps.FirstOrDefault(step => step.Type == type);
 	public WorkflowStep? GetStepByOrder(int order) =>
@@ -72,7 +42,7 @@ public class Workflow//<TEntity, TStepEntity>
 	{
 		WorkflowStep? firstStep = null;
 		//SESZH
-		firstStep = Steps.MinBy(x=> x.Order);
+		//firstStep = Steps.MinBy(x=> x.Order);
 
 		foreach (var step in Steps)
 		{
@@ -161,23 +131,4 @@ public class Workflow//<TEntity, TStepEntity>
 		}
 		return sb.ToString();
 	}
-}
-
-
-
-//public class WorkflowAction
-//{
-//	public required string Type { get; set; }
-//	public required string Name { get; set; }
-//	public required string Description { get; set; }
-//}
-
-
-
-
-public record WorkflowDataItemsCollection<T> : IWorkflowDataCollection<T> //SESZH: пусть пока будет старая версия один тип у всех
-{
-	public required string Name { get; set; }
-	public required string Description { get; set; }
-	public ICollection<T> Collection { get; set; } = Array.Empty<T>();
 }

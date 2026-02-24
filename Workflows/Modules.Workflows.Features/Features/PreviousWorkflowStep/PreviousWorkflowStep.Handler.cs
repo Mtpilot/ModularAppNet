@@ -45,16 +45,15 @@ internal sealed class WorkflowPreviousStepHandler(
 		var currentStep = workflow.CurrentStep();
 		if (currentStep is null)
 		{
-			return WorkflowErrors.StepNotFound("SESZH: зачем нужен тип шага? зачем его передавать?");
+			return WorkflowErrors.StepNotFound($"for {workflow.Code}");
 		}
 
 		var previousStep = workflow.GetPreviousStep(currentStep.Order);
 		if (previousStep is null)
 		{
-			return WorkflowErrors.PreviousStepNotFound(request.Code, "SESZH: аналогично");
+			return WorkflowErrors.PreviousStepNotFound(request.Code, currentStep.StepCode);
 		}
 
-		//workflow.CurrentStepType = previousStep.Type; //SESZH: все еще ОЧЕНЬ странная механика.
 		workflow.SetStepNumber(previousStep.Order);
 		await context.SaveChangesAsync(cancellationToken);
         var tmpWorkflowData = await MockTmpHelper.GetMockInvoiceHeadersFromInMemoryDb(context, workflow.Id, cancellationToken);

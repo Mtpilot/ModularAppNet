@@ -5,7 +5,7 @@ using Modules.Workflows.Domain.Serializers;
 
 namespace Modules.Workflows.Domain.Entities;
 
-public class WorkflowStep //<TEntity> //Сканировать, Проверить, Принять //SESZH: я добавлю типы и генератор содержимого в зависимости от
+public class WorkflowStep //<TEntity> //Сканировать, Проверить, Принять
 {
 	public required Guid Id { get; set; }
 	public required Guid WorkflowId { get; set; }

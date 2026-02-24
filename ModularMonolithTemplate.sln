@@ -79,6 +79,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modules.Workflows.Infrastru
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modules.Workflows.MockInfrastructure", "Workflows\Modules.Workflows.MockInfrastructure\Modules.Workflows.MockInfrastructure.csproj", "{F6817512-EB5B-410B-8378-29151805581A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Barcoding", "Barcoding", "{86415442-311C-4A95-ADBC-BE8C802B7E30}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -233,6 +235,7 @@ Global
 		{1049B08E-A594-45E7-BD90-3DF33BFE08B7} = {F0D623C8-20D4-4E75-84E6-BBD957BC959B}
 		{6589A1E3-E2F0-43CC-B6C6-4EECE9D33CB2} = {F0D623C8-20D4-4E75-84E6-BBD957BC959B}
 		{F6817512-EB5B-410B-8378-29151805581A} = {F0D623C8-20D4-4E75-84E6-BBD957BC959B}
+		{86415442-311C-4A95-ADBC-BE8C802B7E30} = {A140E573-7FC3-46D5-B1B9-3EF537C0B82B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8725359E-50CC-46C4-ABFE-D693155DC824}

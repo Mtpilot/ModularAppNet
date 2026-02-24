@@ -31,14 +31,13 @@ internal sealed class SendScannedBarcodesHandler(
 {
 	public async Task<Result<WorkflowResponse>> HandleAsync(string workflowCode, string stepCode, List<ScannedBarcodePayload> body, CancellationToken cancellationToken)
 	{
-		//SESZH: будем ли мы сообщать клиенту о статусе [обработки отсканированных штрихкодов? Если да, то нужно будет добавить в ответ информацию о том, что штрихкоды были успешно обработаны или произошла ошибка.] до сих пор жутко, что нейронки так генерируют комментарии по контексту.
-		logger.LogInformation("");
+		logger.LogInformation("Sending scanned barcodes for workflow '{WorkflowCode}' and step '{StepCode}'", workflowCode, stepCode);
 
 
 		var workflow = await context.Workflows.Include(w=> w.Type).Include(w => w.Steps).ThenInclude(s=> s.Actions).FirstOrDefaultAsync(w => w.Code == workflowCode, cancellationToken);
 		if (workflow is null)
 		{
-			throw new NotSupportedException("Workflow not found"); //SESZH: пока не знаю, в каких случаях может быть неверный код и что с этим делать.
+			return WorkflowErrors.NotFound(workflowCode);
 		}
 
 
@@ -48,7 +47,7 @@ internal sealed class SendScannedBarcodesHandler(
 			.FirstOrDefaultAsync(x => x.StepCode == stepCode && x.WorkflowId == workflow.Id, cancellationToken);
         if (step is null)
         {
-            throw new NotSupportedException("Step not found"); //SESZH: пока не знаю, в каких случаях может быть неверный код и что с этим делать.
+            return WorkflowErrors.StepNotFound(stepCode);
         }
 
 
@@ -60,7 +59,7 @@ internal sealed class SendScannedBarcodesHandler(
 		var nextStep = workflow?.Steps.FirstOrDefault(s => s.Order == step.Order + 1); //SESZH: пока мы уверены, что шаг подтверждения будет следующим - будет так
 		if (nextStep is null)
 		{
-			throw new NotSupportedException("Next step not found"); //SESZH: пока не знаю, в каких случаях может быть неверный код и что с этим делать.
+			return WorkflowErrors.NextStepNotFound(workflowCode, stepCode);
 		}
 
 

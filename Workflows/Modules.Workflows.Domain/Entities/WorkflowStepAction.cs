@@ -17,10 +17,6 @@ public class WorkflowStepAction
 	// Новые поля для генерации ссылок
 	public required string Endpoint { get; set; }         // "WorkflowItem", "WorkflowLineItem"
 	public required string HttpMethod { get; set; }   // POST, PUT, PATCH
-	//public required Dictionary<string, object>? RouteParams { get; set; }  // параметры маршрута
-																			// отдельное поле-строка для хранения
-
-	//SESZH: это для моковой БД, судя по всему, InMemory не умеет нормально хранить json
 	
 	public string RouteParamsJson { get; set; } = string.Empty;
 

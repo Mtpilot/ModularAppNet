@@ -27,12 +27,6 @@ internal sealed class GetWorkflowTypesHandler(
 
 		var response = await context.WorkflowTypes.Select(x => new WorkflowTypesResponse(x.Code, x.Name)).ToListAsync(cancellationToken);
 
-		//var response = new List<WorkflowTypesResponse>() {
-		//	new WorkflowTypesResponse("ReceiveGoods", "Receive goods Workflow"),
-		//	new WorkflowTypesResponse("ItemPlacement", "Item placement Workflow")
-		//};
-
-
 		return response;
 	}
 }

@@ -48,59 +48,6 @@ internal sealed class CancelWorkflowHandler(
 		return Result.Success;
 	}	
 
-	//private static Workflow<Dictionary<string, object>> BuildSampleWorkflow()
-	//{
-	//	// Sample implementation - in real app, this would load from storage
-	//	const string workflowTypeCode = "ReceiveGoods";
-	//
-    //    var id = Guid.NewGuid();
-    //    return new Workflow<Dictionary<string, object>>
-	//	{
-    //        Id = id,
-    //        WorkflowDataItems = new List<WorkflowDataItem>(),
-    //        Code = "123",
-	//		TypeCode = workflowTypeCode,
-	//		Name = "Приемка по накладной",
-	//		Description = "Приемка по каждой строчки накладной",
-	//		IsActive = true,
-	//		Data = new WorkflowDataCollection(),
-	//		CurrentStepType = "Scan",
-	//		CurrentStepNumber = 1,
-	//		Steps = new List<WorkflowStep>
-	//		{
-	//			new WorkflowStep
-	//			{
-    //                Id = Guid.NewGuid(),
-    //                WorkflowId= id,
-    //                Type = "Scan",
-	//				Name = "Шаг сканирования",
-	//				Description = "Сканирование товара",
-	//				Order = 1,
-	//				Actions = new List<WorkflowStepAction>()
-	//			},
-	//			new WorkflowStep
-	//			{
-    //                Id = Guid.NewGuid(),
-    //                WorkflowId= id,
-    //                Type = "Verify",
-	//				Name = "Шаг проверки",
-	//				Description = "Проверка количества",
-	//				Order = 2,
-	//				Actions = new List<WorkflowStepAction>()
-	//			},
-	//			new WorkflowStep
-	//			{
-    //                Id = Guid.NewGuid(),
-    //                WorkflowId= id,
-    //                Type = "Accept",
-	//				Name = "Шаг приемки",
-	//				Description = "Подтверждение приемки",
-	//				Order = 3,
-	//				Actions = new List<WorkflowStepAction>()
-	//			}
-	//		}
-	//	};
-	//}
 
 	private sealed class WorkflowDataCollection : IWorkflowDataCollection<Dictionary<string, object>>
 	{

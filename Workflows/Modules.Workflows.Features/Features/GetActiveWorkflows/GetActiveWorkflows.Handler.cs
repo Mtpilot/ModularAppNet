@@ -32,9 +32,6 @@ internal sealed class GetActiveWorkflowsHandler(
 	{
 		logger.LogInformation("Getting active workflows");
 
-		// Implementation goes here
-		//const string workflowCode = "123";
-
         logger.LogInformation("Getting active workflows");
 
         var workflows = await context.Workflows

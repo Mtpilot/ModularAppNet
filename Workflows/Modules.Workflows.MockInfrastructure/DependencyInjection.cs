@@ -25,9 +25,6 @@ public static class DependencyInjection
 			opt.UseSqlite(connection);
 		});
 
-		//// Моковый модуль
-		//services.AddDbContext<WorkflowsDbContext>(opt =>
-		//	opt.UseInMemoryDatabase("MockDb_"));
 		services.AddHostedService<MockSeederHostedService>();
 
 		return services;

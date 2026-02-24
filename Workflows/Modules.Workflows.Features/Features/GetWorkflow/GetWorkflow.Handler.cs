@@ -14,6 +14,7 @@ using Modules.Workflows.Features.Features.Shared.Responses;
 using Modules.Workflows.Infrastructure.Helpers;
 using Modules.Workflows.MockInfrastructure.Database;
 using Modules.Workflows.Features.Features.Shared.Helpers;
+using Modules.Workflows.Domain.Errors;
 using HttpMethod = Modules.Common.API.Abstractions.Links.HttpMethod;
 
 namespace Modules.Workflows.Features.Features.GetWorkflow;
@@ -33,54 +34,15 @@ internal sealed class GetWorkflowHandler(
 	{
 		logger.LogInformation("Getting active workflows");
 
-		// Implementation goes here
-		//const string workflowTypeCode = "ReceiveGoods";
-		//const string workflowCode = "123";
-		//const string type = "Verify";
-		//var nextStepLink = linkService.Generate("WorkflowNextStep", new { code = workflowCode, type }, "Move to Next Step", HttpMethod.PATCH)
-
         	var workflow = await context.Workflows
         		.Include(w=> w.Type)
         .Include(w => w.Steps)
         	.ThenInclude(s => s.Actions)
-        .FirstAsync(w => w.Code == workflowCode, cancellationToken);
-
-
-       // workflow.Data = new DefaultWorkflowDataCollection<InvoiceHeader>()
-       // {
-       //     Name = "InvoiceHeaders",
-       //     Description = "Collection of invoice headers",
-       //     Collection = new List<InvoiceHeader>()
-       //     { 
-       //         new InvoiceHeader
-       //         {
-       //             InvoiceId = "INV-2024-001",
-       //             Counterparty = "ООО Поставщик",
-       //             Contract = "Договор-2024"
-       //         }
-       //     }
-       // };
-
-
-        //	var links = await context.WorkflowDataLinks
-        //.Where(l => workflow.DataGuids.Contains(l.DataId))
-        //.ToListAsync(cancellationToken);
-
-        //		var groups = links.GroupBy(l => l.DataType);
-        //
-        //foreach(var group in groups)
-        //		{
-        //			switch (group.Key)
-        //			{
-        //#pragma warning disable
-        //				case "Item": workflow.Data.Name = "DataItems";  workflow.Data.Collection = await context.WorkflowDataItems.Where(x => group.Select(y => y.DataId).Contains(x.Id)).Select(item => new Dictionary<string, object>(JsonSerializer.Deserialize<Dictionary<string, object>>(JsonSerializer.Serialize(item)), StringComparer.OrdinalIgnoreCase)).ToListAsync(cancellationToken); break;
-        //#pragma warning restore
-        //				default: throw new NotSupportedException();
-        //			}
-        //		}
-
-        //var currentStepData = workflow.CurrentStep().Data;
-
+        .FirstOrDefaultAsync(w => w.Code == workflowCode, cancellationToken);
+        if(workflow == null)
+        {
+            return WorkflowErrors.NotFound(workflowCode);
+        }
         var tmpWorkflowData = await MockTmpHelper.GetMockInvoiceHeadersFromInMemoryDb(context, workflow.Id, cancellationToken); 
         switch(workflow.CurrentStep().Type) //SESZH: надо срочно доделывать сигнатуры и начинать очистку от этого всего, потом завязну, оно все нарастает
         { 
@@ -98,106 +60,6 @@ internal sealed class GetWorkflowHandler(
                 }
                 default:
                 throw new NotSupportedException("Current step type not supported");
-        }
-        
-
-
-
-
-		
-	}
-    
+        }       	
+	} 
 }
-    /// <summary>
-    /// Example of creating JsonElement with sample data for CurrentStep.Data field.
-    /// This demonstrates how to populate Data with arbitrary JSON structures including arrays and nested objects.
-    /// </summary>
-//	private static JsonElement CreateSampleData()
-//	{
-//		var sampleData = new
-//		{
-//			invoiceNumber = "INV-2024-001",
-//			date = "2024-01-15",
-//			supplier = new
-//			{
-//				name = "ООО Поставщик",
-//				inn = "1234567890"
-//			},
-//			items = new[]
-//			{
-//				new
-//				{
-//					itemCode = "PROD-001",
-//					name = "Товар 1",
-//					quantity = 10,
-//					unit = "шт",
-//					price = 1500.50m,
-//					tags = new[] { "urgent", "fragile" }
-//				},
-//				new
-//				{
-//					itemCode = "PROD-002",
-//					name = "Товар 2",
-//					quantity = 5,
-//					unit = "шт",
-//					price = 2300.00m,
-//					tags = new[] { "standard" }
-//				}
-//			},
-//			metadata = new
-//			{
-//				source = "warehouse",
-//				priority = "high",
-//				notes = new[]
-//				{
-//					"Требуется проверка качества",
-//					"Срочная доставка"
-//				}
-//			}
-//		};
-//
-//		var jsonString = JsonSerializer.Serialize(sampleData);
-//		using var document = JsonDocument.Parse(jsonString);
-//		return document.RootElement.Clone();
-//	}
-//}
-
-//var wf = new WorkflowResponse(workflowCode, workflowTypeCode, "Приемка по накладной", "Приемка по каждой строчки накладной")
-//{
-//	Data = JsonDocument.Parse("{ \"InvoiceId\": \"string\", \"Сounterparty\": \"string\", \"Contract\": \"string\" }").RootElement,
-//	DataSchema = new WorkflowStepDataSchema
-//	{
-//		Version = "1.0",
-//		DataType = "ReceiveGoods",
-//		SchemaJson = "{ 'InvoiceId': 'string', 'Сounterparty': 'string', 'Contract': 'string' }",
-//	},
-//
-//	CurrentStep = new WorkflowCurrentStep("Scan", "Шаг сканирования", "")
-//	{
-//	Actions = new Actions
-//	{
-//		Links = new List<Link>
-//		{
-//			new Link("/api/workflows/{code}/data/{itemId}/","Increment Qty", HttpMethod.POST), 
-//			new Link("/api/workflows/{itemId}/", "Add Line", HttpMethod.PUT),
-//			new Link("/api/workflows/{code}/data/", "Send Barcode Pack", HttpMethod.POST)
-//			//scanned pack, next/prevsteps, 
-//		},
-//		NextStep = nextStepLink
-//	},
-//		DataSchema = new WorkflowStepDataSchema
-//		{
-//			Version = "1.0",
-//			DataType = "Invoice",
-//			SchemaJson = "{ 'type': 'object', 'properties': { 'invoiceNumber': { 'type': 'string' }, 'items': { 'type': 'array', 'items': { 'type': 'object', 'properties': { 'itemCode': { 'type': 'string' }, 'quantity': { 'type': 'integer' } }, 'required': ['itemCode', 'quantity'] } } }, 'required': ['invoiceNumber', 'items'] }",
-//		},
-//		Data = CreateSampleData()
-//
-//	},
-//	WorkflowSteps = new List<WorkflowStepShortResponse>
-//	{
-//		new WorkflowStepShortResponse("Scan", "Шаг сканирования", 1),
-//		new WorkflowStepShortResponse("Verify", "Шаг проверки", 2),
-//		new WorkflowStepShortResponse("Complete", "Шаг завершения", 3)
-//	}
-//};
