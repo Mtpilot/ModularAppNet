@@ -13,6 +13,11 @@ services:
       - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
       - OTEL_EXPORTER_OTLP_HEADERS=X-Seq-ApiKey=abcde12345
     restart: always
+    depends_on:
+      seq:
+        condition: service_started
+      jaeger:
+        condition: service_started
     networks:
       - docker-web
       - shared-network
@@ -45,6 +50,12 @@ services:
     ports:
       - "5341:5341"
       - "8081:80"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:5341/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     networks:
       - docker-web
       - shared-network
