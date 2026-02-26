@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Json;
@@ -24,6 +24,7 @@ public static class DependencyInjection
 	            
 	            // Add schema filter to convert JsonElement to object type in Swagger
 	            options.SchemaFilter<JsonElementSchemaFilter>();
+	            options.DocumentFilter<MauthServerDocumentFilter>();
 	            
 	            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
 	            {
