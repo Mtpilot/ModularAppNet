@@ -22,8 +22,8 @@ services:
     container_name: mauth_postgres
     environment:
       - TZ
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=admin
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=secretpassword
       - POSTGRES_DB=modular_monolith
     volumes:
       - ./docker_data/pgdata:/var/lib/postgresql/data
