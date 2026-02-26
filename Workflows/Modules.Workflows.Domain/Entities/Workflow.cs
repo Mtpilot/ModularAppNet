@@ -29,7 +29,7 @@ public class Workflow//<TEntity, TStepEntity>
 
 	//TODO: Как связаны Data и WorkflowDataItems, в частном случае приемки тут должне быть массив содержащий один элемент - это спецификация с полями шапки спецификации
 	[NotMapped]
-	public IWorkflowDataCollection Data { get; set; }
+	public IWorkflowDataCollection? Data { get; set; }
 
 	#region Steps
 	public string GetCacheKey() => $"workflow:{Code}";
@@ -54,7 +54,7 @@ public class Workflow//<TEntity, TStepEntity>
 		return firstStep;
 	}
 
-	public WorkflowStep? GetNextStep(int currentOrder)
+	public WorkflowStep? GetNextStep()
 	{
 		WorkflowStep? nextStep = null;
 		//SESZH: linq мне показался очевидным, интересно, почему не так?
@@ -62,7 +62,7 @@ public class Workflow//<TEntity, TStepEntity>
 
 		foreach (var step in Steps)
 		{
-			if (step.Order > currentOrder && (nextStep == null || step.Order < nextStep.Order))
+			if (step.Order > CurrentStepNumber && (nextStep == null || step.Order < nextStep.Order))
 			{				
 				nextStep = step;
 				
@@ -102,7 +102,7 @@ public class Workflow//<TEntity, TStepEntity>
 			return false;
 		}
 
-		var nextStep = GetNextStep(currentStep.Order);
+		var nextStep = GetNextStep();
 		return nextStep is null;
 	}
 	#endregion Steps

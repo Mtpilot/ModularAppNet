@@ -1,4 +1,5 @@
 using FluentValidation;
+using Modules.Workflows.PublicApi.Requests;
 
 namespace Modules.Workflows.Features.Features.CreateWorkflow;
 

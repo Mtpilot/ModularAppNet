@@ -22,7 +22,9 @@ builder.Services
     .AddShipmentsModule(builder.Configuration)
     .AddCarriersModule(builder.Configuration)
     .AddStocksModule(builder.Configuration)
-    .AddWorkflowsModule(builder.Configuration);
+    .AddWorkflowsModule(builder.Configuration)
+	.AddBarcodingModule(builder.Configuration)
+	;
 
 // Seed entities in DEVELOPMENT mode
 if (builder.Environment.IsDevelopment())

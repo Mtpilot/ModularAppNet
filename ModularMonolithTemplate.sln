@@ -81,6 +81,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modules.Workflows.MockInfra
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Barcoding", "Barcoding", "{86415442-311C-4A95-ADBC-BE8C802B7E30}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modules.Barcoding.Domain", "Barcoding\Modules.Barcoding.Domain\Modules.Barcoding.Domain.csproj", "{6A837173-7557-4B2A-B9EF-178DFBD3B6A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modules.Barcoding.Features", "Barcoding\Modules.Barcoding.Features\Modules.Barcoding.Features.csproj", "{946279F8-EA77-4FEB-BA0E-F586BD176EF9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modules.Barcoding.MockInfrastructure", "Barcoding\Modules.Barcoding.MockInfrastructure\Modules.Barcoding.MockInfrastructure.csproj", "{D97366FA-E076-B6BD-B87A-AA8267E4ABA5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modules.Workflows.PublicApi", "Workflows\Modules.Workflows.PublicApi\Modules.Workflows.PublicApi.csproj", "{4A35B263-6275-4355-89AF-9DCAB11D35AB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -195,6 +203,22 @@ Global
 		{F6817512-EB5B-410B-8378-29151805581A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F6817512-EB5B-410B-8378-29151805581A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F6817512-EB5B-410B-8378-29151805581A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A837173-7557-4B2A-B9EF-178DFBD3B6A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A837173-7557-4B2A-B9EF-178DFBD3B6A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A837173-7557-4B2A-B9EF-178DFBD3B6A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A837173-7557-4B2A-B9EF-178DFBD3B6A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{946279F8-EA77-4FEB-BA0E-F586BD176EF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{946279F8-EA77-4FEB-BA0E-F586BD176EF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{946279F8-EA77-4FEB-BA0E-F586BD176EF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{946279F8-EA77-4FEB-BA0E-F586BD176EF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D97366FA-E076-B6BD-B87A-AA8267E4ABA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D97366FA-E076-B6BD-B87A-AA8267E4ABA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D97366FA-E076-B6BD-B87A-AA8267E4ABA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D97366FA-E076-B6BD-B87A-AA8267E4ABA5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A35B263-6275-4355-89AF-9DCAB11D35AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A35B263-6275-4355-89AF-9DCAB11D35AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A35B263-6275-4355-89AF-9DCAB11D35AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A35B263-6275-4355-89AF-9DCAB11D35AB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -236,6 +260,10 @@ Global
 		{6589A1E3-E2F0-43CC-B6C6-4EECE9D33CB2} = {F0D623C8-20D4-4E75-84E6-BBD957BC959B}
 		{F6817512-EB5B-410B-8378-29151805581A} = {F0D623C8-20D4-4E75-84E6-BBD957BC959B}
 		{86415442-311C-4A95-ADBC-BE8C802B7E30} = {A140E573-7FC3-46D5-B1B9-3EF537C0B82B}
+		{6A837173-7557-4B2A-B9EF-178DFBD3B6A2} = {86415442-311C-4A95-ADBC-BE8C802B7E30}
+		{946279F8-EA77-4FEB-BA0E-F586BD176EF9} = {86415442-311C-4A95-ADBC-BE8C802B7E30}
+		{D97366FA-E076-B6BD-B87A-AA8267E4ABA5} = {86415442-311C-4A95-ADBC-BE8C802B7E30}
+		{4A35B263-6275-4355-89AF-9DCAB11D35AB} = {F0D623C8-20D4-4E75-84E6-BBD957BC959B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8725359E-50CC-46C4-ABFE-D693155DC824}

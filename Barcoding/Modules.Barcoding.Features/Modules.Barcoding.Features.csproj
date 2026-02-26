@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\Modules.Common.API\Modules.Common.API.csproj" />
+    <ProjectReference Include="..\..\Common\Modules.Common.Application\Modules.Common.Application.csproj" />
+    <ProjectReference Include="..\Modules.Barcoding.MockInfrastructure\Modules.Barcoding.MockInfrastructure.csproj" />
+    <ProjectReference Include="..\..\Workflows\Modules.Workflows.PublicApi\Modules.Workflows.PublicApi.csproj" />
+  </ItemGroup>
+
+</Project>

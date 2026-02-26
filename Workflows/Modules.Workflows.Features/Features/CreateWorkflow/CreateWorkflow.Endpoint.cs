@@ -5,16 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 using Modules.Common.API.Abstractions;
 using Modules.Common.API.Extensions;
 using Modules.Workflows.Features.Features.Shared.Routes;
-using Modules.Workflows.Features.Features.Shared.Responses;
+using Modules.Workflows.PublicApi.Requests;
+using Modules.Workflows.PublicApi.Responses;
 
 namespace Modules.Workflows.Features.Features.CreateWorkflow;
-
-public sealed record CreateWorkflowRequest(
-	string TypeCode,
-	string TypeName,
-	string Name,
-	string Description,
-	System.Text.Json.JsonElement Data);
 
 public class CreateWorkflowEndpoint : IApiEndpoint
 {

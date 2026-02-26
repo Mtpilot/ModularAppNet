@@ -4,14 +4,12 @@ using Modules.Common.API.Abstractions.Links;
 using Modules.Common.Domain.Handlers;
 using Modules.Common.Domain.Results;
 using Modules.Workflows.Domain.Entities;
-using Modules.Workflows.Features.Features.Shared.Responses;
-using Modules.Workflows.Infrastructure.Helpers;
+using Modules.Workflows.PublicApi.Responses;
 using Modules.Workflows.MockInfrastructure.Database;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Text.Json;
 using HttpMethod = Modules.Common.API.Abstractions.Links.HttpMethod;
+using Modules.Workflows.PublicApi.InfrastructureQueryInterfaces;
+using Modules.Workflows.PublicApi.Contracts;
 
 namespace Modules.Workflows.Features.Features.GetWorkflows;
 
@@ -23,7 +21,8 @@ internal interface IGetWorkflowsHandler : IHandler
 internal sealed class GetWorkflowsHandler(
 	ILogger<GetWorkflowsHandler> logger,
 	WorkflowsDbContext context,
-	ILinkService linkService) : IGetWorkflowsHandler
+	ILinkService linkService,
+    IMockTmpHelper mockTmpHelper) : IGetWorkflowsHandler
 {
 	public async Task<Result<List<WorkflowShortInfoResponse>>> HandleAsync(string workflowTypeCode, CancellationToken cancellationToken)
 	{
@@ -39,7 +38,7 @@ internal sealed class GetWorkflowsHandler(
 		
         foreach (var workflow in workflows)
 		{
-            var tmpData =  await MockTmpHelper.GetMockInvoiceHeadersFromInMemoryDb(context, workflow.Id, cancellationToken);
+            var tmpData =  new DefaultWorkflowDataCollection<InvoiceHeaderDto> { Name = "InvoiceHeaders", Description = "Collection of invoice headers", Collection = await mockTmpHelper.GetMockInvoiceHeadersFromInMemoryDb(workflow.Id, cancellationToken) };
 
 			workflow.Data = tmpData;
             var getWorkflowLink = linkService.Generate("GetWorkflow", new { workflowCode = workflow.Code }, $"Get {workflowTypeCode} workflow data", HttpMethod.GET);

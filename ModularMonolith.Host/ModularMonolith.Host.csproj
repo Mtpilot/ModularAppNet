@@ -12,7 +12,6 @@
         <PackageReference Include="EFCore.NamingConventions" />
         <PackageReference Include="FluentValidation" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
         </PackageReference>        
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
@@ -22,6 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Barcoding\Modules.Barcoding.Features\Modules.Barcoding.Features.csproj" />
       <ProjectReference Include="..\Carriers\Modules.Carriers.Features\Modules.Carriers.Features.csproj" />
       <ProjectReference Include="..\Common\Modules.Common.Infrastructure\Modules.Common.Infrastructure.csproj" />
       <ProjectReference Include="..\Shipments\Modules.Shipments.Features\Modules.Shipments.Features.csproj" />

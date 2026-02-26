@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Modules.Common.API.Abstractions.Links;
 using Modules.Common.Domain.Handlers;
 using Modules.Common.Domain.Results;
-using Modules.Workflows.Features.Features.Shared.Responses;
+using Modules.Workflows.PublicApi.Responses;
 using Modules.Workflows.MockInfrastructure.Database;
 
 namespace Modules.Workflows.Features.Features.GetWorkflowTypes;

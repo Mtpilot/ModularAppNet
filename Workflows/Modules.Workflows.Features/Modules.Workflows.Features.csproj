@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -24,6 +24,7 @@
     <ProjectReference Include="..\Modules.Workflows.Domain\Modules.Workflows.Domain.csproj" />
     <ProjectReference Include="..\Modules.Workflows.Infrastructure\Modules.Workflows.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules.Workflows.MockInfrastructure\Modules.Workflows.MockInfrastructure.csproj" />
+    <ProjectReference Include="..\Modules.Workflows.PublicApi\Modules.Workflows.PublicApi.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -6,12 +6,11 @@ using Modules.Common.Domain.Handlers;
 using Modules.Common.Domain.Results;
 using Modules.Workflows.Domain.Entities;
 using Modules.Workflows.Domain.Errors;
-using Modules.Workflows.Features.Features.Shared.Mappers;
-using Modules.Workflows.Features.Features.Shared.Responses;
+using Modules.Workflows.PublicApi.Responses;
 using Modules.Workflows.MockInfrastructure.Database;
-using HttpMethod = Modules.Common.API.Abstractions.Links.HttpMethod;
-using Modules.Workflows.Infrastructure.Helpers;
 using Modules.Workflows.Features.Features.Shared.Helpers;
+using Modules.Workflows.PublicApi.InfrastructureQueryInterfaces;
+using Modules.Workflows.PublicApi.Contracts;
 
 namespace Modules.Workflows.Features.Features.NextWorkflowStep;
 
@@ -25,7 +24,8 @@ internal interface IWorkflowNextStepHandler : IHandler
 internal sealed class WorkflowNextStepHandler(
 	ILogger<WorkflowNextStepHandler> logger,
 	WorkflowsDbContext context,
-	ILinkService linkService
+	ILinkService linkService,
+    IMockTmpHelper mockTmpHelper
 	) : IWorkflowNextStepHandler
 
 {
@@ -51,7 +51,7 @@ internal sealed class WorkflowNextStepHandler(
 			return WorkflowErrors.StepNotFound($"for {workflow.Code}");
 		}
 
-		var nextStep = workflow.GetNextStep(currentStep.Order);
+		var nextStep = workflow.GetNextStep();
 		if (nextStep is null)
 		{
 			return WorkflowErrors.NextStepNotFound(request.Code, currentStep.StepCode);
@@ -60,18 +60,18 @@ internal sealed class WorkflowNextStepHandler(
 		workflow.SetStepNumber(nextStep.Order);
 
 		await context.SaveChangesAsync();
-	var tmpWorkflowData = await MockTmpHelper.GetMockInvoiceHeadersFromInMemoryDb(context, workflow.Id, cancellationToken);
+	var tmpWorkflowData = new DefaultWorkflowDataCollection<InvoiceHeaderDto> { Name = "InvoiceHeaders", Description = "Collection of invoice headers", Collection = await mockTmpHelper.GetMockInvoiceHeadersFromInMemoryDb(workflow.Id, cancellationToken) };
         switch (workflow.CurrentStep().Type) //SESZH: надо срочно доделывать сигнатуры и начинать очистку от этого всего, потом завязну, оно все нарастает
         {
             case WorkflowStepType.Scan:
                 {
-                    var tmpStepData = await MockTmpHelper.GetMockInvoicesFromInMemoryDb(context, workflow.CurrentStep().Id, cancellationToken);
+                    var tmpStepData = new DefaultWorkflowDataCollection<InvoiceDto> { Name = "Invoices", Description = "Collection of invoices", Collection = await mockTmpHelper.GetMockInvoicesFromInMemoryDb(workflow.CurrentStep().Id, cancellationToken) };
                     var wf = workflow.ConvertWorkflowToResponse(linkService, tmpWorkflowData, tmpStepData);
                     return wf;
                 }
             case WorkflowStepType.Verify:
                 {
-                    var tmpStepData = await MockTmpHelper.GetMockInvoiceCheckoutsFromInMemoryDb(context, workflow.CurrentStep().Id, cancellationToken);
+                    var tmpStepData = new DefaultWorkflowDataCollection<InvoiceCheckoutDto> { Name = "InvoiceCheckouts", Description = "Collection of invoice checkouts", Collection = await mockTmpHelper.GetMockInvoiceCheckoutsFromInMemoryDb(workflow.CurrentStep().Id, cancellationToken) };
                     var wf = workflow.ConvertWorkflowToResponse(linkService, tmpWorkflowData, tmpStepData);
                     return wf;
                 }

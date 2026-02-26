@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Modules.Workflows.Domain.Entities;
-using Modules.Workflows.Domain.Entities.Application;
 
 namespace Modules.Workflows.Infrastructure.Database;
 

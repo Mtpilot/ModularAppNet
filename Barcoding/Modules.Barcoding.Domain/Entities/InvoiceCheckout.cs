@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Modules.Workflows.Domain.Entities.Application;
+﻿namespace Modules.Barcoding.Domain.Entities;
 
 public class InvoiceCheckout : InvoiceHeader
 {

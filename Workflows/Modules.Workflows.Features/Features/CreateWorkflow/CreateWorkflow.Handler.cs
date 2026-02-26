@@ -4,17 +4,11 @@ using Modules.Common.API.Abstractions.Links;
 using Modules.Common.Domain.Handlers;
 using Modules.Common.Domain.Results;
 using Modules.Workflows.Domain.Entities;
-using Modules.Workflows.Domain.Entities.Application;
 using Modules.Workflows.Domain.Errors;
 using Modules.Workflows.Features.Features.Shared.Mappers;
-using Modules.Workflows.Features.Features.Shared.Responses;
+using Modules.Workflows.PublicApi.Requests;
+using Modules.Workflows.PublicApi.Responses;
 using Modules.Workflows.MockInfrastructure.Database;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using HttpMethod = Modules.Common.API.Abstractions.Links.HttpMethod;
 
 namespace Modules.Workflows.Features.Features.CreateWorkflow;
 
@@ -86,23 +80,24 @@ internal sealed class CreateWorkflowHandler(
 			IsActive = true,
 			CurrentStepType = firstStep.Type,
 			CurrentStepNumber = 1,
-			Data = new DefaultWorkflowDataCollection<InvoiceHeader>
-			{
-				Name = "Новое Воркфлоу",
-				Description = "",
-				Collection = new List<InvoiceHeader>
-				{
-					new InvoiceHeader
-					{
-						WorkflowId = id,
-						ContractNumber = "Новая накладная",
-						Counterparty = "Новый источник",
-						InvoiceNumber = $"Новый Айдишник: {Guid.NewGuid().ToString()}",
-						Date = DateTime.UtcNow,
-					}
-				}
-			},
-			Steps = GetStepsForType(id, request.TypeCode)
+			Data = null,
+            //new DefaultWorkflowDataCollection<InvoiceHeader>
+            //{
+            //	Name = "Новое Воркфлоу",
+            //	Description = "",
+            //	Collection = new List<InvoiceHeader>
+            //	{
+            //		new InvoiceHeader
+            //		{
+            //			WorkflowId = id,
+            //			ContractNumber = "Новая накладная",
+            //			Counterparty = "Новый источник",
+            //			InvoiceNumber = $"Новый Айдишник: {Guid.NewGuid().ToString()}",
+            //			Date = DateTime.UtcNow,
+            //		}
+            //	}
+            //},
+            Steps = GetStepsForType(id, request.TypeCode)
 		};
 	}
 
@@ -132,36 +127,37 @@ internal sealed class CreateWorkflowHandler(
 				Description = "Сканирование товара",
 				Order = 1,
 				Actions = new List<WorkflowStepAction>(),
-				Data = new DefaultWorkflowDataCollection<Invoice>
-				{
-					Name = "Сканированные товары",
-					Description = "Коллекция отсканированных товаров",
-					Collection = new List<Invoice>
-					{
-						new Invoice
-						{
-							Date = DateTime.UtcNow,
-							WorkflowId = workflowId,
-							StepId = step1Id,
-							//Name = "Накладная 1",
-							ContractNumber = "Контракт 1",
-							Counterparty = "Поставщик 1",
-							InvoiceNumber = "ID родительского",
-							Lines = new List<InvoiceLine>
-							{
-								new InvoiceLine
-								{
-									ProductName = "Товар 1",
-									ConstructorName = "Конструкторское имя 1",
-									ProductCode = "Код товара 1",
-									Quantity = 10,
-									Units = "шт",
-									Barcode = "1234567890123"
-                                },
-                            }
-                        }
-					}
-                }
+				Data = null,
+				//new DefaultWorkflowDataCollection<Invoice>
+				//{
+				//	Name = "Сканированные товары",
+				//	Description = "Коллекция отсканированных товаров",
+				//	Collection = new List<Invoice>
+				//	{
+				//		new Invoice
+				//		{
+				//			Date = DateTime.UtcNow,
+				//			WorkflowId = workflowId,
+				//			StepId = step1Id,
+				//			//Name = "Накладная 1",
+				//			ContractNumber = "Контракт 1",
+				//			Counterparty = "Поставщик 1",
+				//			InvoiceNumber = "ID родительского",
+				//			Lines = new List<InvoiceLine>
+				//			{
+				//				new InvoiceLine
+				//				{
+				//					ProductName = "Товар 1",
+				//					ConstructorName = "Конструкторское имя 1",
+				//					ProductCode = "Код товара 1",
+				//					Quantity = 10,
+				//					Units = "шт",
+				//					Barcode = "1234567890123"
+                //                },
+                //            }
+                //        }
+				//	}
+                //}
 			},
 			new WorkflowStep
 			{
@@ -173,12 +169,7 @@ internal sealed class CreateWorkflowHandler(
 				Description = "Проверка количества",
 				Order = 2,
 				Actions = new List<WorkflowStepAction>(),
-                Data = new DefaultWorkflowDataCollection<Invoice>
-                {
-                    Name = "Сканированные товары",
-                    Description = "Коллекция отсканированных товаров",
-                    Collection = new List<Invoice>(),
-                }
+                Data = null,
             },
 			new WorkflowStep
 			{
@@ -190,12 +181,7 @@ internal sealed class CreateWorkflowHandler(
 				Description = "Подтверждение приемки",
 				Order = 3,
 				Actions = new List<WorkflowStepAction>(),
-				Data = new DefaultWorkflowDataCollection<Invoice>
-                {
-                    Name = "Сканированные товары",
-                    Description = "Коллекция отсканированных товаров",
-                    Collection = new List<Invoice>(),
-                }
+				Data = null,
             }
 		};
 	}

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using FluentValidation;
@@ -7,8 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Modules.Common.API.Abstractions;
 using Modules.Workflows.Features.Features.PreviousWorkflowStep;
-using Modules.Workflows.Features.Features.Shared.Requests;
-using Modules.Workflows.Features.Features.Shared.Responses;
+using Modules.Workflows.PublicApi.Responses;
 using Modules.Workflows.Features.Features.Shared.Routes;
 using Modules.Common.API.Extensions;
 

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Modules.Workflows.Domain.Entities;
-using Modules.Workflows.Domain.Entities.Application;
 using Modules.Workflows.Domain.Serializers;
 using Modules.Workflows.MockInfrastructure.Database;
 
@@ -33,48 +32,9 @@ public static class MockDbSeeder
 		context.Workflows.AddRange(workflows);
 		context.SaveChanges();
 
-		SaveInvoices(context, workflows);
-		SaveInvoiceCheckouts(context, workflows);
 	}
 
-	private static void SaveInvoices(WorkflowsDbContext context, List<Workflow> workflows)
-	{
-		foreach (var w in workflows)
-		{
-			if (w.Steps == null)
-			{
-				continue;
-			}
 
-			foreach (var step in w.Steps)
-			{
-				if (step.Data is IWorkflowDataCollection<Invoice> invoiceCollection && invoiceCollection.Collection?.Count > 0)
-				{
-					context.Invoices.AddRange(invoiceCollection.Collection);
-				}
-			}
-		}
-		context.SaveChanges();
-	}
-	private static void SaveInvoiceCheckouts(WorkflowsDbContext context, List<Workflow> workflows)
-	{
-		foreach (var w in workflows)
-		{
-			if (w.Steps == null)
-			{
-				continue;
-			}
-			foreach (var step in w.Steps)
-		{
-			if (step.Data is IWorkflowDataCollection<InvoiceCheckout> invoiceCheckoutCollection && invoiceCheckoutCollection.Collection?.Count > 0)
-		{
-			context.InvoiceCheckouts.AddRange(invoiceCheckoutCollection.Collection);
-		}
-		}
-			context.SaveChanges();
-		
-	}
-	}
 
 	private static readonly string[] InboundNames = ["Приёмка товара", "Приёмка поставки", "Входящая приёмка"];
 	//private static readonly string[] OutboundNames = ["Отгрузка / Комплектация", "Комплектация заказа", "Отгрузка со склада"];
@@ -84,70 +44,62 @@ public static class MockDbSeeder
 	private static List<Workflow> CreateInboundWorkflows(WorkflowType workflowType)
 	{
 		var list = new List<Workflow>();
-		for (var i = 1; i <= 2; i++)
-		{
-			var id = Guid.NewGuid();
+
+		var id1 = Guid.Parse("0bdafc87-c7f2-439c-a454-f326d52b590c");
+		var id2 = Guid.Parse("a78b48d0-dab9-42a0-b5fb-4fa76b8674cc");
+		var id3 = Guid.Parse("cae4fee6-a0a3-495c-8592-793b829c0923");
+
+		var w1s1 = Guid.Parse("68b71d26-9a0c-423e-b4df-beb710f217f7"); // Scan
+		var w1s2 = Guid.Parse("e8d8e01d-e526-46ea-92b9-642c0cd9dcc9"); // Verify
+		var w1s3 = Guid.Parse("56e23c91-5017-4c2f-b949-8e9bd17beb88"); // Accept / Putaway
+
+		var w2s1 = Guid.Parse("c2dbe63e-7ce3-40f5-813b-c7adefa45c87"); // Scan
+		var w2s2 = Guid.Parse("ad5d407f-7ba4-4400-8558-5708a14190fe"); // Verify
+		var w2s3 = Guid.Parse("f2a88d1c-5eb3-49b4-aae3-30f0d6cb1e39"); // Accept / Putaway
+
+		var w3s1 = Guid.Parse("ae2ecb08-44a8-4ab4-b719-791eddf7d012"); // Scan
+		var w3s2 = Guid.Parse("8803a1fa-fa7f-4537-981d-5bbc52514eb9"); // Verify
+		var w3s3 = Guid.Parse("1ff1b2a5-b33f-498c-a68c-1c2d6549611c"); // Accept / Putaway
+
+
 			list.Add(new Workflow
-			{
-				Id = id,
-				Code = $"INBOUND-{i:D2}",
-				Name = InboundNames[i - 1],
+			{ 
+				Id = id1,
+				Code = "INBOUND-01",
+				Name = InboundNames[0],
 				Description = "Приёмка и первичная проверка поступившего товара",
 				IsActive = true,
 				CurrentStepType = WorkflowStepType.Scan,
 				Type = workflowType,
 				CurrentStepNumber = 1,
-				Data = new DefaultWorkflowDataCollection<InvoiceHeader>
-				{
-					Name = "Приёмка",
-					Description = "",
-					Collection = new List<InvoiceHeader>
-					{
-						new InvoiceHeader
-						{
-							WorkflowId = id,
-							Counterparty = $"Поставщик {i}",
-							ContractNumber = $"INV-{i:D4}",
-							InvoiceNumber = Guid.NewGuid().ToString(),
-							Date = DateTime.UtcNow.AddDays(-i),
-						}
-					}
-				},
-				//Data = new WorkflowDataItemsCollection<IDataItem> { Name = "Поступление", Description = "", Collection = SeedInboundItems().Cast<IDataItem>().ToList() },
-				//WorkflowDataItems = SeedWorkflowDataItems(context, id, "inbound"),
-				Steps = SeedInboundSteps(id)
+				Data = null,
+				Steps = SeedInboundSteps(id1, w1s1, w1s2, w1s3),
 			});
-		}
-		var stepId = Guid.NewGuid();
-		list.Add(new Workflow
-		{
-			Id = stepId,
-			Code = $"INBOUND-{3:D2}",
-			Name = InboundNames[3 - 1],
-			Description = "Приёмка и первичная проверка поступившего товара",
-			IsActive = false,
-			CurrentStepType = WorkflowStepType.Scan,
-			Type = workflowType,
-			CurrentStepNumber = 1,
-			Data = new DefaultWorkflowDataCollection<InvoiceHeader>
+			list.Add(new Workflow
 			{
-				Name = "Приёмка",
-				Description = "",
-				Collection = new List<InvoiceHeader>
-					{
-						new InvoiceHeader
-						{
-							WorkflowId = stepId,
-							Counterparty = $"Поставщик {3}",
-							ContractNumber = $"INV-{3:D4}",
-							InvoiceNumber = Guid.NewGuid().ToString(),
-							Date = DateTime.UtcNow.AddDays(-3),
-						}
-					}
-			},
-			//Data = new WorkflowDataItemsCollection<IDataItem> { Name = "Поступление", Description = "", Collection = SeedInboundItems().Cast<IDataItem>().ToList() },
-			//WorkflowDataItems = SeedWorkflowDataItems(context, id, "inbound"),
-			Steps = SeedInboundSteps(stepId)
+				Id = id2,
+				Code = "INBOUND-02",
+				Name = InboundNames[1],
+				Description = "Приёмка и первичная проверка поступившего товара",
+				IsActive = true,
+				CurrentStepType = WorkflowStepType.Scan,
+				Type = workflowType,
+				CurrentStepNumber = 1,
+				Data = null,
+				Steps = SeedInboundSteps(id2, w2s1, w2s2, w2s3),
+			});
+			list.Add(new Workflow
+			{
+				Id = id3,
+				Code = "INBOUND-03",
+				Name = InboundNames[2],
+				Description = "Приёмка и первичная проверка поступившего товара",
+				IsActive = false,
+				CurrentStepType = WorkflowStepType.Scan,
+				Type = workflowType,
+				CurrentStepNumber = 1,
+				Data = null,
+			Steps = SeedInboundSteps(id3, w3s1, w3s2, w3s3),
 		});
 		return list;
 	}
@@ -155,53 +107,71 @@ public static class MockDbSeeder
 	private static List<Workflow> CreateReturnsWorkflows(WorkflowType workflowType)
 	{
 		var list = new List<Workflow>();
-		for (var i = 1; i <= 3; i++)
+		var id1 = Guid.Parse("a0dba775-8829-41dd-ba19-0bcd19627ba4");
+		var id2 = Guid.Parse("7dd025bc-be31-442f-942b-c6b547c1898c");
+		var id3 = Guid.Parse("80d5fd23-eba8-40f2-bbd6-538959f13d19");
+
+		var w1s1 = Guid.Parse("9f8faaee-bdec-4607-8c86-5a6d6fb51096"); // Scan returned items
+		var w1s2 = Guid.Parse("6058c88f-78ff-44bb-a733-8d94426c482a"); // Quality check
+		var w1s3 = Guid.Parse("0101aca3-8170-44b2-99ab-bb2a5a00eeb3"); // Accept / Reject
+
+		var w2s1 = Guid.Parse("31429522-d440-490a-9100-37386c23643d"); // Scan returned items
+		var w2s2 = Guid.Parse("d7228348-4112-4745-8940-8a6747526763"); // Quality check
+		var w2s3 = Guid.Parse("e36f766c-0435-4310-a172-166641c0542f"); // Accept / Reject
+
+		var w3s1 = Guid.Parse("1b1d30a2-8752-435c-95b3-893392343733"); // Scan returned items
+		var w3s2 = Guid.Parse("46705528-8065-4665-a76e-90a683953636"); // Quality check
+		var w3s3 = Guid.Parse("7656445e-9131-403e-9d66-042403f8657a"); // Accept / Reject
+
+		
+		list.Add(new Workflow
 		{
-			var id = Guid.NewGuid();
-			list.Add(new Workflow
-			{
-				Id = id,
-				Code = $"RETURN-{i:D2}",
-				Name = ReturnNames[i - 1],
+			Id = id1,
+			Code = "RETURN-01",
+			Name = ReturnNames[0],
 				Description = "",
 				IsActive = true,
 				CurrentStepType = WorkflowStepType.Scan,
 				Type = workflowType,
 				CurrentStepNumber = 1,
-				Steps = SeedReturnSteps(id),
-				Data = new DefaultWorkflowDataCollection<InvoiceHeader>
-				{
-					Name = "Возврат",
-					Description = "",
-					Collection = new List<InvoiceHeader>
-					{
-						new InvoiceHeader
-						{
-							WorkflowId = id,
-							InvoiceNumber = Guid.NewGuid().ToString(),
-							ContractNumber = $"INV-{i:D4}",
-							Counterparty = $"Поставщик {i}",
-							Date = DateTime.UtcNow.AddDays(-i),
-						}
-					}
-				}
-			});
-		}
-			//WorkflowDataItems = SeedWorkflowDataItems(context, id, "return")
-	return list;
+				Steps = SeedReturnSteps(id1, w1s1, w1s2, w1s3),
+				Data = null
+				});
+		list.Add(new Workflow
+		{
+			Id = id2,
+			Code = "RETURN-02",
+			Name = ReturnNames[1],
+			Description = "",
+			IsActive = true,
+			CurrentStepType = WorkflowStepType.Scan,
+			Type = workflowType,
+			CurrentStepNumber = 1,
+			Steps = SeedReturnSteps(id2, w2s1, w2s2, w2s3),
+			Data = null
+		});
+		list.Add(new Workflow
+		{
+			Id = id3,
+			Code = "RETURN-03",
+			Name = ReturnNames[2],
+			Description = "",
+			IsActive = true,
+			CurrentStepType = WorkflowStepType.Scan,
+			Type = workflowType,
+			CurrentStepNumber = 1,
+			Steps = SeedReturnSteps(id3, w3s1, w3s2, w3s3),
+			Data = null
+		});
+		return list;
 	}
 
 	// ────────────────────────────────────────────────
 	// Шаги для разных процессов
 	// ────────────────────────────────────────────────
 
-	private static List<WorkflowStep> SeedInboundSteps(Guid workflowId)
+	private static List<WorkflowStep> SeedInboundSteps(Guid workflowId, Guid s1, Guid s2, Guid s3)
 	{
-		var s1 = Guid.NewGuid(); // Scan
-		var s2 = Guid.NewGuid(); // Verify
-		var s3 = Guid.NewGuid(); // Accept / Putaway
-		var scanData = SeedInboundItems();
-
 		return new List<WorkflowStep>
 		{
 			new()
@@ -215,65 +185,19 @@ public static class MockDbSeeder
 				Description = "Сканируем коробки / паллеты / штуки",
 				Actions =
 				[ SendPackage(s1), NextStep(s1), CancelWorkflow(s1), ],
-				Data = new DefaultWorkflowDataCollection<Invoice>
-				{
-					Name = "Сканирование",
-					Description = "Сканируем коробки / паллеты / штуки",
-					Collection = new List<Invoice>
-					{
-						new Invoice
-						{
-							Date = DateTime.UtcNow.AddDays(-1),
-							WorkflowId = workflowId,
-							StepId = s1,
-							InvoiceNumber = "SESZH: должен быть, как у родительского воркфлоу",
-							Counterparty = "Аналогично",
-							ContractNumber = "Аналогично",
-							//Name = "Аналогично",
-							Lines = scanData.Select(l => new InvoiceLine
-							{
-								ProductName = l.Name,
-								Quantity = l.Quantity,
-								Units = l.Units,
-								Barcode = l.ItemCode,
-								ConstructorName = l.Name,
-								ProductCode = l.ItemCode
-							}).ToList()
-						}
-					}
-				}
-			}, //SESZH: пусть в этом воркфлоу его можно будет отменить когда угодно, потом разберемся, когда можно и где
-			new() 
-			{ 
-				Id = s2, 
-				WorkflowId = workflowId, 
-				StepCode = "Verify-02", 
-				Type = WorkflowStepType.Verify,  
-				Name = "Проверка", 
-				Order = 2, 
-				Description = "Сверка фактического кол-ва с документом", 
-				Actions = [ NextStep(s2), PrevStep(s2), CancelWorkflow(s2)], 
-				Data = new DefaultWorkflowDataCollection<InvoiceCheckout> 
-				{ 
-					Name = "Проверка",
-					Description = "Сверка фактического кол-ва с документом",
-						Collection = new List<InvoiceCheckout>
-						{
-							new InvoiceCheckout
-							{
-								WorkflowId = workflowId,
-								InvoiceNumber = "SESZH: должен быть, как у родительского воркфлоу",
-								Counterparty = "Аналогично",
-								ContractNumber = "Аналогично",
-								Date = DateTime.UtcNow.AddDays(-1),
-								StepId = s2,
-								TotalItems = -1,
-								AcceptedItems = -1,
-								MissingItems = -1,
-								ExtraItems = -1,
-							}
-						},
-				}
+				Data = null
+			},
+			new()
+			{
+				Id = s2,
+				WorkflowId = workflowId,
+				StepCode = "Verify-02",
+				Type = WorkflowStepType.Verify,
+				Name = "Проверка",
+				Order = 2,
+				Description = "Сверка фактического кол-ва с документом",
+				Actions = [ NextStep(s2), PrevStep(s2), CancelWorkflow(s2)],
+				Data = null
 			},
 			new() 
 			{ 
@@ -285,12 +209,7 @@ public static class MockDbSeeder
 				Order = 3, 
 				Description = "Подтверждение и размещение", 
 				Actions = [ PrevStep(s3), CompleteWorkflow(s3), CancelWorkflow(s3)], 
-				Data = new DefaultWorkflowDataCollection<Invoice> 
-				{ 
-					Name = "Принятие на склад",
-					Description = "Подтверждение и размещение",
-					Collection = new List<Invoice>(),
-				}
+				Data = null
 			}
 		};
 	}
@@ -361,54 +280,24 @@ public static class MockDbSeeder
 	//	};
 	//}
 
-	private static List<WorkflowStep> SeedReturnSteps(Guid workflowId)
+	private static List<WorkflowStep> SeedReturnSteps(Guid workflowId, Guid s1, Guid s2, Guid s3)
 	{
-		var s1 = Guid.NewGuid(); // Scan returned items
-		var s2 = Guid.NewGuid(); // Quality check
-		var s3 = Guid.NewGuid(); // Accept / Reject
-		var scanData = SeedReturnItems();
-
 		return new List<WorkflowStep>
 		{
-			new() 
-			{ 
-				Id = s1, 
-				WorkflowId = workflowId, 
-				StepCode = "Scan-01", 
-				Type = WorkflowStepType.Scan,   
-				Name = "Скан возврата", 
-				Description = "",  
-				Order = 1, 
-				Actions = [ SendPackage(s1), NextStep(s1) ], 
-				Data = new DefaultWorkflowDataCollection<Invoice> 
-				{ 
-					Name = "Скан возврата", 
-					Description = "", 
-					Collection = new List<Invoice>
-					{
-						new Invoice
-						{
-							Date = DateTime.UtcNow.AddDays(-1),
-							WorkflowId = workflowId,
-							StepId = s1,
-							InvoiceNumber = "SESZH: должен быть, как у родительского воркфлоу",
-							Counterparty = "Аналогично",
-							ContractNumber = "Аналогично",
-							//Name = "Аналогично",
-							Lines = scanData.Select(l => new InvoiceLine
-							{
-								ProductName = l.Name,
-								Quantity = l.Quantity,
-								Units = l.Units,
-								Barcode = l.ItemCode,
-								ConstructorName = l.Name,
-								ProductCode = l.ItemCode
-							}).ToList(),
-						}
-					}
-				}
+			new()
+			{
+				Id = s1,
+				WorkflowId = workflowId,
+				StepCode = "Scan-01",
+				Type = WorkflowStepType.Scan,
+				Name = "Скан возврата",
+				Description = "",
+				Order = 1,
+				Actions = [ SendPackage(s1), NextStep(s1) ],
+				Data = null
 			},
-			new() {
+			new()
+			{
 				Id = s2,
 				WorkflowId = workflowId,
 				StepCode = "Verify-02",
@@ -417,27 +306,7 @@ public static class MockDbSeeder
 				Description = "",
 				Order = 2,
 				Actions = [ NextStep(s2), PrevStep(s2) ],
-				Data = new DefaultWorkflowDataCollection<InvoiceCheckout>
-				{
-					Name = "Проверка качества",
-					Description = "",
-						Collection = new List<InvoiceCheckout>
-						{
-							new InvoiceCheckout
-							{
-								WorkflowId = workflowId,
-								InvoiceNumber = "SESZH: должен быть, как у родительского воркфлоу",
-								Counterparty = "Аналогично",
-								ContractNumber = "Аналогично",
-								Date = DateTime.UtcNow.AddDays(-1),
-								StepId = s2,
-								TotalItems = -1,
-								AcceptedItems = -1,
-								MissingItems = -1,
-								ExtraItems = -1,
-							}
-						}
-				}
+				Data = null
 			},
 			new() 
 			{ 
@@ -449,12 +318,7 @@ public static class MockDbSeeder
 				Description = "", 
 				Order = 3, 
 				Actions = [PrevStep(s3), CompleteWorkflow(s3) ], 
-				Data = new DefaultWorkflowDataCollection<Invoice> 
-				{ 
-					Name = "Приём", 
-					Description = "", 
-					Collection = new List<Invoice>(),
-				}
+				Data = null
 			}
 		};
 	}
@@ -516,12 +380,6 @@ public static class MockDbSeeder
 		Description = "Отмена процесса",
 		RouteParams = [],
 	};
-	private static List<DataItemInventory> SeedInboundItems() => [
-		new() { Id = Guid.NewGuid(), Name = "Ноутбук Dell XPS", Description = "",     ItemCode = "LAP-DX13", Quantity = 48,  Price = 1890.00m, Units = "шт", Tags = ["electronics", "new"] },
-		new() { Id = Guid.NewGuid(), Name = "Монитор 27\" 4K",   Description = "",     ItemCode = "MON-4K27", Quantity = 120, Price = 420.75m,  Units = "шт", Tags = ["display"] },
-		new() { Id = Guid.NewGuid(), Name = "Клавиатура механическая", Description = "", ItemCode = "KEY-MK02", Quantity = 200, Price = 89.90m,  Units = "шт" }
-	];
-
 	//private static List<DataItemInventory> SeedOutboundItems() => [
 	//	new() { Id = Guid.NewGuid(), Name = "Смартфон Galaxy S24",   Description = "", ItemCode = "PHN-S24",  Quantity = 15,  Price = 799.00m, Units = "шт", Tags = ["mobile", "hot"] },
 	//	new() { Id = Guid.NewGuid(), Name = "Беспроводные наушники", Description = "", ItemCode = "EAR-BW01", Quantity = 65,  Price = 149.00m, Units = "шт" },
@@ -534,10 +392,6 @@ public static class MockDbSeeder
 	//	new() { Id = Guid.NewGuid(), Name = "Сахар-песок 5 кг",   Description = "",    ItemCode = "SUG-005",  Quantity = 0,   Price = 3.99m,   Units = "меш" }
 	//];
 
-	private static List<DataItemInventory> SeedReturnItems() => [
-		new() { Id = Guid.NewGuid(), Name = "Пылесос робот",        Description = "",  ItemCode = "VAC-ROB2", Quantity = 7,   Price = 320.00m, Units = "шт", Tags = ["return"] },
-		new() { Id = Guid.NewGuid(), Name = "Фен профессиональный", Description = "",  ItemCode = "DRY-PRO",  Quantity = 4,   Price = 115.00m, Units = "шт", Tags = ["used"] }
-	];
 	private static Dictionary<string, WorkflowType> SeedWorkflowTypes(WorkflowsDbContext context)
 {
     var types = new[]

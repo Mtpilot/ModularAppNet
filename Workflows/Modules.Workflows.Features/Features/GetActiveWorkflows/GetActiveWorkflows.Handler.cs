@@ -3,15 +3,13 @@ using Microsoft.Extensions.Logging;
 using Modules.Common.API.Abstractions.Links;
 using Modules.Common.Domain.Handlers;
 using Modules.Common.Domain.Results;
-using Modules.Workflows.Features.Features.Shared.Responses;
-using Modules.Workflows.Infrastructure.Helpers;
+using Modules.Workflows.PublicApi.Responses;
 using Modules.Workflows.MockInfrastructure.Database;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Text.Json;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using HttpMethod = Modules.Common.API.Abstractions.Links.HttpMethod;
+using Modules.Workflows.PublicApi.InfrastructureQueryInterfaces;
+using Modules.Workflows.PublicApi.Contracts;
+using Modules.Workflows.Domain.Entities;
 
 namespace Modules.Workflows.Features.Features.GetActiveWorkflows;
 
@@ -26,13 +24,12 @@ internal interface IGetActiveWorkflowsHandler : IHandler
 internal sealed class GetActiveWorkflowsHandler(
 	WorkflowsDbContext context,
 	ILogger<GetActiveWorkflowsHandler> logger,
-	ILinkService linkService) : IGetActiveWorkflowsHandler
+	ILinkService linkService,
+    IMockTmpHelper mockTmpHelper) : IGetActiveWorkflowsHandler
 {
 	public async Task<Result<List<WorkflowShortInfoResponse>>> HandleAsync(string workflowTypeCode, CancellationToken cancellationToken)
 	{
 		logger.LogInformation("Getting active workflows");
-
-        logger.LogInformation("Getting active workflows");
 
         var workflows = await context.Workflows
             .Include(x => x.Type)
@@ -42,7 +39,7 @@ internal sealed class GetActiveWorkflowsHandler(
         var response = new List<WorkflowShortInfoResponse>();
         foreach (var workflow in workflows)
         {
-            workflow.Data = await MockTmpHelper.GetMockInvoiceHeadersFromInMemoryDb(context, workflow.Id, cancellationToken);
+            workflow.Data = new DefaultWorkflowDataCollection<InvoiceHeaderDto> { Name = "InvoiceHeaders", Description = "Collection of invoice headers", Collection = await mockTmpHelper.GetMockInvoiceHeadersFromInMemoryDb(workflow.Id, cancellationToken) };
           
             var getWorkflowLink = linkService.Generate("GetWorkflow", new { workflowCode = workflow.Code }, $"Get {workflowTypeCode} workflow data", HttpMethod.GET);
 

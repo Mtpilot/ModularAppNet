@@ -1,17 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Modules.Common.API.Abstractions;
 using Modules.Common.API.Extensions;
-using Modules.Workflows.Features.Features.Shared.Requests;
-using Modules.Workflows.Features.Features.Shared.Responses;
-using Modules.Workflows.Features.Features.Shared.Routes;
+using Modules.Workflows.PublicApi.Requests;
+using Modules.Workflows.PublicApi.Responses;
+using Modules.Barcoding.Features.Features.Shared.Routes;
 
-namespace Modules.Workflows.Features.Features.SendScannedBarcodes;
+namespace Modules.Barcoding.Features.Features.SendScannedBarcodes;
 
 #pragma warning disable MA0049 // Type name should not match containing namespace
 public class SendScannedBarcodes : IApiEndpoint

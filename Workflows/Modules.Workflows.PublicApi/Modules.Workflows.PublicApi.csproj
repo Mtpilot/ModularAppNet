@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\Modules.Common.API\Modules.Common.API.csproj" />
+    <ProjectReference Include="..\Modules.Workflows.Domain\Modules.Workflows.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -12,7 +12,7 @@ public static class DependencyInjection
 {
 	public static IServiceCollection AddWorkflowsMockInfrastructure(this IServiceCollection services)
 	{
-		services.AddSingleton<SqliteConnection>(_ =>
+		services.AddKeyedSingleton<SqliteConnection>("Workflows", (_, _) =>
 		{
 			var connection = new SqliteConnection("Filename=:memory:");
 			connection.Open();
@@ -21,7 +21,7 @@ public static class DependencyInjection
 
 		services.AddDbContext<WorkflowsDbContext>((sp, opt) =>
 		{
-			var connection = sp.GetRequiredService<SqliteConnection>();
+			var connection = sp.GetRequiredKeyedService<SqliteConnection>("Workflows");
 			opt.UseSqlite(connection);
 		});
 

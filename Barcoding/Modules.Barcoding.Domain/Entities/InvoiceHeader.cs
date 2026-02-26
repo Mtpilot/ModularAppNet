@@ -1,5 +1,4 @@
-
-namespace Modules.Workflows.Domain.Entities.Application;
+namespace Modules.Barcoding.Domain.Entities;
 
 public class InvoiceHeader
 {

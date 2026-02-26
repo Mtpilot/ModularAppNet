@@ -1,9 +1,11 @@
 using FluentValidation;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
-using Modules.Common.API.Abstractions;
 using Modules.Common.Application.Extensions;
-using Modules.Workflows.Infrastructure.Database;
+using Modules.Workflows.Features.Features.Shared;
+//using Modules.Workflows.Infrastructure.Database;
+using Modules.Workflows.PublicApi;
+using Modules.Workflows.PublicApi.InfrastructureQueryInterfaces;
+using Modules.Workflows.Features.QueryHandlers;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
@@ -26,6 +28,10 @@ public static class WorkflowsModuleRegistration
         services.RegisterHandlersFromAssemblyContaining(typeof(WorkflowsModuleRegistration));
         
         services.AddValidatorsFromAssembly(typeof(WorkflowsModuleRegistration).Assembly);
+
+        services.AddScoped<IGetStepMetadata, GetStepMetadata>();
+        services.AddScoped<IGetWorkflowMetadata, GetWorkflowMetadata>();
+        services.AddScoped<IWorkflowToResponseConverter, WorkflowToResponseConverter>();
 
         return services;
     }

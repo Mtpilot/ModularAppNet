@@ -6,9 +6,10 @@ using Modules.Common.Domain.Results;
 using Modules.Workflows.Domain.Entities;
 using Modules.Workflows.Domain.Errors;
 using Modules.Workflows.Features.Features.Shared.Helpers;
-using Modules.Workflows.Features.Features.Shared.Responses;
-using Modules.Workflows.Infrastructure.Helpers;
+using Modules.Workflows.PublicApi.Responses;
 using Modules.Workflows.MockInfrastructure.Database;
+using Modules.Workflows.PublicApi.InfrastructureQueryInterfaces;
+using Modules.Workflows.PublicApi.Contracts;
 
 namespace Modules.Workflows.Features.Features.PreviousWorkflowStep;
 
@@ -22,7 +23,8 @@ internal interface IWorkflowPreviousStepHandler : IHandler
 internal sealed class WorkflowPreviousStepHandler(
 	ILogger<WorkflowPreviousStepHandler> logger,
 	WorkflowsDbContext context,
-	ILinkService linkService
+	ILinkService linkService,
+    IMockTmpHelper mockTmpHelper
 	) : IWorkflowPreviousStepHandler
 
 {
@@ -56,18 +58,18 @@ internal sealed class WorkflowPreviousStepHandler(
 
 		workflow.SetStepNumber(previousStep.Order);
 		await context.SaveChangesAsync(cancellationToken);
-        var tmpWorkflowData = await MockTmpHelper.GetMockInvoiceHeadersFromInMemoryDb(context, workflow.Id, cancellationToken);
+        var tmpWorkflowData = new DefaultWorkflowDataCollection<InvoiceHeaderDto> { Name = "InvoiceHeaders", Description = "Collection of invoice headers", Collection = await mockTmpHelper.GetMockInvoiceHeadersFromInMemoryDb(workflow.Id, cancellationToken) };
         switch (workflow.CurrentStep().Type) //SESZH: надо срочно доделывать сигнатуры и начинать очистку от этого всего, потом завязну, оно все нарастает
         {
             case WorkflowStepType.Scan:
                 {
-                    var tmpStepData = await MockTmpHelper.GetMockInvoicesFromInMemoryDb(context, workflow.CurrentStep().Id, cancellationToken);
+                    var tmpStepData = new DefaultWorkflowDataCollection<InvoiceDto> { Name = "Invoices", Description = "Collection of invoices", Collection = await mockTmpHelper.GetMockInvoicesFromInMemoryDb(workflow.CurrentStep().Id, cancellationToken) };
                     var wf = workflow.ConvertWorkflowToResponse(linkService, tmpWorkflowData, tmpStepData);
                     return wf;
                 }
             case WorkflowStepType.Verify:
                 {
-                    var tmpStepData = await MockTmpHelper.GetMockInvoiceCheckoutsFromInMemoryDb(context, workflow.CurrentStep().Id, cancellationToken);
+                    var tmpStepData = new DefaultWorkflowDataCollection<InvoiceCheckoutDto> { Name = "InvoiceCheckouts", Description = "Collection of invoice checkouts", Collection = await mockTmpHelper.GetMockInvoiceCheckoutsFromInMemoryDb(workflow.CurrentStep().Id, cancellationToken) };
                     var wf = workflow.ConvertWorkflowToResponse(linkService, tmpWorkflowData, tmpStepData);
                     return wf;
                 }

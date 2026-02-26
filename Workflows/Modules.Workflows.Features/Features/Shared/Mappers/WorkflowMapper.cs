@@ -1,8 +1,7 @@
 using System.Text.Json;
 using Modules.Common.API.Abstractions.Links;
 using Modules.Workflows.Domain.Entities;
-using Modules.Workflows.Domain.Entities.Application;
-using Modules.Workflows.Features.Features.Shared.Responses;
+using Modules.Workflows.PublicApi.Responses;
 using HttpMethod = Modules.Common.API.Abstractions.Links.HttpMethod;
 
 namespace Modules.Workflows.Features.Features.Shared.Mappers;
@@ -21,7 +20,7 @@ internal static class WorkflowMapper
 
 		//TODO: Mapper не подходящий класс для вычисления логики перехода на следующий шаг. Но пока можно оставить
 		var currentStep = workflow.CurrentStep();
-		var nextAvailableStep = workflow.GetNextStep(currentStep.Order);
+		var nextAvailableStep = workflow.GetNextStep();
 
 		return new WorkflowResponse(
 			workflow.Code,

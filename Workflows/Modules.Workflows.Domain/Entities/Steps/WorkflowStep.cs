@@ -17,7 +17,7 @@ public class WorkflowStep //<TEntity> //Сканировать, Проверит
 
 	public required List<WorkflowStepAction> Actions { get; set; }
 	[NotMapped]
-	public IWorkflowDataCollection Data{get; set;}
+	public IWorkflowDataCollection? Data{get; set;}
 }
 public enum WorkflowStepType
 {
