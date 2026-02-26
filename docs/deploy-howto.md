@@ -40,7 +40,8 @@ docker compose up -d --wait
 ```
 
 `--wait` держит команду до тех пор, пока все контейнеры с healthcheck не станут healthy
-(или завершится с ошибкой, если что-то не поднялось).
+(или завершится с ошибкой, если что-то не поднялось). Seq поднимается дольше остальных —
+у него `start_period: 60s`, так что команда будет ждать около минуты.
 
 ---
 
@@ -82,13 +83,13 @@ docker compose up -d --remove-orphans
 
 ## Что где доступно после деплоя
 
-| Сервис | URL |
-|---|---|
-| Frontend / Auth test | https://ru01-vm23.gal.lan/external/mauth/ |
-| Swagger UI | https://ru01-vm23.gal.lan/external/mauth/swagger/ |
-| API | https://ru01-vm23.gal.lan/external/mauth/api/ |
-| Seq (логи) | https://ru01-vm23.gal.lan/external/mauth/seq/ |
-| Jaeger (трейсы) | https://ru01-vm23.gal.lan/external/mauth/jaeger/ |
+| Сервис              | URL                                                  |
+|---------------------|------------------------------------------------------|
+| Frontend / Auth test| https://ru01-vm23.gal.lan/external/mauth/            |
+| Swagger UI          | https://ru01-vm23.gal.lan/external/mauth/swagger/    |
+| API                 | https://ru01-vm23.gal.lan/external/mauth/api/        |
+| Seq (логи)          | https://ru01-vm23.gal.lan/external/mauth/seq/        |
+| Jaeger (трейсы)     | https://ru01-vm23.gal.lan/external/mauth/jaeger/     |
 
 ---
 
