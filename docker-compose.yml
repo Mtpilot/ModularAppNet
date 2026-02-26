@@ -23,7 +23,7 @@ services:
       - shared-network
 
   postgres:
-    image: postgres:17
+    image: postgres:latest
     container_name: mauth_postgres
     environment:
       - TZ
@@ -31,7 +31,7 @@ services:
       - POSTGRES_PASSWORD=secretpassword
       - POSTGRES_DB=modular_monolith
     volumes:
-      - ./docker_data/pgdata:/var/lib/postgresql/data
+      - ./docker_data/pgdata:/var/lib/postgresql
     ports:
       - "5450:5432"
     restart: always
