@@ -26,7 +26,8 @@ internal static class WorkflowMapper
 			workflow.Code,
 			workflow.Type.Code,
 			workflow.Name,
-			workflow.Description)
+			workflow.Description,
+			workflow.IsActive)
 		{
 			DataSchema = dataSchema,
 			Data = null,
@@ -57,7 +58,8 @@ internal static class WorkflowMapper
 			workflow.Code,
 			workflow.Type.Code,
 			workflow.Name,
-			workflow.Description)
+			workflow.Description,
+			workflow.IsActive)
 		{
 			CurrentStepType = currentStep.Type.ToString(),
 			CurrentStepName = currentStep.Name,

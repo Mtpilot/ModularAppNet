@@ -6,7 +6,7 @@ using Modules.Barcoding.MockInfrastructure.Database;
 
 namespace Modules.Barcoding.MockInfrastructure;
 
-internal static class MockDbSeeder
+public static class MockDbSeeder
 {
     public static void Seed(BarcodingDbContext context)
     {

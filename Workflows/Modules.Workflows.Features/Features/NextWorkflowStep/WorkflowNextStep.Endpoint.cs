@@ -17,7 +17,7 @@ public sealed class WorkflowNextStepEndpoint : IApiEndpoint
 			.WithName("WorkflowNextStep")
 			.WithTags("Workflow group")
 			.WithSummary("Transfer workflow to NextStep")
-			.WithDescription("Переводим воркфлоу на другой шаг (например из шага \"Сканирования товара\", на шаг \"Проверка накладной\") ")
+			.WithDescription("РџРµСЂРµРІРѕРґРёРј РІРѕСЂРєС„Р»РѕСѓ РЅР° РґСЂСѓРіРѕР№ С€Р°Рі (РЅР°РїСЂРёРјРµСЂ РёР· С€Р°РіР° \"РЎРєР°РЅРёСЂРѕРІР°РЅРёСЏ С‚РѕРІР°СЂР°\", РЅР° С€Р°Рі \"РџСЂРѕРІРµСЂРєР° РЅР°РєР»Р°РґРЅРѕР№\")") //SESZH: РёР· РІСЃРµС… РјРµСЃС‚ СЃР»РµС‚РµР»Р° РєРѕРґРёСЂРѕРІРєР° РўРћР›Р¬РљРћ Р·РґРµСЃСЊ Рё РІРёРґРЅРѕ СЌС‚Рѕ РўРћР›Р¬РљРћ РІ РєСѓСЂСЃРѕСЂРµ, РІ VS РІСЃРµ РІ РїРѕСЂСЏРґРєРµ
 			.Produces<List<WorkflowResponse>>(StatusCodes.Status200OK);
 		
 	}

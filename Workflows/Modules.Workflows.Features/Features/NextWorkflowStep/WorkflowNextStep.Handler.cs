@@ -64,6 +64,7 @@ internal sealed class WorkflowNextStepHandler(
         switch (workflow.CurrentStep().Type) //SESZH: надо срочно доделывать сигнатуры и начинать очистку от этого всего, потом завязну, оно все нарастает
         {
             case WorkflowStepType.Scan:
+			case WorkflowStepType.Accept:
                 {
                     var tmpStepData = new DefaultWorkflowDataCollection<InvoiceDto> { Name = "Invoices", Description = "Collection of invoices", Collection = await mockTmpHelper.GetMockInvoicesFromInMemoryDb(workflow.CurrentStep().Id, cancellationToken) };
                     var wf = workflow.ConvertWorkflowToResponse(linkService, tmpWorkflowData, tmpStepData);
@@ -79,9 +80,4 @@ internal sealed class WorkflowNextStepHandler(
                 throw new NotSupportedException("Current step type not supported");
         }
     }
-
-
-	//This is a sample workflow for demonstration purposes.
-	
-
 }

@@ -9,8 +9,9 @@ public sealed record WorkflowResponse(
 	string WorkflowCode,
 	string WorkflowTypeCode,
 	string Name,
-	string Description)
-	: WorkflowBaseInfoResponse(WorkflowCode, WorkflowTypeCode, Name, Description)
+	string Description, 
+	bool IsActive)
+	: WorkflowBaseInfoResponse(WorkflowCode, WorkflowTypeCode, Name, Description, IsActive)
 {
 	public required WorkflowStepResponse CurrentStep { get; init; }
 	public required IList<WorkflowStepShortInfoResponse> WorkflowSteps { get; init; }

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Modules.Barcoding.MockInfrastructure.Database;
 
 public static class DbConsts

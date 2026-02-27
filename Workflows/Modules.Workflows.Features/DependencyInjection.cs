@@ -32,6 +32,7 @@ public static class WorkflowsModuleRegistration
         services.AddScoped<IGetStepMetadata, GetStepMetadata>();
         services.AddScoped<IGetWorkflowMetadata, GetWorkflowMetadata>();
         services.AddScoped<IWorkflowToResponseConverter, WorkflowToResponseConverter>();
+        services.AddScoped<IDropMockDb, DropMockDb>();
 
         return services;
     }

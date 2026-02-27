@@ -46,7 +46,7 @@ internal sealed class GetActiveWorkflowsHandler(
             var currentStep = workflow.CurrentStep();
             
 
-            var wf = new WorkflowShortInfoResponse(workflow.Code, workflowTypeCode, workflow.Name, workflow.Description)
+            var wf = new WorkflowShortInfoResponse(workflow.Code, workflowTypeCode, workflow.Name, workflow.Description, workflow.IsActive)
             {
                 CurrentStepName = currentStep?.Name ?? string.Empty,
                 CurrentStepType = workflow.CurrentStepType.ToString(),

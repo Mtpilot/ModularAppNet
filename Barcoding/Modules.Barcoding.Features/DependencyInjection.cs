@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Modules.Barcoding.Features.Helpers;
+using Modules.Barcoding.Features.QueryHandlers;
 using Modules.Workflows.PublicApi.InfrastructureQueryInterfaces;
 using Modules.Common.Application.Extensions;
 
@@ -21,6 +22,7 @@ public static class BarcodingModuleRegistration
         services.RegisterHandlersFromAssemblyContaining(typeof(BarcodingModuleRegistration));
         //services.AddValidatorsFromAssembly(typeof(BarcodingModuleRegistration).Assembly);
         services.AddScoped<IMockTmpHelper, MockTmpHelper>();
+        services.AddScoped<IDropMockDb, DropMockDb>();
         return services;
     }
 }

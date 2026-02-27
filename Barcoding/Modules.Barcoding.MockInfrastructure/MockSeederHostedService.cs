@@ -13,9 +13,6 @@ internal sealed class MockSeederHostedService(IServiceProvider serviceProvider) 
 		var db = scope.ServiceProvider.GetRequiredService<BarcodingDbContext>();
 
 		await db.Database.EnsureCreatedAsync(ct);
-		var tableNames = await db.Database
-	.SqlQueryRaw<string>("SELECT name FROM sqlite_master WHERE type='table'")
-	.ToListAsync(ct);
 		MockDbSeeder.Seed(db);
 	}
 
