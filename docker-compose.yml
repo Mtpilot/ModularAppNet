@@ -1,40 +1,47 @@
 services:
-  shipping-modular-monolith:
+  app:
     image: shipping-modular-monolith
-    container_name: shipping-modular-monolith
+    container_name: mauth_app
     build:
       context: .
       dockerfile: ./ModularMonolith.Host/Dockerfile
     ports:
       - "5000:8080"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_ENVIRONMENT=Development
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
       - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
       - OTEL_EXPORTER_OTLP_HEADERS=X-Seq-ApiKey=abcde12345
     restart: always
+    depends_on:
+      seq:
+        condition: service_started
+      jaeger:
+        condition: service_started
     networks:
       - docker-web
+      - shared-network
 
   postgres:
     image: postgres:latest
-    container_name: postgres
+    container_name: mauth_postgres
     environment:
       - TZ
-      - POSTGRES_USER=admin 
-      - POSTGRES_PASSWORD=admin
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=secretpassword
       - POSTGRES_DB=modular_monolith
     volumes:
-      - ./docker_data/pgdata:/var/lib/postgresql/data
+      - ./docker_data/pgdata:/var/lib/postgresql
     ports:
-      - "5432:5432"
+      - "5450:5432"
     restart: always
     networks:
       - docker-web
-      
+      - shared-network
+
   seq:
     image: datalust/seq:2024.3
-    container_name: seq
+    container_name: mauth_seq
     restart: always
     environment:
       - ACCEPT_EULA=Y
@@ -43,21 +50,44 @@ services:
     ports:
       - "5341:5341"
       - "8081:80"
+    healthcheck:
+      # В образе нет curl/wget; проверка через bash /dev/tcp (порт 80 — UI/API)
+      test: ["CMD-SHELL", "timeout 2 bash -c 'echo >/dev/tcp/127.0.0.1/80' || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
     networks:
       - docker-web
+      - shared-network
 
   jaeger:
     image: jaegertracing/all-in-one:latest
-    container_name: jaeger
+    container_name: mauth_jaeger
     restart: always
     ports:
       - 4317:4317
       - 4318:4318
       - 16686:16686
     networks:
-        - docker-web
-    
+      - docker-web
+      - shared-network
+
+  front:
+    image: mauth-front
+    container_name: mauth_front
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8082:80"
+    networks:
+      - docker-web
+      - shared-network
 
 networks:
   docker-web:
     driver: bridge
+  shared-network:
+    external: true

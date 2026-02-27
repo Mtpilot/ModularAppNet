@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>MAuth – README (RU)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px 24px 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        h1, h2, h3 {
+            color: #333;
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        a {
+            color: #3366cc;
+        }
+
+        code {
+            background: #f0f0f0;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: Consolas, Menlo, Monaco, monospace;
+        }
+
+        pre {
+            background: #f0f0f0;
+            padding: 10px 12px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        .back-link {
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../" class="back-link">← Назад на панель MAuth</a>
+
+        <h1>Modular Monolith Template (перевод README)</h1>
+
+        <h2>Описание проекта</h2>
+        <p>
+            Этот проект — современный, хорошо структурированный шаблон для построения поддерживаемых
+            модульных монолитных приложений на .NET. Он демонстрирует, как организовать код в отдельные
+            модули, которые слабо связаны между собой, но развёртываются как одно приложение.
+        </p>
+        <p>
+            Шаблон показывает корректное моделирование домена, чистое разделение ответственности и
+            продуманный подход к межмодульному взаимодействию — без излишнего усложнения.
+            Подробное введение см. в статье
+            <a href="https://antondevtips.com/blog/building-a-modular-monolith-with-vertical-slice-architecture-in-dotnet" target="_blank">
+                Building a Modular Monolith with Vertical Slice Architecture in .NET
+            </a>.
+        </p>
+
+        <h2>Модули</h2>
+        <p>Приложение состоит из 4 основных модулей:</p>
+        <ul>
+            <li><strong>Users Module</strong>: аутентификация и авторизация пользователей с использованием JWT-токенов.</li>
+            <li><strong>Shipments Module</strong>: управление полным жизненным циклом отправлений от создания до доставки.</li>
+            <li><strong>Carriers Module</strong>: управление перевозчиками (службами доставки).</li>
+            <li><strong>Stocks Module</strong>: учёт товарных запасов и доступности.</li>
+        </ul>
+        <p>
+            <strong>Common Packages</strong>: общие библиотеки, утилиты и интерфейсы, используемые во всех модулях.
+        </p>
+
+        <h2>Взаимодействие модулей</h2>
+        <ul>
+            <li>
+                <strong>Shipments Module</strong> обращается к модулям Carriers и Stocks для проверки существования
+                перевозчиков и доступности товаров.
+            </li>
+            <li>
+                <strong>Поток аутентификации</strong>: модули Shipments, Carriers и Stocks требуют аутентифицированного пользователя,
+                но не вызывают напрямую Users-модуль. Пользователь получает JWT и refresh-токен из Users-модуля и использует
+                их для авторизации запросов в другие модули.
+            </li>
+        </ul>
+        <p>
+            Подробнее об этом:
+            <a href="https://antondevtips.com/blog/how-to-implement-refresh-tokens-and-token-revocation-in-aspnetcore" target="_blank">
+                How to Implement Refresh Tokens and Token Revocation in ASP.NET Core
+            </a>
+            и
+            <a href="https://antondevtips.com/blog/authentication-and-authorization-best-practices-in-aspnetcore" target="_blank">
+                Authentication and Authorization Best Practices in ASP.NET Core
+            </a>.
+        </p>
+
+        <h2>NuGet-пакеты</h2>
+        <ul>
+            <li><strong>FluentValidation</strong>: удобное построение типобезопасных правил валидации.</li>
+            <li><strong>Entity Framework Core</strong>: ORM для доступа к базе данных с чистым разделением уровня хранения.</li>
+            <li><strong>ASP.NET Core</strong>: веб-фреймворк для REST API (используются Minimal APIs).</li>
+            <li><strong>OpenTelemetry</strong>: метрики, логи и трейсы для наблюдаемости.</li>
+            <li><strong>Swagger/OpenAPI</strong>: генерация документации API с интерактивным UI.</li>
+        </ul>
+
+        <h2>Docker-окружение</h2>
+        <p>Проект использует Docker Compose для запуска всех необходимых сервисов:</p>
+        <ul>
+            <li><strong>shipping-modular-monolith</strong>: основной контейнер приложения (./ModularMonolith.Host/Dockerfile).</li>
+            <li><strong>postgres</strong>: база PostgreSQL для всех модулей.</li>
+            <li><strong>seq</strong>: платформа структурированного логирования.</li>
+            <li><strong>jaeger</strong>: система распределённой трассировки.</li>
+        </ul>
+
+        <h3>Запуск</h3>
+        <ol>
+            <li>Установить Docker и Docker Compose.</li>
+            <li>Перейти в корень проекта.</li>
+            <li>Выполнить <code>docker-compose up -d</code>.</li>
+            <li>Открыть Swagger по адресу <code>http://localhost:5000/swagger</code>.</li>
+            <li>Открыть Seq по адресу <code>http://localhost:8081</code>.</li>
+            <li>Открыть Jaeger по адресу <code>http://localhost:16686</code>.</li>
+        </ol>
+
+        <h2>Структура проекта</h2>
+        <ul>
+            <li><strong>/src/ModularMonolith.Host</strong>: точка входа приложения, конфигурация и запуск модулей.</li>
+            <li><strong>/src/Common</strong>: общие абстракции, расширения и утилиты.</li>
+            <li><strong>/src/Users</strong>: аутентификация и управление пользователями.</li>
+            <li><strong>/src/Carriers</strong>: управление перевозчиками.</li>
+            <li><strong>/src/Stocks</strong>: управление запасами.</li>
+            <li><strong>/src/Shipments</strong>: обработка и отслеживание отправлений.</li>
+        </ul>
+
+        <h2>Основные API-эндпоинты</h2>
+        <h3>Users Module</h3>
+        <ul>
+            <li><code>POST /api/users/register</code> — регистрация пользователя.</li>
+            <li><code>POST /api/users/login</code> — логин и получение JWT.</li>
+        </ul>
+
+        <h3>Carriers Module</h3>
+        <ul>
+            <li><code>POST /api/carriers</code> — создать перевозчика.</li>
+            <li><code>GET /api/carriers/{name}</code> — получить перевозчика по имени.</li>
+        </ul>
+
+        <h3>Stocks Module</h3>
+        <ul>
+            <li><code>POST /api/stocks</code> — создать запись о запасе.</li>
+            <li><code>GET /api/stocks/{productName}</code> — получить запас по имени товара.</li>
+        </ul>
+
+        <h3>Shipments Module</h3>
+        <ul>
+            <li><code>POST /api/shipments</code> — создать отправление.</li>
+            <li><code>GET /api/shipments/{number}</code> — получить отправление по номеру.</li>
+            <li><code>POST /api/shipments/process/{number}</code> — перевести в статус <em>processing</em>.</li>
+            <li><code>POST /api/shipments/dispatch/{number}</code> — статус <em>dispatched</em>.</li>
+            <li><code>POST /api/shipments/transit/{number}</code> — статус <em>in-transit</em>.</li>
+            <li><code>POST /api/shipments/deliver/{number}</code> — статус <em>delivered</em>.</li>
+            <li><code>POST /api/shipments/receive/{number}</code> — статус <em>received</em>.</li>
+            <li><code>POST /api/shipments/cancel/{number}</code> — отмена отправления.</li>
+        </ul>
+
+        <h2>Тесты</h2>
+        <p>В проекте есть как модульные, так и интеграционные тесты:</p>
+        <ul>
+            <li>Юнит-тесты: доменные правила, обработчики use case, валидация и т.п.</li>
+            <li>Интеграционные тесты: полный путь от HTTP-запроса до базы данных, проверка happy-path и ошибок.</li>
+        </ul>
+
+        <h2>Архитектура</h2>
+        <p>
+            Проект комбинирует Vertical Slice Architecture и Clean Architecture:
+        </p>
+        <ul>
+            <li><strong>Vertical Slices</strong>: фичи организованы по бизнес-функциональности, а не по слоям.</li>
+            <li><strong>Clean Architecture</strong>: доменная модель изолирована от инфраструктуры.</li>
+        </ul>
+        <p>
+            Основные решения:
+        </p>
+        <ul>
+            <li>Ручные хендлеры вместо MediatR для упрощения.</li>
+            <li>Прямое использование EF Core без дополнительных Repository/Unit of Work абстракций.</li>
+            <li>Явное маппирование DTO ↔ доменные объекты.</li>
+            <li>Result-паттерн вместо исключений для ошибок бизнес-логики.</li>
+        </ul>
+
+        <h2>Наблюдаемость</h2>
+        <ul>
+            <li><strong>OpenTelemetry</strong> — метрики, логи и трассировка.</li>
+            <li><strong>Seq</strong> — централизованное структурированное логирование.</li>
+            <li><strong>Jaeger</strong> — визуализация распределённых трассировок.</li>
+        </ul>
+
+        <h2>Конфигурация для разработки</h2>
+        <ul>
+            <li><strong>.editorconfig</strong> — единый стиль кода.</li>
+            <li><strong>Directory.Build.props</strong> — общие настройки сборки, анализаторы, правила стиля.</li>
+            <li><strong>Directory.Packages.props</strong> — централизованное управление версиями пакетов.</li>
+        </ul>
+
+        <p>
+            Оригинальный репозиторий:
+            <a href="https://github.com/gifted2be/dotnet-ModularMonolith-template" target="_blank">
+                github.com/gifted2be/dotnet-ModularMonolith-template
+            </a>
+        </p>
+    </div>
+</body>
+</html>
+
