@@ -3,6 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Modules.Barcoding.MockInfrastructure;
 using Modules.Barcoding.MockInfrastructure.Database;
 using Microsoft.Data.Sqlite;
+using Modules.Barcoding.MockInfrastructure.Policies;
+using Modules.Common.Infrastructure.Policies;
 
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -25,7 +27,7 @@ public static class DependencyInjection
         });
 
         services.AddHostedService<MockSeederHostedService>();
-
+        services.AddSingleton<IPolicyFactory, BarcodingPolicyFactory>();
         return services;
     }
 }

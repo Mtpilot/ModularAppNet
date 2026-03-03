@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Modules.Common.API.Abstractions;
 using Modules.Common.API.Extensions;
 using Modules.Workflows.Features.Features.Shared.Routes;
+using Modules.Workflows.Domain.Policies;
+using Modules.Workflows.PublicApi.Responses;
 
 namespace Modules.Workflows.Features.Features.GetWorkflow;
 
@@ -16,7 +18,11 @@ public class GetWorkflowEndpoint : IApiEndpoint
 	{
 		app.MapGet(RouteConsts.GetWorkflow, Handle)
 			.WithName("GetWorkflow")
-			.WithTags("Workflow group");
+			.WithTags("Workflow group")
+			.WithSummary("Get workflow by code")
+			.WithDescription("Получить workflow по коду")
+			.RequireAuthorization(WorkflowPolicyConsts.ReadPolicy)
+			.Produces<WorkflowResponse>(StatusCodes.Status200OK);
 	}
 
 	private static async Task<IResult> Handle(

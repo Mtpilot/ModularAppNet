@@ -6,6 +6,7 @@ using Modules.Common.API.Extensions;
 using Modules.Workflows.PublicApi.Requests;
 using Modules.Workflows.PublicApi.Responses;
 using Modules.Barcoding.Features.Features.Shared.Routes;
+using Modules.Barcoding.Domain.Policies;
 
 namespace Modules.Barcoding.Features.Features.SendScannedBarcodes;
 
@@ -20,6 +21,7 @@ public class SendScannedBarcodes : IApiEndpoint
 			.WithTags("Workflow group")
 			.WithSummary("Send scanned barcodes with quantities")
 			.WithDescription("Отправить отсканированные штрих-коды с количествами.")
+			.RequireAuthorization(BarcodingPolicyConsts.UpdatePolicy)
 			.Produces<WorkflowResponse>(StatusCodes.Status200OK)
 			;
 	}

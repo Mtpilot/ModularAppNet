@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Modules.Common.Infrastructure.Database;
 using Modules.Common.Infrastructure.Policies;
 using Modules.Workflows.Infrastructure.Database;
-//using Modules.Workflows.Infrastructure.Policies;
+using Modules.Workflows.Infrastructure.Policies;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
@@ -21,7 +21,7 @@ public static class DependencyInjection
         );
         
         services.AddScoped<IModuleDatabaseMigrator, WorkflowsDatabaseMigrator>();
-        //services.AddSingleton<IPolicyFactory, WorkflowsPolicyFactory>();
+        services.AddSingleton<IPolicyFactory, WorkflowsPolicyFactory>();
 
         return services;
     }

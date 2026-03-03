@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Modules.Common.API.Abstractions;
 using Modules.Common.API.Extensions;
+using Modules.Workflows.Domain.Policies;
 using Modules.Workflows.Features.Features.Shared.Routes;
 
 namespace Modules.Workflows.Features.Features.CancelWorkflow;
@@ -16,6 +17,7 @@ public class CancelWorkflowEndpoint : IApiEndpoint
 			.WithTags("Workflow management")
 			.WithSummary("Cancel an active workflow")
 			.WithDescription("Отмена активного workflow")
+			.RequireAuthorization(WorkflowPolicyConsts.UpdatePolicy)
 			.Produces(StatusCodes.Status204NoContent);
 	}
 

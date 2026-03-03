@@ -6,6 +6,7 @@ using Modules.Common.API.Abstractions;
 using Modules.Common.API.Extensions;
 using Modules.Workflows.PublicApi.Responses;
 using Modules.Workflows.Features.Features.Shared.Routes;
+using Modules.Workflows.Domain.Policies;
 
 namespace Modules.Workflows.Features.Features.GetActiveWorkflows;
 
@@ -18,6 +19,7 @@ public class GetActiveWorkflowsEndpoint : IApiEndpoint
 			.WithTags("Workflow group")
 			.WithSummary("Get all active workflow")
 			.WithDescription("Получить весь список активных воркфлоу одного типа.")
+			.RequireAuthorization(WorkflowPolicyConsts.ReadPolicy)
 			.Produces<List<WorkflowShortInfoResponse>>(StatusCodes.Status200OK);
 	}
 

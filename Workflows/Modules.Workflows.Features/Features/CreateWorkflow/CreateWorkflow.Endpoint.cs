@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Modules.Common.API.Abstractions;
 using Modules.Common.API.Extensions;
+using Modules.Workflows.Domain.Policies;
 using Modules.Workflows.Features.Features.Shared.Routes;
 using Modules.Workflows.PublicApi.Requests;
 using Modules.Workflows.PublicApi.Responses;
@@ -19,6 +20,7 @@ public class CreateWorkflowEndpoint : IApiEndpoint
 			.WithTags("Workflow management")
 			.WithSummary("Create a new workflow")
 			.WithDescription("Создание нового workflow с начальным шагом")
+			.RequireAuthorization(WorkflowPolicyConsts.CreatePolicy)
 			.Produces<WorkflowResponse>(StatusCodes.Status200OK);
 	}
 

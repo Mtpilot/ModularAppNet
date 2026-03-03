@@ -4,30 +4,32 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Modules.Common.API.Abstractions;
 using Modules.Common.API.Extensions;
+using Modules.Workflows.Domain.Policies;
 using Modules.Workflows.Features.Features.Shared.Routes;
 using Modules.Workflows.PublicApi.Responses;
 
 namespace Modules.Workflows.Features.Features.NextWorkflowStep;
 
-public sealed class WorkflowNextStepEndpoint : IApiEndpoint
+public sealed class NextWorkflowStepEndpoint : IApiEndpoint
 {
 	public void MapEndpoint(WebApplication app)
 	{
 		app.MapPatch(RouteConsts.NextStep, Handle)
-			.WithName("WorkflowNextStep")
+			.WithName("NextWorkflowStep")
 			.WithTags("Workflow group")
 			.WithSummary("Transfer workflow to NextStep")
 			.WithDescription("Переводим воркфлоу на другой шаг (например из шага \"Сканирования товара\", на шаг \"Проверка накладной\")") //SESZH: из всех мест слетела кодировка ТОЛЬКО здесь и видно это ТОЛЬКО в курсоре, в VS все в порядке
-			.Produces<List<WorkflowResponse>>(StatusCodes.Status200OK);
+			.RequireAuthorization(WorkflowPolicyConsts.UpdatePolicy)
+			.Produces<WorkflowResponse>(StatusCodes.Status200OK);
 		
 	}
 
 	private static async Task<IResult> Handle(
 		string workflowCode,
-		IWorkflowNextStepHandler handler,
+		INextWorkflowStepHandler handler,
 		CancellationToken cancellationToken)
 	{
-		var command = new WorkflowNextStepCommand(workflowCode);
+		var command = new NextWorkflowStepCommand(workflowCode);
 		var response = await handler.HandleAsync(command, cancellationToken);
 		if (response.IsError)
 		{

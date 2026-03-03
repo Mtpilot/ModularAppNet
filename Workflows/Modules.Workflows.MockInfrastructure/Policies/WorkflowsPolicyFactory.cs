@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Modules.Common.Infrastructure.Policies;
 using Modules.Workflows.Domain.Policies;
 
-namespace Modules.Workflows.Infrastructure.Policies;
+    namespace Modules.Workflows.MockInfrastructure.Policies;
 
 public sealed class WorkflowsPolicyFactory : IPolicyFactory
 {

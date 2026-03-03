@@ -13,23 +13,23 @@ using Modules.Workflows.PublicApi.Contracts;
 
 namespace Modules.Workflows.Features.Features.PreviousWorkflowStep;
 
-internal sealed record WorkflowPreviousStepCommand(string Code);
+internal sealed record PreviousWorkflowStepCommand(string Code);
 
-internal interface IWorkflowPreviousStepHandler : IHandler
+internal interface IPreviousWorkflowStepHandler : IHandler
 {
-	Task<Result<WorkflowResponse>> HandleAsync(WorkflowPreviousStepCommand request, CancellationToken cancellationToken);
+	Task<Result<WorkflowResponse>> HandleAsync(PreviousWorkflowStepCommand request, CancellationToken cancellationToken);
 }
 
-internal sealed class WorkflowPreviousStepHandler(
-	ILogger<WorkflowPreviousStepHandler> logger,
+internal sealed class PreviousWorkflowStepHandler(
+	ILogger<PreviousWorkflowStepHandler> logger,
 	WorkflowsDbContext context,
 	ILinkService linkService,
     IMockTmpHelper mockTmpHelper
-	) : IWorkflowPreviousStepHandler
+	) : IPreviousWorkflowStepHandler
 
 {
 #pragma warning disable MA0051 // Method is too long
-	public async Task<Result<WorkflowResponse>> HandleAsync(WorkflowPreviousStepCommand request, CancellationToken cancellationToken)
+	public async Task<Result<WorkflowResponse>> HandleAsync(PreviousWorkflowStepCommand request, CancellationToken cancellationToken)
 #pragma warning restore MA0051 // Method is too long
 	{
 		logger.LogInformation("Advancing workflow {WorkflowCode} from step", request.Code);

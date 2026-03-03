@@ -5,6 +5,7 @@ using Modules.Common.Infrastructure.Policies;
 using Modules.Workflows.MockInfrastructure;
 using Modules.Workflows.MockInfrastructure.Database;
 using Microsoft.Data.Sqlite;
+using Modules.Workflows.MockInfrastructure.Policies;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -26,6 +27,7 @@ public static class DependencyInjection
 		});
 
 		services.AddHostedService<MockSeederHostedService>();
+		services.AddSingleton<IPolicyFactory, WorkflowsPolicyFactory>();
 
 		return services;
 	}

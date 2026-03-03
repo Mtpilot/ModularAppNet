@@ -1,14 +1,16 @@
-﻿
+
 using System.Security.Claims;
 using Bogus;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Modules.Carriers.Domain.Policies;
+using Modules.Barcoding.Domain.Policies;
 using Modules.Shipments.Domain.Policies;
 using Modules.Stocks.Domain.Policies;
 using Modules.Users.Domain.Policies;
 using Modules.Users.Domain.Users;
 using Modules.Users.Infrastructure.Database;
+using Modules.Workflows.Domain.Policies;
 
 namespace ModularMonolith.Host.Seeding;
 
@@ -75,6 +77,18 @@ public class UserSeedService(
         await roleManager.AddClaimAsync(adminRole, new Claim(StockPolicyConsts.CreatePolicy, "true"));
         await roleManager.AddClaimAsync(adminRole, new Claim(StockPolicyConsts.UpdatePolicy, "true"));
         await roleManager.AddClaimAsync(adminRole, new Claim(StockPolicyConsts.DeletePolicy, "true"));
+
+        // Workflows module permissions
+        await roleManager.AddClaimAsync(adminRole, new Claim(WorkflowPolicyConsts.ReadPolicy, "true"));
+        await roleManager.AddClaimAsync(adminRole, new Claim(WorkflowPolicyConsts.CreatePolicy, "true"));
+        await roleManager.AddClaimAsync(adminRole, new Claim(WorkflowPolicyConsts.UpdatePolicy, "true"));
+        await roleManager.AddClaimAsync(adminRole, new Claim(WorkflowPolicyConsts.DeletePolicy, "true"));
+
+        // Barcoding module permissions
+        await roleManager.AddClaimAsync(adminRole, new Claim(BarcodingPolicyConsts.ReadPolicy, "true"));
+        await roleManager.AddClaimAsync(adminRole, new Claim(BarcodingPolicyConsts.CreatePolicy, "true"));
+        await roleManager.AddClaimAsync(adminRole, new Claim(BarcodingPolicyConsts.UpdatePolicy, "true"));
+        await roleManager.AddClaimAsync(adminRole, new Claim(BarcodingPolicyConsts.DeletePolicy, "true"));
     }
 
     private async Task ConfigureManagerRolePermissions(Role managerRole)
@@ -111,7 +125,7 @@ public class UserSeedService(
             Email = "manager@test.com",
             UserName = "manager@test.com"
         };
-
+		
         await userManager.CreateAsync(managerUser, "Test1234!");
         await userManager.AddToRoleAsync(managerUser, "Manager");
     }
