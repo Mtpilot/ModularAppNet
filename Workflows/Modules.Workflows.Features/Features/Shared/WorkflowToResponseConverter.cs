@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using Modules.Workflows.PublicApi.Contracts;
 using Modules.Common.API.Abstractions.Links;
 using Modules.Workflows.Domain.Entities;
 using Modules.Workflows.MockInfrastructure.Database;
 using Modules.Workflows.PublicApi;
-using Modules.Workflows.PublicApi.Contracts;
 using Modules.Workflows.PublicApi.Responses;
 using Modules.Workflows.Features.Features.Shared.Helpers;
 
@@ -14,18 +14,18 @@ internal sealed class WorkflowToResponseConverter(WorkflowsDbContext context) : 
 	public async Task<WorkflowResponse> ConvertAsync(
 		string workflowCode,
 		ILinkService linkService,
-		IReadOnlyList<InvoiceHeaderDto> workflowData,
-		IReadOnlyList<InvoiceDto> stepData,
+		IReadOnlyList<IBaseWorkflowDataDto> workflowData,
+		IReadOnlyList<IBaseStepDataDto> stepData,
 		CancellationToken cancellationToken = default)
 	{
 		var workflow = await LoadWorkflowAsync(workflowCode, cancellationToken);
-		var workflowDataCol = new DefaultWorkflowDataCollection<InvoiceHeaderDto>
+		var workflowDataCol = new WorkflowDataCollection<IBaseWorkflowDataDto>
 		{
 			Name = "InvoiceHeaders",
 			Description = "Collection of invoice headers",
 			Collection = workflowData.ToList()
 		};
-		var stepDataCol = new DefaultWorkflowDataCollection<InvoiceDto>
+		var stepDataCol = new WorkflowDataCollection<IBaseStepDataDto>
 		{
 			Name = "Invoices",
 			Description = "Collection of invoices",
@@ -34,28 +34,28 @@ internal sealed class WorkflowToResponseConverter(WorkflowsDbContext context) : 
 		return workflow.ConvertWorkflowToResponse(linkService, workflowDataCol, stepDataCol);
 	}
 
-	public async Task<WorkflowResponse> ConvertAsync(
-		string workflowCode,
-		ILinkService linkService,
-		IReadOnlyList<InvoiceHeaderDto> workflowData,
-		IReadOnlyList<InvoiceCheckoutDto> stepData,
-		CancellationToken cancellationToken = default)
-	{
-		var workflow = await LoadWorkflowAsync(workflowCode, cancellationToken);
-		var workflowDataCol = new DefaultWorkflowDataCollection<InvoiceHeaderDto>
-		{
-			Name = "InvoiceHeaders",
-			Description = "Collection of invoice headers",
-			Collection = workflowData.ToList()
-		};
-		var stepDataCol = new DefaultWorkflowDataCollection<InvoiceCheckoutDto>
-		{
-			Name = "InvoiceCheckouts",
-			Description = "Collection of invoice checkouts",
-			Collection = stepData.ToList()
-		};
-		return workflow.ConvertWorkflowToResponse(linkService, workflowDataCol, stepDataCol);
-	}
+	//public async Task<WorkflowResponse> ConvertAsync(
+	//	string workflowCode,
+	//	ILinkService linkService,
+	//	IReadOnlyList<IBaseWorkflowDataDto> workflowData,
+	//	IReadOnlyList<IBaseStepDataDto> stepData,
+	//	CancellationToken cancellationToken = default)
+	//{
+	//	var workflow = await LoadWorkflowAsync(workflowCode, cancellationToken);
+	//	var workflowDataCol = new WorkflowDataCollection<IBaseWorkflowDataDto>
+	//	{
+	//		Name = "InvoiceHeaders",
+	//		Description = "Collection of invoice headers",
+	//		Collection = workflowData.ToList()
+	//	};
+	//	var stepDataCol = new WorkflowDataCollection<IBaseStepDataDto>
+	//	{
+	//		Name = "InvoiceCheckouts",
+	//		Description = "Collection of invoice checkouts",
+	//		Collection = stepData.ToList()
+	//	};
+	//	return workflow.ConvertWorkflowToResponse(linkService, workflowDataCol, stepDataCol);
+	//}
 
 	private async Task<Workflow> LoadWorkflowAsync(string workflowCode, CancellationToken cancellationToken)
 	{

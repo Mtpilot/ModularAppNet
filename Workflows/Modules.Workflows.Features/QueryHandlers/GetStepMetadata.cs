@@ -13,7 +13,7 @@ namespace Modules.Workflows.Features.QueryHandlers
             {
                 return null;
             }
-            return new StepMetadata(step.Id, step.StepCode, step.Order);
+            return new StepMetadata(step.Id, step.StepCode, step.Order, step.Type.ToString());
         }
     }
 }

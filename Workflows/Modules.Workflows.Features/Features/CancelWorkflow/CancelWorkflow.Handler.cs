@@ -46,13 +46,5 @@ internal sealed class CancelWorkflowHandler(
 
 		logger.LogInformation("Workflow with code {Code} was cancelled", workflowCode);
 		return Result.Success;
-	}	
-
-
-	private sealed class WorkflowDataCollection : IWorkflowDataCollection<Dictionary<string, object>>
-	{
-		public string Name { get; set; } = "Data";
-		public string Description { get; set; } = "Workflow data";
-		public ICollection<Dictionary<string, object>> Collection { get; set; } = new List<Dictionary<string, object>>();
 	}
 }

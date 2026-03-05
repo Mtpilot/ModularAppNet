@@ -103,7 +103,7 @@ internal static class WorkflowMapper
 					.ToList(),
 				NextStep = nextStep != null
 					? linkService.Generate(
-						"WorkflowNextStep",
+						"NextWorkflowStep",
 						new { workflowCode = workflowCode },
 						"Move to Next Step",
 						HttpMethod.PATCH)

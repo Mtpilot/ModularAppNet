@@ -7,6 +7,7 @@ using Modules.Workflows.PublicApi;
 using Modules.Workflows.PublicApi.Requests;
 using Modules.Workflows.PublicApi.Responses;
 using Modules.Barcoding.MockInfrastructure.Database;
+using Modules.Barcoding.Features.Contracts;
 using Modules.Workflows.PublicApi.InfrastructureQueryInterfaces;
 using Modules.Workflows.PublicApi.Errors;
 using Modules.Barcoding.Domain.Errors;
@@ -46,14 +47,23 @@ internal sealed class SendScannedBarcodesHandler(
         {
             return WorkflowErrors.StepNotFound(stepCode);
         }
-
-
+		//SESZH: надо подумать над проверками, а тут работать через типы шагов
 		if(workflow.CurrentStepId != step.Id)
 		{
 			return WorkflowErrors.WrongStep(workflow.Code, workflow.CurrentStepType, "SendScannedBarcodes");
 		}
+		//SESZH: надо подумать над вынесением енума типа, чтобы не было строк
+		if(workflow.CurrentStepType != "Scan")
+		{
+			return WorkflowErrors.WrongStep(workflow.Code, workflow.CurrentStepType, "SendScannedBarcodes");
+		}
 
-		var nextStep = workflow?.Steps.FirstOrDefault(s => s.Order == step.Order + 1); //SESZH: пока мы уверены, что шаг подтверждения будет следующим - будет так
+		if(step.Type != "Scan")
+		{
+			return WorkflowErrors.WrongStep(workflow.Code, workflow.CurrentStepType, "SendScannedBarcodes");
+		}
+
+		var nextStep = workflow?.Steps.FirstOrDefault(s => s.Type == "Verify"); //SESZH: пока мы уверены, что у шагов такие типы и такой порядок.
 		if (nextStep is null)
 		{
 			return WorkflowErrors.NextStepNotFound(workflowCode, stepCode);
@@ -61,8 +71,13 @@ internal sealed class SendScannedBarcodesHandler(
 
 
 
-		var stepData = await mockTmpHelper.GetMockInvoicesFromInMemoryDb(step.Id, cancellationToken);
-        if (stepData is null)
+		var stepData = await mockTmpHelper.GetMockStepDataFromInMemoryDb(step.Id, step.Type, cancellationToken);
+		if (stepData is null || stepData.Count == 0)
+		{
+			return DataErrors.StepDataNotFound(workflowCode, stepCode);
+		}
+
+		if (stepData[0] is not InvoiceDto scanStepData)
 		{
 			return DataErrors.StepDataNotFound(workflowCode, stepCode);
 		}
@@ -73,7 +88,7 @@ internal sealed class SendScannedBarcodesHandler(
 			return DataErrors.NextStepDataNotFound(workflowCode, nextStep.StepCode);
 		}
 
-		var lines = stepData[0].lines;
+		var lines = scanStepData.lines;
 		var payloadByBarcode = body
 			.GroupBy(p => p.Barcode, StringComparer.OrdinalIgnoreCase)
 			.ToDictionary(g => g.Key, g => g.Sum(p => p.Quantity), StringComparer.OrdinalIgnoreCase);
@@ -112,8 +127,8 @@ internal sealed class SendScannedBarcodesHandler(
 
 		await context.SaveChangesAsync(cancellationToken);
 
-		var tmpWorkflowData = await mockTmpHelper.GetMockInvoiceHeadersFromInMemoryDb(workflow.Id, cancellationToken);
-		var tmpNextStepData = await mockTmpHelper.GetMockInvoiceCheckoutsFromInMemoryDb(workflow.NextStepId, cancellationToken);
+		var tmpWorkflowData = await mockTmpHelper.GetMockWorkflowDataFromInMemoryDb(workflow.Id, cancellationToken);
+		var tmpNextStepData = await mockTmpHelper.GetMockStepDataFromInMemoryDb(nextStep.Id, nextStep.Type, cancellationToken);
 		var response = await workflowToResponseConverter.ConvertAsync(workflowCode, linkService, tmpWorkflowData, tmpNextStepData, cancellationToken);
 		return response;
 	}

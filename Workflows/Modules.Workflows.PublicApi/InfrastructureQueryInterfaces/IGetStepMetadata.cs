@@ -8,7 +8,8 @@ public interface IGetStepMetadata
 public record StepMetadata(
 	Guid Id,
 	string StepCode,
-	int Order
+	int Order,
+	string Type
 	//string Name,
 	//string Description,
 	//string Type,

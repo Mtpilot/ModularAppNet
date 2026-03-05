@@ -16,17 +16,17 @@ public interface IWorkflowToResponseConverter
 	Task<WorkflowResponse> ConvertAsync(
 		string workflowCode,
 		ILinkService linkService,
-		IReadOnlyList<InvoiceHeaderDto> workflowData,
-		IReadOnlyList<InvoiceDto> stepData,
+		IReadOnlyList<IBaseWorkflowDataDto> workflowData,
+		IReadOnlyList<IBaseStepDataDto> stepData,
 		CancellationToken cancellationToken = default);
 
-	/// <summary>
-	/// Loads workflow by code and builds response with checkout step data.
-	/// </summary>
-	Task<WorkflowResponse> ConvertAsync(
-		string workflowCode,
-		ILinkService linkService,
-		IReadOnlyList<InvoiceHeaderDto> workflowData,
-		IReadOnlyList<InvoiceCheckoutDto> stepData,
-		CancellationToken cancellationToken = default);
+	///// <summary>
+	///// Loads workflow by code and builds response with checkout step data.
+	///// </summary>
+	//Task<WorkflowResponse> ConvertAsync(
+	//	string workflowCode,
+	//	ILinkService linkService,
+	//	IReadOnlyList<IBaseWorkflowDataDto> workflowData,
+	//	IReadOnlyList<IBaseStepDataDto> stepData,
+	//	CancellationToken cancellationToken = default);
 }

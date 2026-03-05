@@ -341,7 +341,7 @@ public static class MockDbSeeder
 		Name = "Next",
 		Type = "GoToNextStep",
 		HttpMethod = "PATCH",
-		Endpoint = "WorkflowNextStep",
+		Endpoint = "NextWorkflowStep",
 		Description = "",
 		RouteParams = [],
 	};

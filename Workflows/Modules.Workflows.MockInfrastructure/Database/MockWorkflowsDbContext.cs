@@ -7,8 +7,6 @@ public class WorkflowsDbContext(DbContextOptions<WorkflowsDbContext> options) : 
 {
 	public DbSet<Workflow> Workflows { get; set; }
 	public DbSet<WorkflowStep> WorkflowSteps { get; set; }
-	//public DbSet<WorkflowStepAction> WorkflowStepActions { get; set; }
-	//public DbSet<DataItemInventory> WorkflowDataItemInventory { get; set; }
 	public DbSet<WorkflowType> WorkflowTypes { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -17,8 +15,6 @@ public class WorkflowsDbContext(DbContextOptions<WorkflowsDbContext> options) : 
 
 		modelBuilder.Entity<WorkflowStep>()
 			.Ignore(x => x.Data);
-
-
 
 		modelBuilder.Entity<WorkflowStepAction>()
 			.Ignore(e => e.RouteParams);

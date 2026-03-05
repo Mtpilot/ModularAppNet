@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using Modules.Common.Domain.Collections;
 
 namespace Modules.Workflows.Domain.Entities;
 
-public interface IWorkflowDataCollection
-{
-	string Name { get; set; } //e.g., "Спецификации"
-	string Description { get; set; }// Содержит коллекцию документов (в частном случае спецификации)
+/// <summary>
+/// Специализация коллекции данных для Workflow.
+/// Наследует базовую абстракцию из Common.
+/// </summary>
+public interface IWorkflowDataCollection : ICommonDataCollection;
 
-}
-public interface IWorkflowDataCollection<TEntity>: IWorkflowDataCollection//TEntity - e.g., Invoce(Specification)
-{
-	
-
-	ICollection<TEntity> Collection { get; set; }
-}
+/// <summary>
+/// Типизированная коллекция данных Workflow.
+/// Наследует базовую абстракцию из Common.
+/// </summary>
+/// <typeparam name="TEntity">Тип элемента коллекции (например, InvoiceHeaderDto, InvoiceDto).</typeparam>
+public interface IWorkflowDataCollection<TEntity> : ICommonDataCollection<TEntity>, IWorkflowDataCollection; //TEntity - e.g., Invoce(Specification)
