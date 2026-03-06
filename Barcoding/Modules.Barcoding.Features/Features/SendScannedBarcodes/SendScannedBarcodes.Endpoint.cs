@@ -3,21 +3,19 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Modules.Common.API.Abstractions;
 using Modules.Common.API.Extensions;
-using Modules.Workflows.PublicApi.Requests;
 using Modules.Workflows.PublicApi.Responses;
 using Modules.Barcoding.Features.Features.Shared.Routes;
 using Modules.Barcoding.Domain.Policies;
+using Modules.Barcoding.Features.Requests;
 
 namespace Modules.Barcoding.Features.Features.SendScannedBarcodes;
 
-#pragma warning disable MA0049 // Type name should not match containing namespace
-public class SendScannedBarcodes : IApiEndpoint
-#pragma warning restore MA0049 // Type name should not match containing namespace
+public class SendScannedBarcodesApiEndpoint : IApiEndpoint
 {
 	public void MapEndpoint(WebApplication app)
 	{
 		app.MapPatch(RouteConsts.SendScannedBarcodes, Handle)
-			.WithName("SendScannedBarcodes")
+			.WithName(EndpointConsts.SendScannedBarcodes)
 			.WithTags("Workflow group")
 			.WithSummary("Send scanned barcodes with quantities")
 			.WithDescription("Отправить отсканированные штрих-коды с количествами.")
@@ -29,7 +27,7 @@ public class SendScannedBarcodes : IApiEndpoint
 	private static async Task<IResult> Handle(
 		[FromRoute] string workflowCode,
 		[FromRoute] string stepCode,
-		[FromBody] List<ScannedBarcodePayload> scannedBarcodes,
+		[FromBody] List<ScannedBarcodesPayload> scannedBarcodes,
 		ISendScannedBarcodesHandler handler,
 		CancellationToken cancellationToken)
 	{

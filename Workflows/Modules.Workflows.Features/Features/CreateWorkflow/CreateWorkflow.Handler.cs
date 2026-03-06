@@ -50,7 +50,7 @@ internal sealed class CreateWorkflowHandler(
 
         logger.LogInformation("Created workflow with code '{Code}'", workflowCode);
 
-		var response = workflow.ToPartialResponse(new WorkflowStepDataSchema
+		var response = workflow.ToPartialResponse(workflow.CurrentStep(), workflow.GetNextStep(), new WorkflowStepDataSchema //SESZH: сомнительно тащить его сюда
         {
             Version = "1.0",
             DataType = workflow.Type.Code,
@@ -78,7 +78,6 @@ internal sealed class CreateWorkflowHandler(
 			Name = request.Name,
 			Description = request.Description,
 			IsActive = true,
-			CurrentStepType = firstStep.Type,
 			CurrentStepNumber = 1,
 			Data = null,
             //new DefaultWorkflowDataCollection<InvoiceHeader>
@@ -122,7 +121,7 @@ internal sealed class CreateWorkflowHandler(
 				Id = step1Id,
 				WorkflowId = workflowId,
 				StepCode = "Scan-01",
-				Type = WorkflowStepType.Scan,
+				Type = "Scan",
 				Name = "Шаг сканирования",
 				Description = "Сканирование товара",
 				Order = 1,
@@ -164,7 +163,7 @@ internal sealed class CreateWorkflowHandler(
 				Id = step2Id,
 				WorkflowId = workflowId,
 				StepCode = "Verify-02",
-				Type = WorkflowStepType.Verify,
+				Type = "Verify",
 				Name = "Шаг проверки",
 				Description = "Проверка количества",
 				Order = 2,
@@ -176,7 +175,7 @@ internal sealed class CreateWorkflowHandler(
 				Id = step3Id,
 				WorkflowId= workflowId,
 				StepCode = "Accept-03",
-				Type = WorkflowStepType.Accept,
+				Type = "Accept",
 				Name = "Шаг приемки",
 				Description = "Подтверждение приемки",
 				Order = 3,

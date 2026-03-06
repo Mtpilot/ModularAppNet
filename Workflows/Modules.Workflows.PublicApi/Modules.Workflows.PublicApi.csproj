@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Modules.Common.API\Modules.Common.API.csproj" />
-    <ProjectReference Include="..\Modules.Workflows.Domain\Modules.Workflows.Domain.csproj" />
+    <ProjectReference Include="..\Modules.Workflows.Domain\Modules.Workflows.Domain.csproj" PrivateAssets ="All"/> <!--SESZH: добавил, чтобы убрать транзитивные зависимости. Иначе Barcoding имеет доступ к домену воркфлоу-->
   </ItemGroup>
 
 </Project>

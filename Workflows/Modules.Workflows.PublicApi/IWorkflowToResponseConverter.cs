@@ -19,14 +19,4 @@ public interface IWorkflowToResponseConverter
 		IReadOnlyList<IBaseWorkflowDataDto> workflowData,
 		IReadOnlyList<IBaseStepDataDto> stepData,
 		CancellationToken cancellationToken = default);
-
-	///// <summary>
-	///// Loads workflow by code and builds response with checkout step data.
-	///// </summary>
-	//Task<WorkflowResponse> ConvertAsync(
-	//	string workflowCode,
-	//	ILinkService linkService,
-	//	IReadOnlyList<IBaseWorkflowDataDto> workflowData,
-	//	IReadOnlyList<IBaseStepDataDto> stepData,
-	//	CancellationToken cancellationToken = default);
 }

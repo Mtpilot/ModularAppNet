@@ -8,12 +8,12 @@ using Modules.Workflows.Features.Features.Shared.Routes;
 
 namespace Modules.Workflows.Features.Features.CancelWorkflow;
 
-public class CancelWorkflowEndpoint : IApiEndpoint
+public class CancelWorkflowApiEndpoint : IApiEndpoint
 {
 	public void MapEndpoint(WebApplication app)
 	{
 		app.MapPost(RouteConsts.CancelWorkflow, Handle)
-			.WithName("CancelWorkflow")
+			.WithName(EndpointConsts.CancelWorkflow)
 			.WithTags("Workflow management")
 			.WithSummary("Cancel an active workflow")
 			.WithDescription("Отмена активного workflow")

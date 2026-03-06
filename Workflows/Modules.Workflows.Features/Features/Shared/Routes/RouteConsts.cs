@@ -19,5 +19,5 @@ internal static class RouteConsts
 	internal const string CompleteWorkflow = $"{BaseRoute}/{{workflowCode}}/complete";
 	internal const string NextStep = $"{BaseRoute}/{{workflowCode}}/next/";
 	internal const string PreviousStep = $"{BaseRoute}/{{workflowCode}}/previous/";
-	internal const string DropMockDB = $"{BaseRoute}/dropmockdb";
+	internal const string DropMockDb = $"{BaseRoute}/dropmockdb";
 }

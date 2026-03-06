@@ -8,15 +8,16 @@ using Modules.Workflows.Domain.Policies;
 using Modules.Workflows.Features.Features.Shared.Routes;
 using Modules.Workflows.PublicApi.Requests;
 using Modules.Workflows.PublicApi.Responses;
+using Modules.Workflows.Features.Features.Shared.Routes;
 
 namespace Modules.Workflows.Features.Features.CreateWorkflow;
 
-public class CreateWorkflowEndpoint : IApiEndpoint
+public class CreateWorkflowApiEndpoint : IApiEndpoint
 {
 	public void MapEndpoint(WebApplication app)
 	{
 		app.MapPost(RouteConsts.CreateWorkflow, Handle)
-			.WithName("CreateWorkflow")
+			.WithName(EndpointConsts.CreateWorkflow)
 			.WithTags("Workflow management")
 			.WithSummary("Create a new workflow")
 			.WithDescription("Создание нового workflow с начальным шагом")

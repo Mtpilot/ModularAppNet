@@ -10,12 +10,12 @@ using Modules.Workflows.Domain.Policies;
 
 namespace Modules.Workflows.Features.Features.GetActiveWorkflows;
 
-public class GetActiveWorkflowsEndpoint : IApiEndpoint
+public class GetActiveWorkflowsApiEndpoint : IApiEndpoint
 {
 	public void MapEndpoint(WebApplication app)
 	{
 		app.MapGet(RouteConsts.GetActiveWorkflows, Handle)
-			.WithName("GetActiveWorkflows")
+			.WithName(EndpointConsts.GetActiveWorkflows)
 			.WithTags("Workflow group")
 			.WithSummary("Get all active workflow")
 			.WithDescription("Получить весь список активных воркфлоу одного типа.")

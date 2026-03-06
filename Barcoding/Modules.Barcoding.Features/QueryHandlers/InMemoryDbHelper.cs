@@ -4,18 +4,17 @@ using Modules.Workflows.PublicApi.InfrastructureQueryInterfaces;
 using Modules.Workflows.PublicApi.Contracts;
 using Microsoft.EntityFrameworkCore;
 
-namespace Modules.Barcoding.Features.Helpers;
+namespace Modules.Barcoding.Features.QueryHandlers;
 
-//Временный класс для моков.
-//SESZH: Есть мысль уже переименовать его из временного и для моков в постоянный. Все-таки он в своем модуле, и вполне решает задачу: "достать данные из бд". Оставлю темповым моковым, пока не определимся лучше с хранением данных
-public class MockTmpHelper(BarcodingDbContext context) : IMockTmpHelper
+//Временный класс для моков. //Бывший MockTmpHelper
+public class InMemoryDbHelper(BarcodingDbContext context) : IInMemoryDbHelper
 {
-	public async Task<List<IBaseWorkflowDataDto>> GetMockWorkflowDataFromInMemoryDb(Guid workflowId, CancellationToken cancellationToken)
+	public async Task<List<IBaseWorkflowDataDto>> GetWorkflowDataFromInMemoryDb(Guid workflowId, CancellationToken cancellationToken)
 	{
 		var headers = await context.Invoices.Where(x => x.WorkflowId == workflowId).Select(x => new InvoiceHeaderDto(x.InvoiceNumber, x.Counterparty, x.ContractNumber, x.Date)).ToListAsync(cancellationToken);
 		return headers.Cast<IBaseWorkflowDataDto>().ToList();
 	}
-	public async Task<List<IBaseStepDataDto>> GetMockStepDataFromInMemoryDb(Guid stepId, string stepType, CancellationToken cancellationToken)
+	public async Task<List<IBaseStepDataDto>> GetStepDataFromInMemoryDb(Guid stepId, string stepType, CancellationToken cancellationToken)
 	{
 		return stepType switch
 		{

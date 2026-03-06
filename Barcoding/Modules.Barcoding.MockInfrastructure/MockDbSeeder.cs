@@ -70,7 +70,7 @@ public static class MockDbSeeder
         {
             WorkflowId = workflowId,
             StepId = stepId,
-            InvoiceNumber = Guid.NewGuid().ToString(),
+            InvoiceNumber = $"№000000-{Guid.NewGuid().ToString()[..2].ToUpperInvariant()}",
             Counterparty = counterparty,
             ContractNumber = contractNumber,
             Date = date,
@@ -108,7 +108,7 @@ public static class MockDbSeeder
         {
             WorkflowId = workflowId,
             StepId = stepId,
-            InvoiceNumber = Guid.NewGuid().ToString(),
+            InvoiceNumber = $"№000000-{Guid.NewGuid().ToString()[..2].ToUpperInvariant()}",
             Counterparty = counterparty,
             ContractNumber = contractNumber,
             Date = date,

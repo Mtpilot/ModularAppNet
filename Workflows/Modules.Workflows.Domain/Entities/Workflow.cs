@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
-using System.Text.Json;
 
 
 using Modules.Workflows.Domain.Serializers;
@@ -14,15 +11,10 @@ public class Workflow//<TEntity, TStepEntity>
 {
 	public required Guid Id { get; set; }
 	public required string Code { get; set; }
-
-	//public required string TypeCode { get; set; }
-
 	public required string Name { get; set; }
 	public required string Description { get; set; }
-
 	public required bool IsActive { get; set; }
 	public required int CurrentStepNumber { get; set; }
-	public required WorkflowStepType CurrentStepType { get; set; }
 	public required WorkflowType Type {get; set;}
 	public required List<WorkflowStep> Steps { get; set; }
 
@@ -32,17 +24,15 @@ public class Workflow//<TEntity, TStepEntity>
 	public IWorkflowDataCollection? Data { get; set; }
 
 	#region Steps
+	public string GetCurrentStepType() => CurrentStep().Type;
 	public string GetCacheKey() => $"workflow:{Code}";
 	public WorkflowStep CurrentStep() => GetStepByOrder(CurrentStepNumber) ?? throw new InvalidOperationException($"Current step with order '{CurrentStepNumber}' not found in workflow '{Code}'.");
-	public WorkflowStep? GetStepByType(WorkflowStepType type) => Steps.FirstOrDefault(step => step.Type == type);
 	public WorkflowStep? GetStepByOrder(int order) =>
 		Steps.FirstOrDefault(step => step.Order == order);
 
 	public WorkflowStep? GetFirstStep()
 	{
 		WorkflowStep? firstStep = null;
-		//SESZH
-		//firstStep = Steps.MinBy(x=> x.Order);
 
 		foreach (var step in Steps)
 		{
@@ -57,8 +47,6 @@ public class Workflow//<TEntity, TStepEntity>
 	public WorkflowStep? GetNextStep()
 	{
 		WorkflowStep? nextStep = null;
-		//SESZH: linq мне показался очевидным, интересно, почему не так?
-		//nextStep = Steps.Where(x=> x.Order> currentOrder).MinBy(x=> x.Order);
 
 		foreach (var step in Steps)
 		{
@@ -74,8 +62,6 @@ public class Workflow//<TEntity, TStepEntity>
 	public WorkflowStep? GetPreviousStep(int currentOrder)
 	{
 		WorkflowStep? previousStep = null;
-		//SESZH: linq мне показался очевидным, интересно, почему не так?
-		//previousStep = Steps.Where(x => x.Order < currentOrder).MaxBy(x => x.Order);
 
 		foreach (var step in Steps)
 		{

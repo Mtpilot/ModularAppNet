@@ -24,13 +24,11 @@ internal sealed class PreviousWorkflowStepHandler(
 	ILogger<PreviousWorkflowStepHandler> logger,
 	WorkflowsDbContext context,
 	ILinkService linkService,
-    IMockTmpHelper mockTmpHelper
+    IInMemoryDbHelper mockTmpHelper
 	) : IPreviousWorkflowStepHandler
 
 {
-#pragma warning disable MA0051 // Method is too long
 	public async Task<Result<WorkflowResponse>> HandleAsync(PreviousWorkflowStepCommand request, CancellationToken cancellationToken)
-#pragma warning restore MA0051 // Method is too long
 	{
 		logger.LogInformation("Advancing workflow {WorkflowCode} from step", request.Code);
 
@@ -58,24 +56,8 @@ internal sealed class PreviousWorkflowStepHandler(
 
 		workflow.SetStepNumber(previousStep.Order);
 		await context.SaveChangesAsync(cancellationToken);
-        var tmpWorkflowData = new WorkflowDataCollection<IBaseWorkflowDataDto> { Name = "InvoiceHeaders", Description = "Collection of invoice headers", Collection = await mockTmpHelper.GetMockWorkflowDataFromInMemoryDb(workflow.Id, cancellationToken) };
-        //switch (workflow.CurrentStep().Type) //SESZH: надо срочно доделывать сигнатуры и начинать очистку от этого всего, потом завязну, оно все нарастает
-        //{
-        //    case WorkflowStepType.Scan:
-		//    case WorkflowStepType.Accept:
-                //{
-                    var tmpStepData = new WorkflowDataCollection<IBaseStepDataDto> { Name = "Invoices", Description = "Collection of invoices", Collection = await mockTmpHelper.GetMockStepDataFromInMemoryDb(workflow.CurrentStep().Id, workflow.CurrentStep().Type.ToString(), cancellationToken) };
-                    var wf = workflow.ConvertWorkflowToResponse(linkService, tmpWorkflowData, tmpStepData);
-                    return wf;
-                //}
-        //    case WorkflowStepType.Verify:
-        //        {
-        //            var tmpStepData = new WorkflowDataCollection<IBaseStepDataDto> { Name = "InvoiceCheckouts", Description = "Collection of invoice checkouts", Collection = await mockTmpHelper.GetMockStepDataFromInMemoryDb(workflow.CurrentStep().Id, cancellationToken) };
-        //            var wf = workflow.ConvertWorkflowToResponse(linkService, tmpWorkflowData, tmpStepData);
-        //            return wf;
-        //        }
-        //    default:
-        //        throw new NotSupportedException("Current step type not supported");
-        //}
+        var workflowData = new WorkflowDataCollection<IBaseWorkflowDataDto> { Name = workflow.Name, Description = workflow.Description, Collection = await mockTmpHelper.GetWorkflowDataFromInMemoryDb(workflow.Id, cancellationToken) };
+		var stepData = new WorkflowDataCollection<IBaseStepDataDto> { Name = previousStep.Name, Description = previousStep.Description, Collection = await mockTmpHelper.GetStepDataFromInMemoryDb(previousStep.Id, previousStep.Type, cancellationToken) };
+		return workflow.ConvertWorkflowToResponse(linkService, workflowData, stepData);	
     }
 }

@@ -9,12 +9,12 @@ using Modules.Workflows.Domain.Policies;
 
 namespace Modules.Workflows.Features.Features.GetWorkflows;
 
-public class GetWorkflowsEndpoint : IApiEndpoint
+public class GetWorkflowsApiEndpoint : IApiEndpoint
 {
     public void MapEndpoint(WebApplication app)
     {
         app.MapGet(RouteConsts.GetWorkflows, Handle)
-            .WithName("GetWorkflows")
+            .WithName(EndpointConsts.GetWorkflows)
             .WithTags("Workflow group")
             .WithSummary("Get workflows by type")
             .WithDescription("Получить список ВСЕХ воркфлоу одного типа. ")

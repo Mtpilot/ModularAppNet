@@ -10,15 +10,15 @@ using Modules.Workflows.PublicApi.Responses;
 
 namespace Modules.Workflows.Features.Features.NextWorkflowStep;
 
-public sealed class NextWorkflowStepEndpoint : IApiEndpoint
+public sealed class NextWorkflowStepApiEndpoint : IApiEndpoint
 {
 	public void MapEndpoint(WebApplication app)
 	{
 		app.MapPatch(RouteConsts.NextStep, Handle)
-			.WithName("NextWorkflowStep")
+			.WithName(EndpointConsts.NextWorkflowStep)
 			.WithTags("Workflow group")
 			.WithSummary("Transfer workflow to NextStep")
-			.WithDescription("Переводим воркфлоу на другой шаг (например из шага \"Сканирования товара\", на шаг \"Проверка накладной\")") //SESZH: из всех мест слетела кодировка ТОЛЬКО здесь и видно это ТОЛЬКО в курсоре, в VS все в порядке
+			.WithDescription("Переводим воркфлоу на другой шаг (например из шага \"Сканирования товара\", на шаг \"Проверка накладной\")")
 			.RequireAuthorization(WorkflowPolicyConsts.UpdatePolicy)
 			.Produces<WorkflowResponse>(StatusCodes.Status200OK);
 		

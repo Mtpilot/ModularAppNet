@@ -10,6 +10,7 @@ using Modules.Workflows.PublicApi.InfrastructureQueryInterfaces;
 using Modules.Workflows.Domain.Entities;
 using Modules.Workflows.Features.Features.Shared.Helpers;
 using Modules.Workflows.PublicApi.Contracts;
+using Modules.Workflows.Features.Features.Shared.Routes;
 
 namespace Modules.Workflows.Features.Features.GetActiveWorkflows;
 
@@ -25,7 +26,7 @@ internal sealed class GetActiveWorkflowsHandler(
 	WorkflowsDbContext context,
 	ILogger<GetActiveWorkflowsHandler> logger,
 	ILinkService linkService,
-    IMockTmpHelper mockTmpHelper) : IGetActiveWorkflowsHandler
+    IInMemoryDbHelper mockTmpHelper) : IGetActiveWorkflowsHandler
 {
 	public async Task<Result<List<WorkflowShortInfoResponse>>> HandleAsync(string workflowTypeCode, CancellationToken cancellationToken)
 	{
@@ -39,19 +40,18 @@ internal sealed class GetActiveWorkflowsHandler(
         var response = new List<WorkflowShortInfoResponse>();
         foreach (var workflow in workflows)
         {
-            var tmpData = new WorkflowDataCollection<IBaseWorkflowDataDto> { Name = "InvoiceHeaders", Description = "Collection of invoice headers", Collection = await mockTmpHelper.GetMockWorkflowDataFromInMemoryDb(workflow.Id, cancellationToken) };
-            workflow.Data = tmpData;
+            var workflowData = new WorkflowDataCollection<IBaseWorkflowDataDto> { Name = workflow.Name, Description = workflow.Description, Collection = await mockTmpHelper.GetWorkflowDataFromInMemoryDb(workflow.Id, cancellationToken) };    
 
-            var getWorkflowLink = linkService.Generate("GetWorkflow", new { workflowCode = workflow.Code }, $"Get {workflowTypeCode} workflow data", HttpMethod.GET);
+            var getWorkflowLink = linkService.Generate(EndpointConsts.GetWorkflow, new { workflowCode = workflow.Code }, $"Get {workflowTypeCode} workflow data", HttpMethod.GET);
 
             var currentStep = workflow.CurrentStep();
 
             var wf = new WorkflowShortInfoResponse(workflow.Code, workflowTypeCode, workflow.Name, workflow.Description, workflow.IsActive)
             {
                 CurrentStepName = currentStep?.Name ?? string.Empty,
-                CurrentStepType = workflow.CurrentStepType.ToString(),
+                CurrentStepType = workflow.GetCurrentStepType(),
                 Links = new List<Link> { getWorkflowLink },
-                Data = WorkflowDataCollectionSerializer.Serialize(tmpData),
+                Data = WorkflowDataCollectionSerializer.Serialize(workflowData),
                 DataSchema = new WorkflowStepDataSchema
                 {
                     Version = "1.0",

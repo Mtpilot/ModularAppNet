@@ -12,12 +12,12 @@ using Modules.Workflows.PublicApi.Responses;
 
 namespace Modules.Workflows.Features.Features.GetWorkflow;
 
-public class GetWorkflowEndpoint : IApiEndpoint
+public class GetWorkflowApiEndpoint : IApiEndpoint
 {
 	public void MapEndpoint(WebApplication app)
 	{
 		app.MapGet(RouteConsts.GetWorkflow, Handle)
-			.WithName("GetWorkflow")
+			.WithName(EndpointConsts.GetWorkflow)
 			.WithTags("Workflow group")
 			.WithSummary("Get workflow by code")
 			.WithDescription("Получить workflow по коду")

@@ -4,19 +4,21 @@ using Modules.Common.API.Abstractions.Links;
 using Modules.Common.Domain.Handlers;
 using Modules.Common.Domain.Results;
 using Modules.Workflows.PublicApi;
-using Modules.Workflows.PublicApi.Requests;
 using Modules.Workflows.PublicApi.Responses;
 using Modules.Barcoding.MockInfrastructure.Database;
 using Modules.Barcoding.Features.Contracts;
 using Modules.Workflows.PublicApi.InfrastructureQueryInterfaces;
 using Modules.Workflows.PublicApi.Errors;
 using Modules.Barcoding.Domain.Errors;
+using Modules.Barcoding.Domain.Enums;
+using Modules.Barcoding.Features.Requests;
+using Modules.Barcoding.Features.Features.Shared.Routes;
 
 namespace Modules.Barcoding.Features.Features.SendScannedBarcodes;
 
 internal interface ISendScannedBarcodesHandler : IHandler
 {
-	Task<Result<WorkflowResponse>> HandleAsync(string workflowCode, string stepCode, List<ScannedBarcodePayload> body, CancellationToken cancellationToken);
+	Task<Result<WorkflowResponse>> HandleAsync(string workflowCode, string stepCode, List<ScannedBarcodesPayload> body, CancellationToken cancellationToken);
 }
 
 
@@ -26,23 +28,23 @@ internal sealed class SendScannedBarcodesHandler(
 	ILinkService linkService,
 	IGetWorkflowMetadata getWorkflowMetadata,
 	IGetStepMetadata getStepMetadata,
-	IMockTmpHelper mockTmpHelper,
+	IInMemoryDbHelper mockTmpHelper,
 	IWorkflowToResponseConverter workflowToResponseConverter
 	) : ISendScannedBarcodesHandler
 {
-	public async Task<Result<WorkflowResponse>> HandleAsync(string workflowCode, string stepCode, List<ScannedBarcodePayload> body, CancellationToken cancellationToken)
+	public async Task<Result<WorkflowResponse>> HandleAsync(string workflowCode, string stepCode, List<ScannedBarcodesPayload> body, CancellationToken cancellationToken)
 	{
 		logger.LogInformation("Sending scanned barcodes for workflow '{WorkflowCode}' and step '{StepCode}'", workflowCode, stepCode);
 
 
-		var workflow = await getWorkflowMetadata.GetWorkflowMetadataByCodeAsync(workflowCode, cancellationToken); // await context.Workflows.Include(w=> w.Type).Include(w => w.Steps).ThenInclude(s=> s.Actions).FirstOrDefaultAsync(w => w.Code == workflowCode, cancellationToken);
+		var workflow = await getWorkflowMetadata.GetWorkflowMetadataByCodeAsync(workflowCode, cancellationToken);
 		if (workflow is null)
 		{
 			return WorkflowErrors.NotFound(workflowCode);
 		}
 
 
-		var step = await getStepMetadata.GetStepMetadataByCodesAsync(workflow.Id, stepCode, cancellationToken); //await context.WorkflowSteps.Include(s=> s.Actions).FirstOrDefaultAsync(x => x.StepCode == stepCode && x.WorkflowId == workflow.Id, cancellationToken);
+		var step = await getStepMetadata.GetStepMetadataByCodesAsync(workflow.Id, stepCode, cancellationToken);
         if (step is null)
         {
             return WorkflowErrors.StepNotFound(stepCode);
@@ -50,28 +52,20 @@ internal sealed class SendScannedBarcodesHandler(
 		//SESZH: надо подумать над проверками, а тут работать через типы шагов
 		if(workflow.CurrentStepId != step.Id)
 		{
-			return WorkflowErrors.WrongStep(workflow.Code, workflow.CurrentStepType, "SendScannedBarcodes");
+			return WorkflowErrors.WrongStep(workflow.Code, workflow.CurrentStepType, EndpointConsts.SendScannedBarcodes);
 		}
-		//SESZH: надо подумать над вынесением енума типа, чтобы не было строк
-		if(workflow.CurrentStepType != "Scan")
+		if(!workflow.CurrentStepType.Equals(nameof(WorkflowStepType.Scan), StringComparison.OrdinalIgnoreCase))
 		{
-			return WorkflowErrors.WrongStep(workflow.Code, workflow.CurrentStepType, "SendScannedBarcodes");
+			return WorkflowErrors.WrongStep(workflow.Code, workflow.CurrentStepType, EndpointConsts.SendScannedBarcodes);
 		}
 
-		if(step.Type != "Scan")
-		{
-			return WorkflowErrors.WrongStep(workflow.Code, workflow.CurrentStepType, "SendScannedBarcodes");
-		}
-
-		var nextStep = workflow?.Steps.FirstOrDefault(s => s.Type == "Verify"); //SESZH: пока мы уверены, что у шагов такие типы и такой порядок.
+		var nextStep = workflow.Steps.FirstOrDefault(s => s.Type.Equals(nameof(WorkflowStepType.Verify), StringComparison.OrdinalIgnoreCase)); //SESZH: теперь это работает только для баркодинга, в котором мы точно знаем, какой у шагов порядок и какие типы
 		if (nextStep is null)
 		{
 			return WorkflowErrors.NextStepNotFound(workflowCode, stepCode);
 		}
 
-
-
-		var stepData = await mockTmpHelper.GetMockStepDataFromInMemoryDb(step.Id, step.Type, cancellationToken);
+		var stepData = await mockTmpHelper.GetStepDataFromInMemoryDb(step.Id, step.Type, cancellationToken);
 		if (stepData is null || stepData.Count == 0)
 		{
 			return DataErrors.StepDataNotFound(workflowCode, stepCode);
@@ -127,8 +121,8 @@ internal sealed class SendScannedBarcodesHandler(
 
 		await context.SaveChangesAsync(cancellationToken);
 
-		var tmpWorkflowData = await mockTmpHelper.GetMockWorkflowDataFromInMemoryDb(workflow.Id, cancellationToken);
-		var tmpNextStepData = await mockTmpHelper.GetMockStepDataFromInMemoryDb(nextStep.Id, nextStep.Type, cancellationToken);
+		var tmpWorkflowData = await mockTmpHelper.GetWorkflowDataFromInMemoryDb(workflow.Id, cancellationToken);
+		var tmpNextStepData = await mockTmpHelper.GetStepDataFromInMemoryDb(nextStep.Id, nextStep.Type, cancellationToken);
 		var response = await workflowToResponseConverter.ConvertAsync(workflowCode, linkService, tmpWorkflowData, tmpNextStepData, cancellationToken);
 		return response;
 	}

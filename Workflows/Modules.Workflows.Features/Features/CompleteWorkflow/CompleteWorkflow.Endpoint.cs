@@ -8,12 +8,12 @@ using Modules.Workflows.Features.Features.Shared.Routes;
 
 namespace Modules.Workflows.Features.Features.CompleteWorkflow;
 
-public class CompleteWorkflowEndpoint : IApiEndpoint
+public class CompleteWorkflowApiEndpoint : IApiEndpoint
 {
 	public void MapEndpoint(WebApplication app)
 	{
 		app.MapPost(RouteConsts.CompleteWorkflow, Handle)
-			.WithName("CompleteWorkflow")
+			.WithName(EndpointConsts.CompleteWorkflow)
 			.WithTags("Workflow management")
 			.WithSummary("Complete a workflow")
 			.WithDescription("Завершение workflow (только если workflow находится на финальном шаге)")

@@ -69,7 +69,7 @@ public static class MockDbSeeder
 				Name = InboundNames[0],
 				Description = "Приёмка и первичная проверка поступившего товара",
 				IsActive = true,
-				CurrentStepType = WorkflowStepType.Scan,
+				//CurrentStepType = nameof(WorkflowStepType.Scan),
 				Type = workflowType,
 				CurrentStepNumber = 1,
 				Data = null,
@@ -82,7 +82,7 @@ public static class MockDbSeeder
 				Name = InboundNames[1],
 				Description = "Приёмка и первичная проверка поступившего товара",
 				IsActive = true,
-				CurrentStepType = WorkflowStepType.Scan,
+				//CurrentStepType = nameof(WorkflowStepType.Scan),
 				Type = workflowType,
 				CurrentStepNumber = 1,
 				Data = null,
@@ -95,7 +95,7 @@ public static class MockDbSeeder
 				Name = InboundNames[2],
 				Description = "Приёмка и первичная проверка поступившего товара",
 				IsActive = false,
-				CurrentStepType = WorkflowStepType.Scan,
+				//CurrentStepType = nameof(WorkflowStepType.Scan),
 				Type = workflowType,
 				CurrentStepNumber = 1,
 				Data = null,
@@ -131,7 +131,7 @@ public static class MockDbSeeder
 			Name = ReturnNames[0],
 				Description = "",
 				IsActive = true,
-				CurrentStepType = WorkflowStepType.Scan,
+				//CurrentStepType = nameof(WorkflowStepType.Scan),
 				Type = workflowType,
 				CurrentStepNumber = 1,
 				Steps = SeedReturnSteps(id1, w1s1, w1s2, w1s3),
@@ -144,7 +144,7 @@ public static class MockDbSeeder
 			Name = ReturnNames[1],
 			Description = "",
 			IsActive = true,
-			CurrentStepType = WorkflowStepType.Scan,
+			//CurrentStepType = nameof(WorkflowStepType.Scan),
 			Type = workflowType,
 			CurrentStepNumber = 1,
 			Steps = SeedReturnSteps(id2, w2s1, w2s2, w2s3),
@@ -157,7 +157,7 @@ public static class MockDbSeeder
 			Name = ReturnNames[2],
 			Description = "",
 			IsActive = true,
-			CurrentStepType = WorkflowStepType.Scan,
+			//CurrentStepType = nameof(WorkflowStepType.Scan),
 			Type = workflowType,
 			CurrentStepNumber = 1,
 			Steps = SeedReturnSteps(id3, w3s1, w3s2, w3s3),
@@ -179,7 +179,7 @@ public static class MockDbSeeder
 				Id = s1,
 				WorkflowId = workflowId,
 				StepCode = "Scan-01",
-				Type = WorkflowStepType.Scan,
+				Type = nameof(WorkflowStepType.Scan),
 				Name = "Сканирование",
 				Order = 1,
 				Description = "Сканируем коробки / паллеты / штуки",
@@ -192,7 +192,7 @@ public static class MockDbSeeder
 				Id = s2,
 				WorkflowId = workflowId,
 				StepCode = "Verify-02",
-				Type = WorkflowStepType.Verify,
+				Type = nameof(WorkflowStepType.Verify),
 				Name = "Проверка",
 				Order = 2,
 				Description = "Сверка фактического кол-ва с документом",
@@ -204,7 +204,7 @@ public static class MockDbSeeder
 				Id = s3, 
 				WorkflowId = workflowId, 
 				StepCode = "Accept-03", 
-				Type = WorkflowStepType.Accept,  
+				Type = nameof(WorkflowStepType.Accept),  
 				Name = "Принятие на склад", 
 				Order = 3, 
 				Description = "Подтверждение и размещение", 
@@ -289,7 +289,7 @@ public static class MockDbSeeder
 				Id = s1,
 				WorkflowId = workflowId,
 				StepCode = "Scan-01",
-				Type = WorkflowStepType.Scan,
+				Type = nameof(WorkflowStepType.Scan),
 				Name = "Скан возврата",
 				Description = "",
 				Order = 1,
@@ -301,7 +301,7 @@ public static class MockDbSeeder
 				Id = s2,
 				WorkflowId = workflowId,
 				StepCode = "Verify-02",
-				Type = WorkflowStepType.Verify,
+				Type = nameof(WorkflowStepType.Verify),
 				Name = "Проверка качества",
 				Description = "",
 				Order = 2,
@@ -313,7 +313,7 @@ public static class MockDbSeeder
 				Id = s3, 
 				WorkflowId = workflowId, 
 				StepCode = "Accept-03", 
-				Type = WorkflowStepType.Accept, 
+				Type = nameof(WorkflowStepType.Accept), 
 				Name = "Приём", 
 				Description = "", 
 				Order = 3, 
@@ -329,7 +329,7 @@ public static class MockDbSeeder
 		Name = "SendData",
 		Type = "SendPackage",
 		HttpMethod = "POST",
-		Endpoint = "SendScannedBarcodes",
+		Endpoint = EndpointConsts.SendScannedBarcodesEndpoint,
 		Description = "Отправка данных шага",
 		RouteParams = [],
 	};
@@ -341,7 +341,7 @@ public static class MockDbSeeder
 		Name = "Next",
 		Type = "GoToNextStep",
 		HttpMethod = "PATCH",
-		Endpoint = "NextWorkflowStep",
+		Endpoint = EndpointConsts.NextWorkflowStepEndpoint,
 		Description = "",
 		RouteParams = [],
 	};
@@ -353,7 +353,7 @@ public static class MockDbSeeder
 		Name = "Prev",
 		Type = "GoToPreviousStep",
 		HttpMethod = "PATCH",
-		Endpoint = "WorkflowPrevStep",
+		Endpoint = EndpointConsts.PreviousWorkflowStepEndpoint,
 		Description = "Предыдущий шаг",
 		RouteParams = [],
 	};
@@ -365,7 +365,7 @@ public static class MockDbSeeder
 		Name = "Complete",
 		Type = "CompleteWorkflow",
 		HttpMethod = "PATCH",
-		Endpoint = "CompleteWorkflow",
+		Endpoint = EndpointConsts.CompleteWorkflowEndpoint,
 		Description = "Завершение процесса",
 		RouteParams = [],
 	};
@@ -376,7 +376,7 @@ public static class MockDbSeeder
 		Name = "Cancel",
 		Type = "CancelWorkflow",
 		HttpMethod = "PATCH",
-		Endpoint = "CancelWorkflow",
+		Endpoint = EndpointConsts.CancelWorkflowEndpoint,
 		Description = "Отмена процесса",
 		RouteParams = [],
 	};
@@ -406,6 +406,24 @@ public static class MockDbSeeder
     context.SaveChanges();
 
     return types.ToDictionary(t => t.Code, t => t);
+}
+
+	private enum WorkflowStepType //SESZH: это для надежности моковых данных, на случай, если добавлю или удалю новые данные
+	{
+		Scan,
+		Verify,
+		Accept,
+	}
+	internal static class EndpointConsts //SESZH: аналогично
+{
+	internal const string GetWorkflowsEndpoint = "GetWorkflows";
+	internal const string GetWorkflowEndpoint = "GetWorkflow";
+	internal const string CreateWorkflowEndpoint = "CreateWorkflow";
+	internal const string CancelWorkflowEndpoint = "CancelWorkflow";
+	internal const string CompleteWorkflowEndpoint = "CompleteWorkflow";
+	internal const string NextWorkflowStepEndpoint = "NextWorkflowStep";
+	internal const string PreviousWorkflowStepEndpoint = "PreviousWorkflowStep";
+	internal const string SendScannedBarcodesEndpoint = "SendScannedBarcodes"; //SESZH: этот здесь, потому что мы в моках
 }
 }
 

@@ -3,6 +3,7 @@ using Modules.Common.API.Abstractions.Links;
 using Modules.Workflows.Domain.Entities;
 using Modules.Workflows.PublicApi.Responses;
 using HttpMethod = Modules.Common.API.Abstractions.Links.HttpMethod;
+using Modules.Workflows.Features.Features.Shared.Routes;
 
 namespace Modules.Workflows.Features.Features.Shared.Mappers;
 
@@ -13,14 +14,16 @@ internal static class WorkflowMapper
 	/// </summary>
 	internal static WorkflowResponse ToPartialResponse(
 		this Workflow workflow,
+		WorkflowStep currentStep,
+		WorkflowStep nextAvailableStep, //SESZH: сомнительно тащить его сюда
 		//JsonElement data, //DefaultWorkflowData<InvoiceHeader> 
 		WorkflowStepDataSchema dataSchema,
 		ILinkService linkService)
 	{
 
 		//TODO: Mapper не подходящий класс для вычисления логики перехода на следующий шаг. Но пока можно оставить
-		var currentStep = workflow.CurrentStep();
-		var nextAvailableStep = workflow.GetNextStep();
+		//var currentStep = workflow.CurrentStep();
+		//var nextAvailableStep = workflow.GetNextStep();
 
 		return new WorkflowResponse(
 			workflow.Code,
@@ -35,7 +38,6 @@ internal static class WorkflowMapper
 				workflow.Code,
 				nextAvailableStep,
 				dataSchema,
-				//JsonElement.Parse(currentStep.DataJson),
 				linkService),
 			WorkflowSteps = workflow.Steps
 				.Select(s => new WorkflowStepShortInfoResponse(s.StepCode, s.Type.ToString(), s.Name, s.Order,  s.Description))
@@ -68,7 +70,7 @@ internal static class WorkflowMapper
 			Links = new List<Link>
 			{
 				linkService.Generate(
-					"GetWorkflow",
+					EndpointConsts.GetWorkflow,
 					new { workflowCode = workflow.Code },
 					"Self",
 					HttpMethod.GET)
@@ -101,9 +103,9 @@ internal static class WorkflowMapper
 						action.Name,
 						action.HttpMethod.ToHttpMethod()))
 					.ToList(),
-				NextStep = nextStep != null
+				NextStep = nextStep != null //SESZH: тут по сути проверка на да/нет, предварительно очень хочется не таскать целый следующий шаг, а просто отдать бул, есть он или нет, результат будет тот же
 					? linkService.Generate(
-						"NextWorkflowStep",
+						EndpointConsts.NextWorkflowStep,
 						new { workflowCode = workflowCode },
 						"Move to Next Step",
 						HttpMethod.PATCH)

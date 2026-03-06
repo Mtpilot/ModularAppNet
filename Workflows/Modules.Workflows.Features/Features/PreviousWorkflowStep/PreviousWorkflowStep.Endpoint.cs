@@ -16,13 +16,13 @@ using Modules.Workflows.Domain.Policies;
 namespace Modules.Workflows.Features.Features.PreviousWorkflowStep;
 
 
-public sealed class PreviousWorkflowStepEndpoint : IApiEndpoint
+public sealed class PreviousWorkflowStepApiEndpoint : IApiEndpoint
 
 {
 	public void MapEndpoint(WebApplication app)
 	{
 		app.MapPatch(RouteConsts.PreviousStep, Handle)
-			.WithName("WorkflowPrevStep")
+			.WithName(EndpointConsts.PreviousWorkflowStep)
 			.WithTags("Workflow group")
 			.WithSummary("Transfer workflow to Previous Step")
 			.WithDescription("Переводим воркфлоу на другой шаг (например из шага \"Сканирования товара\", на шаг \"Проверка накладной\") ")

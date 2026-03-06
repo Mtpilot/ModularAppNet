@@ -1,4 +1,3 @@
-using Modules.Workflows.Domain; //SESZH: выяснить, почему оно не ругается на эту ссылку!!!
 using Modules.Workflows.PublicApi.Contracts;
 
 namespace Modules.Barcoding.Features.Contracts;
