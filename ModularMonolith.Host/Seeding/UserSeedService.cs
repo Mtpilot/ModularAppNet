@@ -1,4 +1,4 @@
-
+﻿
 using System.Security.Claims;
 using Bogus;
 using Microsoft.AspNetCore.Identity;
@@ -23,19 +23,16 @@ public class UserSeedService(
     public async Task SeedUsersAsync()
     {
 	    Randomizer.Seed = new Random(4503);
+		//SESZH: это из-за того, как создаются роли и прописываются права, надо либо базу переоздавать на сервере, либо так 
+		if (await usersContext.Users.AnyAsync()) //SESZH: больше не актуально, я научился пересоздавать базу на стенде, потому что предыдущие действия не помогли
+		{
+		    logger.LogInformation("Users already exist, skipping user seeding");
+		    return;
+		}
 
-        //if (await usersContext.Users.AnyAsync()) //SESZH: это из-за того, как создаются роли и прописываются права, надо либо базу переоздавать на сервере, либо так
-        //{
-        //    logger.LogInformation("Users already exist, skipping user seeding");
-        //    return;
-        //}
-
-        logger.LogInformation("Starting user seeding...");
+		logger.LogInformation("Starting user seeding...");
 		
-        if (!await usersContext.Roles.AnyAsync())
-        {
-            await CreateRolesAsync();
-        }
+        await CreateRolesAsync();
         await CreateUsersAsync();
 
         await usersContext.SaveChangesAsync();
@@ -112,40 +109,31 @@ public class UserSeedService(
 
     private async Task CreateUsersAsync()
     {
-        if (await usersContext.Users.FirstOrDefaultAsync(x => x.Email == "admin@test.com") is null)
-        {
-            var adminUser = new User
-            {
-                Id = Guid.NewGuid().ToString(),
-                Email = "admin@test.com",
-                UserName = "admin@test.com"
-            };
-            await userManager.CreateAsync(adminUser, "Test1234!");
-            await userManager.AddToRoleAsync(adminUser, "Admin");
-        }
-        
-        if (await usersContext.Users.FirstOrDefaultAsync(x => x.Email == "manager@test.com") is null)
-        {
-            var managerUser = new User
-            {
-                Id = Guid.NewGuid().ToString(),
-                Email = "manager@test.com",
-                UserName = "manager@test.com"
-            };
-            await userManager.CreateAsync(managerUser, "Test1234!");
-            await userManager.AddToRoleAsync(managerUser, "Manager");
-        }
+		var adminUser = new User
+		{
+		    Id = Guid.NewGuid().ToString(),
+		    Email = "admin@test.com",
+		    UserName = "admin@test.com"
+		};
+		await userManager.CreateAsync(adminUser, "Test1234!");
+		await userManager.AddToRoleAsync(adminUser, "Admin");
+		
+		var managerUser = new User
+		{
+		    Id = Guid.NewGuid().ToString(),
+		    Email = "manager@test.com",
+		    UserName = "manager@test.com"
+		};
+		await userManager.CreateAsync(managerUser, "Test1234!");
+		await userManager.AddToRoleAsync(managerUser, "Manager");
 
-        if (await usersContext.Users.FirstOrDefaultAsync(x => x.Email == "uberadmin@test.com") is null)
-        {
-            var uberAdminUser = new User
-            {
-                Id = Guid.NewGuid().ToString(),
-                Email = "uberadmin@test.com",
-                UserName = "uberadmin@test.com"
-            };
-            await userManager.CreateAsync(uberAdminUser, "Test1234!");
-            await userManager.AddToRoleAsync(uberAdminUser, "Admin");
-        }
+		var uberAdminUser = new User
+		{
+		    Id = Guid.NewGuid().ToString(),
+		    Email = "uberadmin@test.com",
+		    UserName = "uberadmin@test.com"
+		};
+		await userManager.CreateAsync(uberAdminUser, "Test1234!");
+		await userManager.AddToRoleAsync(uberAdminUser, "Admin");
     }
 }
